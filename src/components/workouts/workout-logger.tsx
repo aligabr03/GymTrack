@@ -2,11 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-    createWorkout,
-    updateWorkout,
-    getLastSetsForExercise,
-} from "@/actions/workouts";
+import { createWorkout, updateWorkout } from "@/actions/workouts";
 import type {
     Exercise,
     WorkoutMetaSuggestions,
@@ -189,7 +185,7 @@ export function WorkoutLogger({
             return;
         }
 
-        // New exercise — close sheet immediately, then fetch last session in background
+        // New exercise
         setAddExOpen(false);
         setExerciseSearch("");
         setGroups((prev) => [
@@ -202,56 +198,24 @@ export function WorkoutLogger({
                 supersetGroupId: null,
             },
         ]);
-
-        // Pre-fill with last session data
-        startTransition(async () => {
-            try {
-                const lastSets = await getLastSetsForExercise(exercise.id);
-                if (lastSets.length === 0) return;
-                setGroups((prev) =>
-                    prev.map((g) =>
-                        g.exerciseId === exercise.id
-                            ? {
-                                  ...g,
-                                  sets: lastSets.map((s, i) => ({
-                                      id: makeId(),
-                                      exerciseId: exercise.id,
-                                      exerciseName: exercise.name,
-                                      setNumber: i + 1,
-                                      weightKg: s.weightKg?.toString() ?? "",
-                                      reps: s.reps?.toString() ?? "",
-                                      formRating: s.formRating,
-                                      rpe: s.rpe?.toString() ?? "",
-                                      notes: "",
-                                      isDropset: false,
-                                  })),
-                              }
-                            : g,
-                    ),
-                );
-            } catch {
-                // ignore — blank sets are already showing
-            }
-        });
     }
 
     function addSet(exerciseId: string) {
         setGroups((prev) =>
-            prev.map((g) =>
-                g.exerciseId === exerciseId
+            prev.map((g) => {
+                if (g.exerciseId !== exerciseId) return g;
+                const last = g.sets.at(-1);
+                const next: SetRow = last
                     ? {
-                          ...g,
-                          sets: [
-                              ...g.sets,
-                              makeSet(
-                                  exerciseId,
-                                  g.exerciseName,
-                                  g.sets.length + 1,
-                              ),
-                          ],
+                          ...last,
+                          id: makeId(),
+                          setNumber: g.sets.length + 1,
+                          notes: "",
+                          isDropset: false,
                       }
-                    : g,
-            ),
+                    : makeSet(exerciseId, g.exerciseName, g.sets.length + 1);
+                return { ...g, sets: [...g.sets, next] };
+            }),
         );
     }
 
@@ -680,7 +644,10 @@ export function WorkoutLogger({
                                             removeSet(group.exerciseId, setId)
                                         }
                                         onDuplicateSet={(setId) =>
-                                            duplicateSet(group.exerciseId, setId)
+                                            duplicateSet(
+                                                group.exerciseId,
+                                                setId,
+                                            )
                                         }
                                         onRemoveExercise={() =>
                                             removeExercise(group.exerciseId)
