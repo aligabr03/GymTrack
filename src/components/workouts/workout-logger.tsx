@@ -399,8 +399,9 @@ export function WorkoutLogger({
             return;
         }
 
-        const incompleteSet = setDrafts
-            .find((set) => !set.weightKg || !set.reps);
+        const incompleteSet = setDrafts.find(
+            (set) => !set.weightKg || !set.reps,
+        );
 
         if (incompleteSet) {
             toast({
