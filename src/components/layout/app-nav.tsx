@@ -21,12 +21,38 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const navItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", subtitle: null },
-    { href: "/workouts", icon: ClipboardList, label: "Workouts", subtitle: null },
+    {
+        href: "/dashboard",
+        icon: LayoutDashboard,
+        label: "Dashboard",
+        mobileLabel: "Home",
+        subtitle: "date",
+    },
+    {
+        href: "/workouts",
+        icon: ClipboardList,
+        label: "Workouts",
+        subtitle: null,
+    },
     { href: "/exercises", icon: Library, label: "Exercises", subtitle: null },
-    { href: "/body", icon: Scale, label: "Body", subtitle: "Weight, body fat & measurements" },
-    { href: "/insights", icon: TrendingUp, label: "Insights", subtitle: "Training trends & progression" },
-    { href: "/records", icon: Trophy, label: "Records", subtitle: "All-time bests" },
+    {
+        href: "/body",
+        icon: Scale,
+        label: "Body",
+        subtitle: "Weight, body fat & measurements",
+    },
+    {
+        href: "/insights",
+        icon: TrendingUp,
+        label: "Insights",
+        subtitle: "Training trends & progression",
+    },
+    {
+        href: "/records",
+        icon: Trophy,
+        label: "Records",
+        subtitle: "All-time bests",
+    },
 ];
 
 // Bottom tab bar only shows 5 items — the most commonly used
@@ -46,9 +72,16 @@ export function AppNav({ user }: { user: User }) {
     const currentPage = navItems.find(
         (item) =>
             pathname === item.href || pathname.startsWith(item.href + "/"),
-    );
-    const currentPageTitle = currentPage?.label ?? "GymTrack";
-    const currentPageSubtitle = currentPage?.subtitle ?? null;
+    ) as (typeof navItems)[0] & { mobileLabel?: string } | undefined;
+    const currentPageTitle = currentPage?.mobileLabel ?? currentPage?.label ?? "GymTrack";
+    const currentPageSubtitle =
+        currentPage?.subtitle === "date"
+            ? new Date().toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "short",
+                  day: "numeric",
+              })
+            : currentPage?.subtitle ?? null;
 
     const initials =
         (user.user_metadata?.name as string | undefined)

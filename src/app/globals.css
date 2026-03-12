@@ -65,6 +65,17 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Hide scrollbars on mobile */
+@media (max-width: 767px) {
+    * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    *::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 h1,
 h2,
 h3,

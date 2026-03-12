@@ -23,11 +23,9 @@ export default async function DashboardPage() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between animate-fade-in">
+            <div className="hidden md:flex items-center justify-between animate-fade-in">
                 <div>
-                    <h1 className="text-3xl font-bold hidden md:block">
-                        Dashboard
-                    </h1>
+                    <h1 className="text-3xl font-bold">Dashboard</h1>
                     <p className="text-[var(--muted-foreground)] mt-1">
                         {new Date().toLocaleDateString("en-US", {
                             weekday: "long",
@@ -37,7 +35,7 @@ export default async function DashboardPage() {
                         })}
                     </p>
                 </div>
-                <Link href="/workouts/new" className="hidden md:block">
+                <Link href="/workouts/new">
                     <Button>
                         <Plus className="h-4 w-4" />
                         Log Workout
