@@ -1,33 +1,30 @@
 import {
-    getVolumeByWeek,
     getMuscleGroupVolume,
     getWorkoutCalendar,
     getLoggedExercises,
+    getAiInsight,
 } from "@/actions/insights";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { VolumeChart } from "@/components/insights/volume-chart";
 import { ProgressionChart } from "@/components/insights/progression-chart";
 import { MuscleBalanceChart } from "@/components/insights/muscle-balance-chart";
 import { WorkoutCalendar } from "@/components/insights/workout-calendar";
+import { AiAnalysisCard } from "@/components/insights/ai-analysis";
 
 export const metadata = { title: "Insights — GymTrack" };
 
 export default async function InsightsPage() {
     const year = new Date().getFullYear();
 
-    const [weeklyVolume, muscleData, calendarCounts, exercises] =
+    const [muscleData, calendarCounts, exercises, aiInsight] =
         await Promise.allSettled([
-            getVolumeByWeek(12),
             getMuscleGroupVolume(30),
             getWorkoutCalendar(year),
             getLoggedExercises(),
+            getAiInsight(),
         ]).then((results) =>
             results.map((r) => (r.status === "fulfilled" ? r.value : null)),
         );
 
-    const volumeData =
-        (weeklyVolume as Awaited<ReturnType<typeof getVolumeByWeek>> | null) ??
-        [];
     const muscleGroupData =
         (muscleData as Awaited<
             ReturnType<typeof getMuscleGroupVolume>
@@ -39,6 +36,8 @@ export default async function InsightsPage() {
     const exerciseList =
         (exercises as Awaited<ReturnType<typeof getLoggedExercises>> | null) ??
         [];
+    const aiData =
+        (aiInsight as Awaited<ReturnType<typeof getAiInsight>> | null) ?? null;
 
     return (
         <div className="space-y-6">
@@ -48,6 +47,23 @@ export default async function InsightsPage() {
                     Analyze your training trends and progression.
                 </p>
             </div>
+
+            {/* AI Analysis */}
+            {aiData && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <span>AI Training Analysis</span>
+                            <span className="text-[10px] font-normal px-1.5 py-0.5 rounded-md bg-[var(--secondary)] text-[var(--muted-foreground)] tracking-wide uppercase">
+                                GPT-4o mini
+                            </span>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <AiAnalysisCard initial={aiData} />
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Workout calendar */}
             <Card>
@@ -61,30 +77,17 @@ export default async function InsightsPage() {
                 </CardContent>
             </Card>
 
-            {/* Volume + Muscle balance side-by-side on wide screens */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base">
-                            Weekly Volume (last 12 weeks)
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <VolumeChart data={volumeData} />
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base">
-                            Muscle Group Balance (last 30 days)
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <MuscleBalanceChart data={muscleGroupData} />
-                    </CardContent>
-                </Card>
-            </div>
+            {/* Muscle balance */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-base">
+                        Muscle Group Balance (last 30 days)
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <MuscleBalanceChart data={muscleGroupData} />
+                </CardContent>
+            </Card>
 
             {/* Progression over time */}
             <Card>

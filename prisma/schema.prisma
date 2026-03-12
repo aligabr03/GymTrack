@@ -117,3 +117,13 @@ model PersonalRecord {
   @@unique([userId, exerciseId])
   @@index([userId])
 }
+
+model AiInsight {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  dataHash  String
+  analysis  String
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
