@@ -56,10 +56,7 @@ export async function register(formData: FormData) {
 
     if (error) return { error: error.message };
 
-    return {
-        success: true,
-        message: "Check your email to confirm your account.",
-    };
+    redirect("/dashboard");
 }
 
 export async function resetPassword(formData: FormData) {
