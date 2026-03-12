@@ -14,24 +14,20 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setError(null);
-        setSuccess(null);
         const formData = new FormData(e.currentTarget);
 
         startTransition(async () => {
             const result = await register(formData);
-            if ("error" in result && result.error) setError(result.error);
-            if ("message" in result && result.message)
-                setSuccess(result.message);
+            if (result?.error) setError(result.error);
         });
     }
 
@@ -50,13 +46,6 @@ export default function RegisterPage() {
                         <div className="flex items-center gap-2 rounded-md border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-300">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             {error}
-                        </div>
-                    )}
-
-                    {success && (
-                        <div className="flex items-center gap-2 rounded-md border border-emerald-800 bg-emerald-950 px-3 py-2 text-sm text-emerald-300">
-                            <CheckCircle2 className="h-4 w-4 shrink-0" />
-                            {success}
                         </div>
                     )}
 
@@ -99,7 +88,7 @@ export default function RegisterPage() {
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={isPending || !!success}
+                        disabled={isPending}
                     >
                         {isPending ? (
                             <>
