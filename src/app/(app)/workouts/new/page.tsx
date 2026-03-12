@@ -1,9 +1,13 @@
 import { getExercises } from "@/actions/exercises";
+import { getWorkoutMetaSuggestions } from "@/actions/workouts";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
 import { ClipboardList } from "lucide-react";
 
 export default async function NewWorkoutPage() {
-    const exercises = await getExercises();
+    const [exercises, suggestions] = await Promise.all([
+        getExercises(),
+        getWorkoutMetaSuggestions(),
+    ]);
 
     return (
         <div className="space-y-6">
@@ -19,7 +23,7 @@ export default async function NewWorkoutPage() {
                 </div>
             </div>
 
-            <WorkoutLogger exercises={exercises} />
+            <WorkoutLogger exercises={exercises} suggestions={suggestions} />
         </div>
     );
 }

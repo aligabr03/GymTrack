@@ -248,7 +248,7 @@ function ExerciseCard({
                                 >
                                     {s.isDropset ? (
                                         <span className="text-[var(--foreground)] font-bold">
-                                            â†“
+                                            ↓
                                         </span>
                                     ) : (
                                         <span className="text-[var(--muted-foreground)]">
@@ -257,9 +257,9 @@ function ExerciseCard({
                                     )}
                                 </span>
                                 <span>
-                                    {s.weightKg ? `${s.weightKg} lbs` : "â€”"}
+                                    {s.weightKg ? `${s.weightKg} lbs` : "-"}
                                 </span>
-                                <span>{s.reps ?? "â€”"}</span>
+                                <span>{s.reps ?? "-"}</span>
                                 <span>
                                     {formLabel ? (
                                         <Badge
@@ -276,12 +276,12 @@ function ExerciseCard({
                                         </Badge>
                                     ) : (
                                         <span className="text-[var(--muted-foreground)]">
-                                            â€”
+                                            -
                                         </span>
                                     )}
                                 </span>
                                 <span className="text-[var(--muted-foreground)]">
-                                    {s.rpe ?? "â€”"}
+                                    {s.rpe == null ? "-" : s.rpe}
                                 </span>
                             </div>
                         );

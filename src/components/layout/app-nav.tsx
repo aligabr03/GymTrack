@@ -72,8 +72,9 @@ export function AppNav({ user }: { user: User }) {
     const currentPage = navItems.find(
         (item) =>
             pathname === item.href || pathname.startsWith(item.href + "/"),
-    ) as (typeof navItems)[0] & { mobileLabel?: string } | undefined;
-    const currentPageTitle = currentPage?.mobileLabel ?? currentPage?.label ?? "GymTrack";
+    ) as ((typeof navItems)[0] & { mobileLabel?: string }) | undefined;
+    const currentPageTitle =
+        currentPage?.mobileLabel ?? currentPage?.label ?? "GymTrack";
     const currentPageSubtitle =
         currentPage?.subtitle === "date"
             ? new Date().toLocaleDateString("en-US", {
@@ -81,7 +82,7 @@ export function AppNav({ user }: { user: User }) {
                   month: "short",
                   day: "numeric",
               })
-            : currentPage?.subtitle ?? null;
+            : (currentPage?.subtitle ?? null);
 
     const initials =
         (user.user_metadata?.name as string | undefined)

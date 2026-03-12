@@ -1,4 +1,4 @@
-import { getWorkout } from "@/actions/workouts";
+import { getWorkout, getWorkoutMetaSuggestions } from "@/actions/workouts";
 import { getExercises } from "@/actions/exercises";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
 import { notFound } from "next/navigation";
@@ -10,9 +10,10 @@ export default async function EditWorkoutPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const [workout, exercises] = await Promise.all([
+    const [workout, exercises, suggestions] = await Promise.all([
         getWorkout(id),
         getExercises(),
+        getWorkoutMetaSuggestions(),
     ]);
 
     if (!workout) notFound();
@@ -31,7 +32,11 @@ export default async function EditWorkoutPage({
                 </div>
             </div>
 
-            <WorkoutLogger exercises={exercises} existing={workout} />
+            <WorkoutLogger
+                exercises={exercises}
+                existing={workout}
+                suggestions={suggestions}
+            />
         </div>
     );
 }

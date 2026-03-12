@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
     createWorkout,
     updateWorkout,
     getLastSetsForExercise,
 } from "@/actions/workouts";
-import type { Exercise, WorkoutWithSets } from "@/types";
+import type {
+    Exercise,
+    WorkoutMetaSuggestions,
+    WorkoutWithSets,
+} from "@/types";
 import { FORM_RATINGS } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,9 +96,11 @@ function makeSet(
 export function WorkoutLogger({
     exercises,
     existing,
+    suggestions,
 }: {
     exercises: Exercise[];
     existing?: WorkoutWithSets;
+    suggestions: WorkoutMetaSuggestions;
 }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -433,6 +439,19 @@ export function WorkoutLogger({
         0,
     );
 
+    const normalizedWorkoutName = workoutName.trim().toLowerCase();
+    const filteredNameSuggestions = suggestions.names
+        .filter((name) =>
+            normalizedWorkoutName
+                ? name.toLowerCase().includes(normalizedWorkoutName)
+                : true,
+        )
+        .filter((name) => name.toLowerCase() !== normalizedWorkoutName)
+        .slice(0, 4);
+    const durationSuggestions = suggestions.durations
+        .filter((duration) => duration.toString() !== durationMins)
+        .slice(0, 4);
+
     return (
         <div className="space-y-6">
             {/* Workout meta */}
@@ -453,6 +472,13 @@ export function WorkoutLogger({
                             value={workoutName}
                             onChange={(e) => setWorkoutName(e.target.value)}
                         />
+                        {filteredNameSuggestions.length > 0 && (
+                            <SuggestionRow
+                                label="Recent"
+                                items={filteredNameSuggestions}
+                                onSelect={setWorkoutName}
+                            />
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label>Duration (min)</Label>
@@ -463,6 +489,17 @@ export function WorkoutLogger({
                             value={durationMins}
                             onChange={(e) => setDurationMins(e.target.value)}
                         />
+                        {durationSuggestions.length > 0 && (
+                            <SuggestionRow
+                                label="Quick picks"
+                                items={durationSuggestions.map(
+                                    (duration) => `${duration} min`,
+                                )}
+                                onSelect={(value) =>
+                                    setDurationMins(value.replace(" min", ""))
+                                }
+                            />
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label>Notes</Label>
@@ -723,6 +760,34 @@ export function WorkoutLogger({
                     )}
                 </Button>
             </div>
+        </div>
+    );
+}
+
+function SuggestionRow({
+    label,
+    items,
+    onSelect,
+}: {
+    label: string;
+    items: string[];
+    onSelect: (value: string) => void;
+}) {
+    return (
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+            <span className="text-xs text-[var(--muted-foreground)]">
+                {label}
+            </span>
+            {items.map((item) => (
+                <button
+                    key={item}
+                    type="button"
+                    onClick={() => onSelect(item)}
+                    className="rounded-full border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-1 text-xs text-[var(--foreground)] transition-colors hover:border-[var(--ring)] hover:bg-[var(--accent)]"
+                >
+                    {item}
+                </button>
+            ))}
         </div>
     );
 }

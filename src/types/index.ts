@@ -22,6 +22,11 @@ export type WorkoutWithSets = Workout & {
     sets: (WorkoutSet & { exercise: Exercise })[];
 };
 
+export type WorkoutMetaSuggestions = {
+    names: string[];
+    durations: number[];
+};
+
 export type TemplateWithExercises = WorkoutTemplate & {
     exercises: (TemplateExercise & { exercise: Exercise })[];
 };

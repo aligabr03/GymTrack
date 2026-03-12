@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { WorkoutMetaSuggestions } from "@/types";
 import { z } from "zod";
 import { estimateOneRM } from "@/lib/calculations";
 
@@ -163,6 +164,58 @@ export async function getWorkouts(limit?: number) {
     });
 
     return workouts;
+}
+
+export async function getWorkoutMetaSuggestions(): Promise<WorkoutMetaSuggestions> {
+    const userId = await getUserId();
+
+    const workouts = await prisma.workout.findMany({
+        where: { userId },
+        select: {
+            name: true,
+            durationMins: true,
+            date: true,
+        },
+        orderBy: { date: "desc" },
+        take: 30,
+    });
+
+    const names = Array.from(
+        new Set(
+            workouts
+                .map((workout) => workout.name?.trim())
+                .filter((name): name is string => Boolean(name)),
+        ),
+    ).slice(0, 6);
+
+    const durationRank = new Map<
+        number,
+        { count: number; lastUsedAt: number }
+    >();
+    workouts.forEach((workout, index) => {
+        if (!workout.durationMins) return;
+        const existing = durationRank.get(workout.durationMins);
+        if (existing) {
+            existing.count += 1;
+            return;
+        }
+        durationRank.set(workout.durationMins, {
+            count: 1,
+            lastUsedAt: index,
+        });
+    });
+
+    const durations = Array.from(durationRank.entries())
+        .sort((a, b) => {
+            if (b[1].count !== a[1].count) {
+                return b[1].count - a[1].count;
+            }
+            return a[1].lastUsedAt - b[1].lastUsedAt;
+        })
+        .map(([duration]) => duration)
+        .slice(0, 6);
+
+    return { names, durations };
 }
 
 export async function getLastSetsForExercise(exerciseId: string) {
