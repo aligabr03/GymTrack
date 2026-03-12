@@ -135,6 +135,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     <Label>Weight (lbs)</Label>
                                     <Input
                                         type="number"
+                                        inputMode="decimal"
                                         placeholder="75.5"
                                         value={form.weightKg}
                                         onChange={field("weightKg")}
@@ -146,6 +147,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     <Label>Body Fat (%)</Label>
                                     <Input
                                         type="number"
+                                        inputMode="decimal"
                                         placeholder="15.0"
                                         value={form.bodyFatPct}
                                         onChange={field("bodyFatPct")}
@@ -158,6 +160,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     <Label>Waist (cm)</Label>
                                     <Input
                                         type="number"
+                                        inputMode="decimal"
                                         placeholder="80"
                                         value={form.waistCm}
                                         onChange={field("waistCm")}
@@ -169,6 +172,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     <Label>Hip (cm)</Label>
                                     <Input
                                         type="number"
+                                        inputMode="decimal"
                                         placeholder="95"
                                         value={form.hipCm}
                                         onChange={field("hipCm")}
@@ -180,6 +184,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     <Label>Chest (cm)</Label>
                                     <Input
                                         type="number"
+                                        inputMode="decimal"
                                         placeholder="100"
                                         value={form.chestCm}
                                         onChange={field("chestCm")}
@@ -191,6 +196,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     <Label>Arm (cm)</Label>
                                     <Input
                                         type="number"
+                                        inputMode="decimal"
                                         placeholder="38"
                                         value={form.armCm}
                                         onChange={field("armCm")}

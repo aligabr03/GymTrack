@@ -135,7 +135,7 @@ export function AppNav({ user }: { user: User }) {
                                 key={href}
                                 href={href}
                                 className={cn(
-                                    "flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 min-w-[3.5rem]",
+                                    "flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation",
                                     active
                                         ? "text-[var(--foreground)]"
                                         : "text-[var(--muted-foreground)]",
@@ -143,13 +143,13 @@ export function AppNav({ user }: { user: User }) {
                             >
                                 <div
                                     className={cn(
-                                        "p-1 rounded-lg transition-all duration-200",
+                                        "p-1 rounded-lg",
                                         active && "bg-[var(--secondary)]",
                                     )}
                                 >
                                     <Icon
                                         className={cn(
-                                            "h-5 w-5 transition-transform duration-200",
+                                            "h-5 w-5",
                                             active && "scale-110",
                                         )}
                                     />

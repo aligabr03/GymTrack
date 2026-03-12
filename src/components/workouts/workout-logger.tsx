@@ -458,6 +458,7 @@ export function WorkoutLogger({
                         <Label>Duration (min)</Label>
                         <Input
                             type="number"
+                            inputMode="numeric"
                             placeholder="60"
                             value={durationMins}
                             onChange={(e) => setDurationMins(e.target.value)}
@@ -944,6 +945,7 @@ function SetRow({
                 </button>
                 <Input
                     type="number"
+                    inputMode="decimal"
                     placeholder="0"
                     value={set.weightKg}
                     onChange={(e) => onUpdate("weightKg", e.target.value)}
@@ -953,6 +955,7 @@ function SetRow({
                 />
                 <Input
                     type="number"
+                    inputMode="numeric"
                     placeholder="0"
                     value={set.reps}
                     onChange={(e) => onUpdate("reps", e.target.value)}
@@ -981,6 +984,7 @@ function SetRow({
                 </Select>
                 <Input
                     type="number"
+                    inputMode="decimal"
                     placeholder="—"
                     value={set.rpe}
                     onChange={(e) => onUpdate("rpe", e.target.value)}
@@ -1029,12 +1033,13 @@ function SetRow({
                         </label>
                         <Input
                             type="number"
+                            inputMode="decimal"
                             placeholder="0"
                             value={set.weightKg}
                             onChange={(e) =>
                                 onUpdate("weightKg", e.target.value)
                             }
-                            className="h-10 text-sm"
+                            className="h-10"
                             min={0}
                             step={0.5}
                         />
@@ -1045,10 +1050,11 @@ function SetRow({
                         </label>
                         <Input
                             type="number"
+                            inputMode="numeric"
                             placeholder="0"
                             value={set.reps}
                             onChange={(e) => onUpdate("reps", e.target.value)}
-                            className="h-10 text-sm"
+                            className="h-10"
                             min={1}
                         />
                     </div>
@@ -1086,10 +1092,11 @@ function SetRow({
                         </label>
                         <Input
                             type="number"
+                            inputMode="decimal"
                             placeholder="—"
                             value={set.rpe}
                             onChange={(e) => onUpdate("rpe", e.target.value)}
-                            className="h-10 text-sm"
+                            className="h-10"
                             min={1}
                             max={10}
                             step={0.5}
