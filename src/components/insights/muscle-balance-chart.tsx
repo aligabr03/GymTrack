@@ -73,7 +73,7 @@ export function MuscleBalanceChart({ data }: Props) {
                     }}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [
-                        `${Number(value ?? 0).toLocaleString()} kg`,
+                        `${Number(value ?? 0).toLocaleString()} lbs`,
                         "Volume",
                     ]}
                 />

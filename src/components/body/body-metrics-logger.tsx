@@ -132,7 +132,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Weight (kg)</Label>
+                                    <Label>Weight (lbs)</Label>
                                     <Input
                                         type="number"
                                         placeholder="75.5"
@@ -254,7 +254,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                             {m.weightKg && (
                                                 <MetricPill
                                                     label="Weight"
-                                                    value={`${m.weightKg} kg`}
+                                                    value={`${m.weightKg} lbs`}
                                                 />
                                             )}
                                             {m.bodyFatPct && (

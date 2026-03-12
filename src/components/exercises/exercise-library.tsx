@@ -236,8 +236,8 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
             {/* Exercise list grouped by category */}
             {Object.keys(grouped).length === 0 ? (
                 <div className="text-center py-16 text-[var(--muted-foreground)]">
-                    No exercises found. Try a different search or add a custom
-                    one.
+                    No exercises found. Add your own with the &quot;Add
+                    Exercise&quot; button above.
                 </div>
             ) : (
                 Object.entries(grouped)
@@ -249,7 +249,10 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                             </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {exs.map((ex) => (
-                                    <Card key={ex.id} className="group">
+                                    <Card
+                                        key={ex.id}
+                                        className={`group ${ex.isCustom ? "border-[var(--primary)]/40 bg-[var(--primary)]/5" : ""}`}
+                                    >
                                         <CardContent className="p-4">
                                             <div className="flex items-start justify-between gap-2">
                                                 <div className="flex-1 min-w-0">

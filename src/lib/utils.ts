@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function formatWeight(kg: number, unit: "kg" | "lbs" = "kg"): string {
+export function formatWeight(kg: number, unit: "kg" | "lbs" = "lbs"): string {
     if (unit === "lbs") {
         return `${(kg * 2.20462).toFixed(1)} lbs`;
     }

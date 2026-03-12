@@ -118,7 +118,7 @@ export function ProgressionChart({ exercises }: Props) {
                             }}
                             axisLine={false}
                             tickLine={false}
-                            unit=" kg"
+                            unit=" lbs"
                         />
                         <Tooltip
                             contentStyle={{
@@ -130,7 +130,7 @@ export function ProgressionChart({ exercises }: Props) {
                             }}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             formatter={(value: any, name: any) => [
-                                `${Number(value ?? 0)} kg`,
+                                `${Number(value ?? 0)} lbs`,
                                 name === "weight" ? "Top weight" : "Est. 1RM",
                             ]}
                         />

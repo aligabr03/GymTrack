@@ -175,7 +175,7 @@ export default async function DashboardPage() {
                                                             {Math.round(
                                                                 volume,
                                                             ).toLocaleString()}{" "}
-                                                            kg
+                                                            lbs
                                                         </p>
                                                         <p className="text-xs text-[var(--muted-foreground)]">
                                                             volume
@@ -235,11 +235,11 @@ export default async function DashboardPage() {
                                                 </div>
                                                 <div className="text-right shrink-0 ml-2">
                                                     <p className="text-sm font-semibold text-[var(--primary)]">
-                                                        {pr.weightKg}kg ×{" "}
+                                                        {pr.weightKg}lbs ×{" "}
                                                         {pr.reps}
                                                     </p>
                                                     <p className="text-xs text-[var(--muted-foreground)]">
-                                                        ~{pr.estimatedOneRM}kg
+                                                        ~{pr.estimatedOneRM}lbs
                                                         1RM
                                                     </p>
                                                 </div>
@@ -282,7 +282,7 @@ export default async function DashboardPage() {
                                         {stats.latestMetric.weightKg && (
                                             <MetricItem
                                                 label="Weight"
-                                                value={`${stats.latestMetric.weightKg} kg`}
+                                                value={`${stats.latestMetric.weightKg} lbs`}
                                             />
                                         )}
                                         {stats.latestMetric.bodyFatPct && (

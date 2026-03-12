@@ -14,7 +14,8 @@ export default async function ExercisesPage() {
                 <div>
                     <h1 className="text-2xl font-bold">Exercise Library</h1>
                     <p className="text-sm text-[var(--muted-foreground)]">
-                        {exercises.length} exercises available
+                        {exercises.length} exercises — add your own with the
+                        button below
                     </p>
                 </div>
             </div>

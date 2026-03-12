@@ -70,7 +70,7 @@ export default async function WorkoutDetailPage({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <SummaryCard
                     label="Volume"
-                    value={`${Math.round(volume).toLocaleString()} kg`}
+                    value={`${Math.round(volume).toLocaleString()} lbs`}
                 />
                 <SummaryCard
                     label="Sets"
@@ -126,7 +126,7 @@ export default async function WorkoutDetailPage({
                                     {bestSet?.e1rm && (
                                         <div className="text-right">
                                             <p className="text-sm font-semibold text-[var(--primary)]">
-                                                ~{bestSet.e1rm} kg 1RM
+                                                ~{bestSet.e1rm} lbs 1RM
                                             </p>
                                             <p className="text-xs text-[var(--muted-foreground)]">
                                                 estimated

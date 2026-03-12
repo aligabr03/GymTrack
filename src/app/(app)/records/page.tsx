@@ -55,7 +55,7 @@ export default async function RecordsPage() {
                                             Lifted
                                         </span>
                                         <span className="font-medium">
-                                            {pr.weightKg} kg × {pr.reps} reps
+                                            {pr.weightKg} lbs × {pr.reps} reps
                                         </span>
                                     </div>
                                     {pr.estimatedOneRM && (
@@ -65,7 +65,7 @@ export default async function RecordsPage() {
                                             </span>
                                             <span className="font-semibold text-[var(--primary)]">
                                                 {pr.estimatedOneRM.toFixed(1)}{" "}
-                                                kg
+                                                lbs
                                             </span>
                                         </div>
                                     )}

@@ -366,7 +366,7 @@ export function WorkoutLogger({
                     </span>
                     <span>
                         <strong className="text-[var(--foreground)]">
-                            {Math.round(totalVolume).toLocaleString()} kg
+                            {Math.round(totalVolume).toLocaleString()} lbs
                         </strong>{" "}
                         volume
                     </span>
@@ -539,7 +539,7 @@ function ExerciseGroupCard({
                     {/* Header row */}
                     <div className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 text-xs text-[var(--muted-foreground)] px-1 pb-1">
                         <span>#</span>
-                        <span>Weight (kg)</span>
+                        <span>Weight (lbs)</span>
                         <span>Reps</span>
                         <span>Form</span>
                         <span>RPE</span>
@@ -650,7 +650,7 @@ function SetRow({
             </div>
             {estimatedRM && (
                 <p className="text-xs text-[var(--muted-foreground)] pl-10">
-                    ~{estimatedRM} kg est. 1RM
+                    ~{estimatedRM} lbs est. 1RM
                 </p>
             )}
         </div>
