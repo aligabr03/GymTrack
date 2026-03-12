@@ -48,8 +48,7 @@ type ChartPoint = {
 };
 
 export function BodyTrendsChart({ metrics }: { metrics: BodyMetric[] }) {
-    const [selectedMetric, setSelectedMetric] =
-        useState<MetricKey>("weightKg");
+    const [selectedMetric, setSelectedMetric] = useState<MetricKey>("weightKg");
 
     const selected =
         METRIC_OPTIONS.find((option) => option.key === selectedMetric) ??
@@ -85,7 +84,9 @@ export function BodyTrendsChart({ metrics }: { metrics: BodyMetric[] }) {
                 </p>
                 <Select
                     value={selectedMetric}
-                    onValueChange={(value) => setSelectedMetric(value as MetricKey)}
+                    onValueChange={(value) =>
+                        setSelectedMetric(value as MetricKey)
+                    }
                 >
                     <SelectTrigger className="w-full sm:w-[220px]">
                         <SelectValue placeholder="Select metric" />
@@ -143,7 +144,10 @@ export function BodyTrendsChart({ metrics }: { metrics: BodyMetric[] }) {
                             formatter={(value: any) =>
                                 value == null
                                     ? ["-", selected.label]
-                                    : [`${Number(value).toFixed(1)} ${selected.unit}`, selected.label]
+                                    : [
+                                          `${Number(value).toFixed(1)} ${selected.unit}`,
+                                          selected.label,
+                                      ]
                             }
                         />
                         <Line

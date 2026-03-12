@@ -82,6 +82,17 @@ export function AppNav({ user }: { user: User }) {
         }
     }, []);
 
+    useEffect(() => {
+        // Ensure each tab/page switch starts from the top.
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        document.querySelector("main")?.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "auto",
+        });
+        setProfileOpen(false);
+    }, [pathname]);
+
     function toggleTheme() {
         const next = theme === "dark" ? "light" : "dark";
         setTheme(next);
