@@ -7,8 +7,7 @@ import { EXERCISE_CATEGORIES } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+
 import {
     Dialog,
     DialogContent,
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
-import { Plus, Trash2, Search, Loader2 } from "lucide-react";
+import { Plus, Trash2, Search, Loader2, Sparkles } from "lucide-react";
 
 const MUSCLE_GROUPS = [
     "Chest",
@@ -240,70 +239,61 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                     Exercise&quot; button above.
                 </div>
             ) : (
-                Object.entries(grouped)
-                    .sort(([a], [b]) => a.localeCompare(b))
-                    .map(([cat, exs]) => (
-                        <div key={cat}>
-                            <h2 className="text-sm font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">
-                                {cat}
-                            </h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {exs.map((ex) => (
-                                    <Card
-                                        key={ex.id}
-                                        className={`group ${ex.isCustom ? "border-[var(--foreground)]/20 bg-[var(--foreground)]/5" : ""}`}
-                                    >
-                                        <CardContent className="p-4">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-1.5 min-w-0">
-                                                        <p className="font-medium text-sm truncate">
-                                                            {ex.name}
-                                                        </p>
-                                                        {ex.isCustom && (
-                                                            <Badge
-                                                                variant="outline"
-                                                                className="text-xs shrink-0"
-                                                            >
-                                                                Custom
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex flex-wrap gap-1 mt-2">
-                                                        {ex.muscleGroups
-                                                            .slice(0, 3)
-                                                            .map((m) => (
-                                                                <Badge
-                                                                    key={m}
-                                                                    variant="secondary"
-                                                                    className="text-xs"
-                                                                >
-                                                                    {m}
-                                                                </Badge>
-                                                            ))}
-                                                    </div>
+                <div className="space-y-8">
+                    {Object.entries(grouped)
+                        .sort(([a], [b]) => a.localeCompare(b))
+                        .map(([cat, exs]) => (
+                            <div key={cat}>
+                                <div className="flex items-center gap-2.5 mb-2 px-1">
+                                    <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-widest">
+                                        {cat}
+                                    </h2>
+                                    <span className="text-[10px] tabular-nums text-[var(--muted-foreground)]/60">
+                                        {exs.length}
+                                    </span>
+                                    <div className="h-px flex-1 bg-[var(--border)]" />
+                                </div>
+                                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                                    {exs.map((ex) => (
+                                        <div
+                                            key={ex.id}
+                                            className="flex items-center gap-3 px-4 py-3 group"
+                                        >
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="text-sm font-medium truncate">
+                                                        {ex.name}
+                                                    </span>
+                                                    {ex.isCustom && (
+                                                        <Sparkles className="h-3 w-3 shrink-0 text-[var(--muted-foreground)]" />
+                                                    )}
                                                 </div>
-                                                {ex.isCustom && (
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                ex.id,
-                                                                ex.name,
-                                                            )
-                                                        }
-                                                        className="shrink-0 p-1.5 rounded hover:bg-red-900/40 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
-                                                        aria-label="Delete exercise"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </button>
-                                                )}
+                                                <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
+                                                    {ex.muscleGroups.join(
+                                                        " · ",
+                                                    )}
+                                                </p>
                                             </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                            {ex.isCustom && (
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            ex.id,
+                                                            ex.name,
+                                                        )
+                                                    }
+                                                    className="shrink-0 p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-900/30 transition-colors"
+                                                    aria-label="Delete exercise"
+                                                >
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))
+                        ))}
+                </div>
             )}
         </div>
     );
