@@ -251,7 +251,7 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                                 {exs.map((ex) => (
                                     <Card
                                         key={ex.id}
-                                        className={`group ${ex.isCustom ? "border-[var(--primary)]/40 bg-[var(--primary)]/5" : ""}`}
+                                        className={`group ${ex.isCustom ? "border-[var(--foreground)]/20 bg-[var(--foreground)]/5" : ""}`}
                                     >
                                         <CardContent className="p-4">
                                             <div className="flex items-start justify-between gap-2">

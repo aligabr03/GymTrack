@@ -20,8 +20,8 @@ export default async function WorkoutsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between animate-fade-in">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-lg bg-[var(--primary)]/10">
-                        <ClipboardList className="h-6 w-6 text-[var(--primary)]" />
+                    <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                        <ClipboardList className="h-6 w-6 text-[var(--foreground)]" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold">Workouts</h1>

@@ -146,18 +146,18 @@ export function ProgressionChart({ exercises }: Props) {
                         <Line
                             type="monotone"
                             dataKey="weight"
-                            stroke="var(--primary)"
+                            stroke="var(--foreground)"
                             strokeWidth={2}
-                            dot={{ r: 3, fill: "var(--primary)" }}
+                            dot={{ r: 3, fill: "var(--foreground)" }}
                             activeDot={{ r: 5 }}
                         />
                         <Line
                             type="monotone"
                             dataKey="estimatedOneRM"
-                            stroke="#60a5fa"
+                            stroke="#71717a"
                             strokeWidth={2}
                             strokeDasharray="5 5"
-                            dot={{ r: 2, fill: "#60a5fa" }}
+                            dot={{ r: 2, fill: "#71717a" }}
                             activeDot={{ r: 4 }}
                         />
                     </LineChart>

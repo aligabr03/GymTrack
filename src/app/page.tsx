@@ -7,7 +7,7 @@ export default function Home() {
         <div className="min-h-screen flex flex-col">
             <header className="border-b border-[var(--border)] px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <Dumbbell className="h-6 w-6 text-[var(--primary)]" />
+                    <Dumbbell className="h-6 w-6 text-[var(--foreground)]" />
                     <span className="text-lg font-bold">GymTrack</span>
                 </div>
                 <div className="flex gap-3">
@@ -24,12 +24,14 @@ export default function Home() {
 
             <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-24 gap-8">
                 <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] text-sm text-[var(--muted-foreground)]">
-                    <span className="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-[var(--foreground)] animate-pulse" />
                     Track every rep, every set, every PR
                 </div>
                 <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight max-w-3xl">
                     Your gym{" "}
-                    <span className="text-[var(--primary)]">progression</span>{" "}
+                    <span className="underline decoration-[var(--muted-foreground)] underline-offset-4">
+                        progression
+                    </span>{" "}
                     at a glance
                 </h1>
                 <p className="text-xl text-[var(--muted-foreground)] max-w-xl">
@@ -75,8 +77,8 @@ export default function Home() {
                             key={title}
                             className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 space-y-3"
                         >
-                            <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center">
-                                <Icon className="h-5 w-5 text-[var(--primary)]" />
+                            <div className="w-10 h-10 rounded-lg bg-[var(--secondary)] flex items-center justify-center">
+                                <Icon className="h-5 w-5 text-[var(--foreground)]" />
                             </div>
                             <h3 className="font-semibold">{title}</h3>
                             <p className="text-sm text-[var(--muted-foreground)]">

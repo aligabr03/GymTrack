@@ -117,7 +117,7 @@ export default function RegisterPage() {
                 Already have an account?{" "}
                 <Link
                     href="/auth/login"
-                    className="ml-1 text-[var(--primary)] hover:underline"
+                    className="ml-1 text-[var(--foreground)] hover:underline"
                 >
                     Sign in
                 </Link>

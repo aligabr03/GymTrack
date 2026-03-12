@@ -58,8 +58,8 @@ export function AppNav({ user }: { user: User }) {
             <aside className="hidden md:flex fixed top-0 left-0 z-40 h-full w-64 flex-col bg-[var(--card)]/80 backdrop-blur-xl border-r border-[var(--border)]">
                 {/* Logo */}
                 <div className="flex items-center gap-2.5 px-5 py-5 border-b border-[var(--border)]">
-                    <div className="p-1.5 rounded-lg bg-[var(--primary)]/10">
-                        <Dumbbell className="h-5 w-5 text-[var(--primary)]" />
+                    <div className="p-1.5 rounded-lg bg-[var(--secondary)]">
+                        <Dumbbell className="h-5 w-5 text-[var(--foreground)]" />
                     </div>
                     <span className="text-lg font-bold tracking-tight">
                         GymTrack
@@ -79,7 +79,7 @@ export function AppNav({ user }: { user: User }) {
                                 className={cn(
                                     "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                                     active
-                                        ? "bg-[var(--primary)]/10 text-[var(--primary)] shadow-sm"
+                                        ? "bg-[var(--secondary)] text-[var(--foreground)] shadow-sm"
                                         : "text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
                                 )}
                             >
@@ -94,7 +94,7 @@ export function AppNav({ user }: { user: User }) {
                 <div className="border-t border-[var(--border)] p-4 space-y-3">
                     <div className="flex items-center gap-3 px-1">
                         <Avatar className="h-8 w-8">
-                            <AvatarFallback className="text-xs bg-[var(--primary)]/10 text-[var(--primary)]">
+                            <AvatarFallback className="text-xs bg-[var(--secondary)] text-[var(--foreground)]">
                                 {initials}
                             </AvatarFallback>
                         </Avatar>
@@ -124,7 +124,7 @@ export function AppNav({ user }: { user: User }) {
             </aside>
 
             {/* ===== MOBILE: Bottom tab bar ===== */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--card)]/90 backdrop-blur-xl border-t border-[var(--border)] pb-[env(safe-area-inset-bottom)]">
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--background)]/90 backdrop-blur-xl border-t border-[var(--border)] pb-[env(safe-area-inset-bottom)]">
                 <div className="flex items-center justify-around px-1 h-16">
                     {mobileNavItems.map(({ href, icon: Icon, label }) => {
                         const active =
@@ -137,14 +137,14 @@ export function AppNav({ user }: { user: User }) {
                                 className={cn(
                                     "flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 min-w-[3.5rem]",
                                     active
-                                        ? "text-[var(--primary)]"
+                                        ? "text-[var(--foreground)]"
                                         : "text-[var(--muted-foreground)]",
                                 )}
                             >
                                 <div
                                     className={cn(
                                         "p-1 rounded-lg transition-all duration-200",
-                                        active && "bg-[var(--primary)]/10",
+                                        active && "bg-[var(--secondary)]",
                                     )}
                                 >
                                     <Icon
@@ -164,20 +164,14 @@ export function AppNav({ user }: { user: User }) {
             </nav>
 
             {/* Mobile: top bar with user info */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-[var(--card)]/90 backdrop-blur-xl border-b border-[var(--border)]">
-                <div className="flex items-center gap-2">
-                    <div className="p-1 rounded-md bg-[var(--primary)]/10">
-                        <Dumbbell className="h-4 w-4 text-[var(--primary)]" />
-                    </div>
-                    <span className="font-bold tracking-tight">GymTrack</span>
-                </div>
+            <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-end px-4 py-3 bg-[var(--background)]/80 backdrop-blur-xl">
                 <div className="relative">
                     <button
                         onClick={() => setProfileOpen((v) => !v)}
                         className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[var(--secondary)] transition-colors"
                     >
                         <Avatar className="h-7 w-7">
-                            <AvatarFallback className="text-[10px] bg-[var(--primary)]/10 text-[var(--primary)]">
+                            <AvatarFallback className="text-[10px] bg-[var(--secondary)] text-[var(--foreground)]">
                                 {initials}
                             </AvatarFallback>
                         </Avatar>

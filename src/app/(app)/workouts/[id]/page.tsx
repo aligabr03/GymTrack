@@ -119,13 +119,13 @@ export default async function WorkoutDetailPage({
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-base">
                                         <div className="flex items-center gap-2">
-                                            <Dumbbell className="h-4 w-4 text-[var(--primary)]" />
+                                            <Dumbbell className="h-4 w-4 text-[var(--foreground)]" />
                                             {exercise.name}
                                         </div>
                                     </CardTitle>
                                     {bestSet?.e1rm && (
                                         <div className="text-right">
-                                            <p className="text-sm font-semibold text-[var(--primary)]">
+                                            <p className="text-sm font-semibold text-[var(--foreground)]">
                                                 ~{bestSet.e1rm} lbs 1RM
                                             </p>
                                             <p className="text-xs text-[var(--muted-foreground)]">

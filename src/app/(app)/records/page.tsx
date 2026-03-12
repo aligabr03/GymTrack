@@ -50,7 +50,7 @@ export default async function RecordsPage() {
                                             {pr.exercise.category}
                                         </Badge>
                                     </div>
-                                    <Trophy className="h-5 w-5 text-[var(--primary)] flex-shrink-0 mt-0.5" />
+                                    <Trophy className="h-5 w-5 text-[var(--foreground)] flex-shrink-0 mt-0.5" />
                                 </div>
 
                                 <div className="mt-3 space-y-1">
@@ -67,7 +67,7 @@ export default async function RecordsPage() {
                                             <span className="text-[var(--muted-foreground)]">
                                                 Est. 1RM
                                             </span>
-                                            <span className="font-semibold text-[var(--primary)]">
+                                            <span className="font-semibold text-[var(--foreground)]">
                                                 {pr.estimatedOneRM.toFixed(1)}{" "}
                                                 lbs
                                             </span>

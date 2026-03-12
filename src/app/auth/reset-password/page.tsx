@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
             <CardFooter className="justify-center text-sm text-[var(--muted-foreground)]">
                 <Link
                     href="/auth/login"
-                    className="text-[var(--primary)] hover:underline"
+                    className="text-[var(--foreground)] hover:underline"
                 >
                     Back to sign in
                 </Link>

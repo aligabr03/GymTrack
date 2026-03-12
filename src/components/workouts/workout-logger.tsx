@@ -508,7 +508,7 @@ function ExerciseGroupCard({
                 onClick={onToggleCollapse}
             >
                 <div className="flex items-center gap-2">
-                    <Dumbbell className="h-4 w-4 text-[var(--primary)]" />
+                    <Dumbbell className="h-4 w-4 text-[var(--foreground)]" />
                     <span className="font-semibold">{group.exerciseName}</span>
                     <Badge variant="secondary" className="text-xs">
                         {group.sets.length} set

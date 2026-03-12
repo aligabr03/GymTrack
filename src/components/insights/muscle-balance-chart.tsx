@@ -16,15 +16,15 @@ type Props = {
 };
 
 const COLORS = [
-    "#f97316",
-    "#60a5fa",
-    "#34d399",
-    "#a78bfa",
-    "#fbbf24",
-    "#f472b6",
-    "#38bdf8",
-    "#4ade80",
-    "#fb923c",
+    "#fafafa",
+    "#a1a1aa",
+    "#71717a",
+    "#52525b",
+    "#3f3f46",
+    "#27272a",
+    "#d4d4d8",
+    "#e4e4e7",
+    "#18181b",
 ];
 
 export function MuscleBalanceChart({ data }: Props) {

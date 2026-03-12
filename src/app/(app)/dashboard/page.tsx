@@ -50,32 +50,32 @@ export default async function DashboardPage() {
                     icon={Dumbbell}
                     label="Total Workouts"
                     value={stats.totalWorkouts}
-                    iconColor="text-[var(--primary)]"
-                    iconBg="bg-[var(--primary)]/10"
+                    iconColor="text-[var(--foreground)]"
+                    iconBg="bg-[var(--secondary)]"
                     index={0}
                 />
                 <StatCard
                     icon={Flame}
                     label="This Week"
                     value={stats.workoutsThisWeek}
-                    iconColor="text-amber-400"
-                    iconBg="bg-amber-400/10"
+                    iconColor="text-[var(--foreground)]"
+                    iconBg="bg-[var(--secondary)]"
                     index={1}
                 />
                 <StatCard
                     icon={CalendarDays}
                     label="This Month"
                     value={stats.workoutsThisMonth}
-                    iconColor="text-blue-400"
-                    iconBg="bg-blue-400/10"
+                    iconColor="text-[var(--foreground)]"
+                    iconBg="bg-[var(--secondary)]"
                     index={2}
                 />
                 <StatCard
                     icon={Trophy}
                     label="Personal Records"
                     value={stats.personalRecords.length}
-                    iconColor="text-yellow-400"
-                    iconBg="bg-yellow-400/10"
+                    iconColor="text-[var(--foreground)]"
+                    iconBg="bg-[var(--secondary)]"
                     index={3}
                 />
             </div>
@@ -233,13 +233,13 @@ export default async function DashboardPage() {
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2 min-w-0">
-                                                    <Trophy className="h-4 w-4 shrink-0 text-yellow-400" />
+                                                    <Trophy className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
                                                     <span className="text-sm font-medium truncate">
                                                         {pr.exercise.name}
                                                     </span>
                                                 </div>
                                                 <div className="text-right shrink-0 ml-2">
-                                                    <p className="text-sm font-semibold text-[var(--primary)]">
+                                                    <p className="text-sm font-semibold text-[var(--foreground)]">
                                                         {pr.weightKg}lbs ×{" "}
                                                         {pr.reps}
                                                     </p>
