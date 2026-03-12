@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
 import { calculateVolume } from "@/lib/calculations";
@@ -57,82 +55,54 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                     </p>
                 </div>
             ) : (
-                filtered.map((workout, index) => {
-                    const volume = calculateVolume(workout.sets);
-                    const exercises = [
-                        ...new Set(workout.sets.map((s) => s.exercise.name)),
-                    ];
-                    return (
-                        <Link key={workout.id} href={`/workouts/${workout.id}`}>
-                            <Card
-                                className="hover:border-[var(--primary)]/40 transition-all duration-200 cursor-pointer animate-fade-in-up"
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                    {filtered.map((workout, index) => {
+                        const volume = calculateVolume(workout.sets);
+                        const exercises = [
+                            ...new Set(workout.sets.map((s) => s.exercise.name)),
+                        ];
+                        const exerciseSummary =
+                            exercises.slice(0, 3).join(" · ") +
+                            (exercises.length > 3
+                                ? ` · +${exercises.length - 3}`
+                                : "");
+
+                        return (
+                            <Link
+                                key={workout.id}
+                                href={`/workouts/${workout.id}`}
+                                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40 animate-fade-in-up"
                                 style={{ animationDelay: `${index * 50}ms` }}
                             >
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="font-semibold">
-                                                    {workout.name ??
-                                                        formatDate(
-                                                            workout.date,
-                                                        )}
-                                                </span>
-                                                <span className="text-xs text-[var(--muted-foreground)]">
-                                                    {formatRelativeDate(
-                                                        workout.date,
-                                                    )}
-                                                </span>
-                                                {workout.durationMins && (
-                                                    <span className="text-xs text-[var(--muted-foreground)] flex items-center gap-0.5">
-                                                        <Clock className="h-3 w-3" />
-                                                        {workout.durationMins}{" "}
-                                                        min
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-wrap gap-1 mt-2">
-                                                {exercises
-                                                    .slice(0, 4)
-                                                    .map((ex) => (
-                                                        <Badge
-                                                            key={ex}
-                                                            variant="secondary"
-                                                            className="text-xs"
-                                                        >
-                                                            {ex}
-                                                        </Badge>
-                                                    ))}
-                                                {exercises.length > 4 && (
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="text-xs"
-                                                    >
-                                                        +{exercises.length - 4}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-4 shrink-0 text-right">
-                                            <div>
-                                                <p className="text-sm font-semibold">
-                                                    {Math.round(
-                                                        volume,
-                                                    ).toLocaleString()}{" "}
-                                                    lbs
-                                                </p>
-                                                <p className="text-xs text-[var(--muted-foreground)]">
-                                                    {workout.sets.length} sets
-                                                </p>
-                                            </div>
-                                            <ChevronRight className="h-4 w-4 text-[var(--muted-foreground)]" />
-                                        </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <span className="text-sm font-medium truncate">
+                                            {workout.name ?? formatDate(workout.date)}
+                                        </span>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    );
-                })
+                                    <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
+                                        {formatRelativeDate(workout.date)}
+                                        {workout.durationMins
+                                            ? ` · ${workout.durationMins} min`
+                                            : ""}
+                                        {exerciseSummary
+                                            ? ` · ${exerciseSummary}`
+                                            : ""}
+                                    </p>
+                                </div>
+                                <div className="shrink-0 text-right">
+                                    <p className="text-sm font-medium tabular-nums">
+                                        {Math.round(volume).toLocaleString()} lbs
+                                    </p>
+                                    <p className="text-xs text-[var(--muted-foreground)]">
+                                        {workout.sets.length} sets
+                                    </p>
+                                </div>
+                                <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
+                            </Link>
+                        );
+                    })}
+                </div>
             )}
         </div>
     );
