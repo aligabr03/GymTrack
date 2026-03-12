@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GymTrack
+
+A full-stack gym progression tracking web app built with **Next.js 15**, **Supabase**, and **Prisma**.
+
+Track your workouts, weights, body measurements, and visualize your progress with charts and personal records.
+
+---
+
+## Features
+
+- **Workout Logging** — log exercises, sets, reps, weight, form rating (1–5), and RPE per set
+- **Exercise Library** — 60+ built-in exercises; add your own custom ones
+- **Personal Records** — automatically tracked when you log a workout (Brzycki estimated 1RM)
+- **Body Metrics** — log weight, body fat %, waist, hip, chest, arm with full history
+- **Insights** — weekly volume bar chart, exercise progression line chart, muscle group balance, workout calendar heatmap
+- **Authentication** — email/password sign-up and login via Supabase Auth
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router, TypeScript) |
+| Styling | Tailwind CSS v4, Radix UI primitives |
+| Database | PostgreSQL via Supabase |
+| ORM | Prisma 7 |
+| Auth | Supabase Auth (@supabase/ssr) |
+| Charts | Recharts |
+| Validation | Zod |
+| Forms | React Hook Form |
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Prerequisites
+
+- Node.js 18+
+- A [Supabase](https://supabase.com) project (free tier works)
+
+### 2. Clone and install
+
+```bash
+git clone <your-repo-url>
+cd GymTrack
+npm install
+```
+
+### 3. Configure environment variables
+
+Copy the example file and fill in your Supabase credentials:
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local`:
+
+```env
+DATABASE_URL=postgresql://postgres:<password>@<host>:5432/postgres
+NEXT_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+```
+
+Find these in your Supabase project under **Settings -> Database** and **Settings -> API**.
+
+### 4. Push the database schema
+
+```bash
+npx prisma db push
+```
+
+### 5. Seed the exercise library
+
+```bash
+npx prisma db seed
+```
+
+This adds 60+ built-in exercises across all muscle groups.
+
+### 6. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 and sign up for an account.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+src/
+  actions/          # Server actions (auth, workouts, exercises, body metrics, insights)
+  app/
+    (app)/          # Protected routes (dashboard, workouts, exercises, body, insights, records)
+    auth/           # Login, register, reset-password pages
+    page.tsx        # Landing page
+  components/
+    body/           # Body metrics logger
+    exercises/      # Exercise library
+    insights/       # Recharts chart components
+    layout/         # App navigation sidebar
+    ui/             # Radix-based UI primitives (Button, Card, Dialog, etc.)
+    workouts/       # Workout logger, delete button
+  generated/        # Prisma generated client (do not edit)
+  lib/              # prisma.ts, supabase clients, utils, calculations
+  middleware.ts     # Auth route protection
+  types/            # Shared TypeScript types
+prisma/
+  schema.prisma     # Database schema (7 models)
+  seed.ts           # Exercise seed data
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Available Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Description |
+|---|---|
+| npm run dev | Start development server |
+| npm run build | Build for production |
+| npm run start | Start production server |
+| npx prisma db push | Push schema to database |
+| npx prisma db seed | Seed exercise library |
+| npx prisma studio | Open Prisma Studio UI |
+| npx prisma generate | Regenerate Prisma client |
