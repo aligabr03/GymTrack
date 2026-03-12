@@ -68,12 +68,15 @@ export async function createWorkout(data: z.infer<typeof workoutSchema>) {
         include: { sets: true },
     });
 
-    // Update personal records for each exercise
-    await updatePersonalRecords(userId, parsed.data.sets);
+    await syncPersonalRecordsForExercises(
+        userId,
+        parsed.data.sets.map((set) => set.exerciseId),
+    );
 
     revalidatePath("/workouts");
     revalidatePath("/dashboard");
     revalidatePath("/insights");
+    revalidatePath("/records");
 
     return { success: true, data: workout };
 }
@@ -85,7 +88,16 @@ export async function updateWorkout(
     const userId = await getUserId();
 
     // Verify ownership
-    const existing = await prisma.workout.findUnique({ where: { id } });
+    const existing = await prisma.workout.findUnique({
+        where: { id },
+        include: {
+            sets: {
+                select: {
+                    exerciseId: true,
+                },
+            },
+        },
+    });
     if (!existing || existing.userId !== userId) {
         return { success: false, error: "Not found" };
     }
@@ -121,12 +133,16 @@ export async function updateWorkout(
         include: { sets: true },
     });
 
-    await updatePersonalRecords(userId, parsed.data.sets);
+    await syncPersonalRecordsForExercises(userId, [
+        ...existing.sets.map((set) => set.exerciseId),
+        ...parsed.data.sets.map((set) => set.exerciseId),
+    ]);
 
     revalidatePath("/workouts");
     revalidatePath(`/workouts/${id}`);
     revalidatePath("/dashboard");
     revalidatePath("/insights");
+    revalidatePath("/records");
 
     return { success: true, data: workout };
 }
@@ -134,16 +150,31 @@ export async function updateWorkout(
 export async function deleteWorkout(id: string) {
     const userId = await getUserId();
 
-    const existing = await prisma.workout.findUnique({ where: { id } });
+    const existing = await prisma.workout.findUnique({
+        where: { id },
+        include: {
+            sets: {
+                select: {
+                    exerciseId: true,
+                },
+            },
+        },
+    });
     if (!existing || existing.userId !== userId) {
         return { success: false, error: "Not found" };
     }
 
     await prisma.workout.delete({ where: { id } });
 
+    await syncPersonalRecordsForExercises(
+        userId,
+        existing.sets.map((set) => set.exerciseId),
+    );
+
     revalidatePath("/workouts");
     revalidatePath("/dashboard");
     revalidatePath("/insights");
+    revalidatePath("/records");
 
     return { success: true };
 }
@@ -261,53 +292,67 @@ export async function getWorkout(id: string) {
     return workout;
 }
 
-async function updatePersonalRecords(
+async function syncPersonalRecordsForExercises(
     userId: string,
-    sets: z.infer<typeof setSchema>[],
+    exerciseIds: string[],
 ) {
-    const byExercise = sets.reduce(
-        (acc, s) => {
-            if (!s.weightKg || !s.reps) return acc;
-            const existingBest = acc[s.exerciseId];
-            const estimated = estimateOneRM(s.weightKg, s.reps);
-            if (!existingBest || estimated > existingBest.estimatedOneRM) {
-                acc[s.exerciseId] = {
-                    weightKg: s.weightKg,
-                    reps: s.reps,
-                    estimatedOneRM: estimated,
-                };
-            }
-            return acc;
-        },
-        {} as Record<
-            string,
-            { weightKg: number; reps: number; estimatedOneRM: number }
-        >,
-    );
+    const uniqueExerciseIds = [...new Set(exerciseIds)];
+    if (uniqueExerciseIds.length === 0) return;
 
-    for (const [exerciseId, best] of Object.entries(byExercise)) {
-        const existing = await prisma.personalRecord.findUnique({
-            where: { userId_exerciseId: { userId, exerciseId } },
+    for (const exerciseId of uniqueExerciseIds) {
+        const sets = await prisma.workoutSet.findMany({
+            where: {
+                exerciseId,
+                workout: { userId },
+                weightKg: { not: null },
+                reps: { not: null },
+            },
+            select: {
+                weightKg: true,
+                reps: true,
+                workout: {
+                    select: {
+                        date: true,
+                    },
+                },
+            },
         });
 
-        if (!existing || best.estimatedOneRM > existing.estimatedOneRM) {
-            await prisma.personalRecord.upsert({
-                where: { userId_exerciseId: { userId, exerciseId } },
-                update: {
-                    weightKg: best.weightKg,
-                    reps: best.reps,
-                    estimatedOneRM: best.estimatedOneRM,
-                    achievedAt: new Date(),
-                },
-                create: {
-                    userId,
-                    exerciseId,
-                    weightKg: best.weightKg,
-                    reps: best.reps,
-                    estimatedOneRM: best.estimatedOneRM,
-                    achievedAt: new Date(),
-                },
-            });
+        let best: {
+            weightKg: number;
+            reps: number;
+            estimatedOneRM: number;
+            achievedAt: Date;
+        } | null = null;
+
+        for (const set of sets) {
+            if (set.weightKg == null || set.reps == null) continue;
+            const estimatedOneRM = estimateOneRM(set.weightKg, set.reps);
+            if (!best || estimatedOneRM > best.estimatedOneRM) {
+                best = {
+                    weightKg: set.weightKg,
+                    reps: set.reps,
+                    estimatedOneRM,
+                    achievedAt: set.workout.date,
+                };
+            }
         }
+
+        if (!best) {
+            await prisma.personalRecord.deleteMany({
+                where: { userId, exerciseId },
+            });
+            continue;
+        }
+
+        await prisma.personalRecord.upsert({
+            where: { userId_exerciseId: { userId, exerciseId } },
+            update: best,
+            create: {
+                userId,
+                exerciseId,
+                ...best,
+            },
+        });
     }
 }
