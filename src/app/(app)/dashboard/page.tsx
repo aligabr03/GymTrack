@@ -286,7 +286,7 @@ export default async function DashboardPage() {
                                         {stats.latestMetric.weightKg && (
                                             <MetricItem
                                                 label="Weight"
-                                                value={`${stats.latestMetric.weightKg} lbs`}
+                                                value={`${stats.latestMetric.weightKg} kg`}
                                             />
                                         )}
                                         {stats.latestMetric.bodyFatPct && (

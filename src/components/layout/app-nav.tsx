@@ -75,7 +75,10 @@ export function AppNav({ user }: { user: User }) {
         const saved = localStorage.getItem("theme") as "dark" | "light" | null;
         if (saved) {
             setTheme(saved);
-            document.documentElement.classList.toggle("light", saved === "light");
+            document.documentElement.classList.toggle(
+                "light",
+                saved === "light",
+            );
         }
     }, []);
 
@@ -293,7 +296,9 @@ export function AppNav({ user }: { user: User }) {
                                         ) : (
                                             <Moon className="h-4 w-4" />
                                         )}
-                                        {theme === "dark" ? "Light mode" : "Dark mode"}
+                                        {theme === "dark"
+                                            ? "Light mode"
+                                            : "Dark mode"}
                                     </button>
                                     <form action={logout}>
                                         <button
