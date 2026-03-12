@@ -29,8 +29,17 @@ const WORKOUT_GROUPS = [
     "Older",
 ] as const;
 
+function normalizeWorkoutDate(date: Date) {
+    const value = new Date(date);
+    return new Date(
+        value.getUTCFullYear(),
+        value.getUTCMonth(),
+        value.getUTCDate(),
+    );
+}
+
 function getWorkoutGroup(date: Date) {
-    const workoutDate = new Date(date);
+    const workoutDate = normalizeWorkoutDate(date);
     const now = new Date();
     const startOfToday = new Date(
         now.getFullYear(),
@@ -100,81 +109,88 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                 </div>
             ) : (
                 <div className="space-y-8">
-                    {WORKOUT_GROUPS.filter((group) => grouped[group]?.length)
-                        .map((group) => (
-                            <div key={group}>
-                                <div className="flex items-center gap-2.5 mb-2 px-1">
-                                    <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-widest">
-                                        {group}
-                                    </h2>
-                                    <span className="text-[10px] tabular-nums text-[var(--muted-foreground)]/60">
-                                        {grouped[group].length}
-                                    </span>
-                                    <div className="h-px flex-1 bg-[var(--border)]" />
-                                </div>
-                                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
-                                    {grouped[group].map((workout, index) => {
-                                        const volume = calculateVolume(
-                                            workout.sets,
-                                        );
-                                        const exercises = [
-                                            ...new Set(
-                                                workout.sets.map(
-                                                    (s) => s.exercise.name,
-                                                ),
-                                            ),
-                                        ];
-                                        const exerciseSummary =
-                                            exercises.slice(0, 3).join(" · ") +
-                                            (exercises.length > 3
-                                                ? ` · +${exercises.length - 3}`
-                                                : "");
-
-                                        return (
-                                            <Link
-                                                key={workout.id}
-                                                href={`/workouts/${workout.id}`}
-                                                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40 animate-fade-in-up"
-                                                style={{ animationDelay: `${index * 50}ms` }}
-                                            >
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 min-w-0">
-                                                        <span className="text-sm font-medium truncate">
-                                                            {workout.name ??
-                                                                formatDate(
-                                                                    workout.date,
-                                                                )}
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
-                                                        {formatRelativeDate(
-                                                            workout.date,
-                                                        )}
-                                                        {workout.durationMins
-                                                            ? ` · ${workout.durationMins} min`
-                                                            : ""}
-                                                        {exerciseSummary
-                                                            ? ` · ${exerciseSummary}`
-                                                            : ""}
-                                                    </p>
-                                                </div>
-                                                <div className="shrink-0 text-right">
-                                                    <p className="text-sm font-medium tabular-nums">
-                                                        {Math.round(
-                                                            volume,
-                                                        ).toLocaleString()} lbs
-                                                    </p>
-                                                    <p className="text-xs text-[var(--muted-foreground)]">
-                                                        {workout.sets.length} sets
-                                                    </p>
-                                                </div>
-                                                <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
+                    {WORKOUT_GROUPS.filter(
+                        (group) => grouped[group]?.length,
+                    ).map((group) => (
+                        <div key={group}>
+                            <div className="flex items-center gap-2.5 mb-2 px-1">
+                                <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-widest">
+                                    {group}
+                                </h2>
+                                <span className="text-[10px] tabular-nums text-[var(--muted-foreground)]/60">
+                                    {grouped[group].length}
+                                </span>
+                                <div className="h-px flex-1 bg-[var(--border)]" />
                             </div>
-                        ))}
+                            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                                {grouped[group].map((workout, index) => {
+                                        const workoutDate = normalizeWorkoutDate(
+                                            workout.date,
+                                        );
+                                    const volume = calculateVolume(
+                                        workout.sets,
+                                    );
+                                    const exercises = [
+                                        ...new Set(
+                                            workout.sets.map(
+                                                (s) => s.exercise.name,
+                                            ),
+                                        ),
+                                    ];
+                                    const exerciseSummary =
+                                        exercises.slice(0, 3).join(" · ") +
+                                        (exercises.length > 3
+                                            ? ` · +${exercises.length - 3}`
+                                            : "");
+
+                                    return (
+                                        <Link
+                                            key={workout.id}
+                                            href={`/workouts/${workout.id}`}
+                                            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40 animate-fade-in-up"
+                                            style={{
+                                                animationDelay: `${index * 50}ms`,
+                                            }}
+                                        >
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="text-sm font-medium truncate">
+                                                        {workout.name ??
+                                                            formatDate(
+                                                                    workoutDate,
+                                                            )}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
+                                                    {formatRelativeDate(
+                                                            workoutDate,
+                                                    )}
+                                                    {workout.durationMins
+                                                        ? ` · ${workout.durationMins} min`
+                                                        : ""}
+                                                    {exerciseSummary
+                                                        ? ` · ${exerciseSummary}`
+                                                        : ""}
+                                                </p>
+                                            </div>
+                                            <div className="shrink-0 text-right">
+                                                <p className="text-sm font-medium tabular-nums">
+                                                    {Math.round(
+                                                        volume,
+                                                    ).toLocaleString()}{" "}
+                                                    lbs
+                                                </p>
+                                                <p className="text-xs text-[var(--muted-foreground)]">
+                                                    {workout.sets.length} sets
+                                                </p>
+                                            </div>
+                                            <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
