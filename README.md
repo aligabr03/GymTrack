@@ -1,19 +1,51 @@
 # GymTrack
 
-A full-stack gym progression tracking web app built with **Next.js 15**, **Supabase**, and **Prisma**.
+A full-stack gym progression tracker built with Next.js, Supabase, and Prisma.
 
-Track your workouts, weights, body measurements, and visualize your progress with charts and personal records.
+GymTrack helps you log workouts quickly, track personal records automatically, monitor body metrics, and review training trends with visual insights.
 
 ---
 
 ## Features
 
-- **Workout Logging** — log exercises, sets, reps, weight, form rating (1–5), and RPE per set
-- **Exercise Library** — 60+ built-in exercises; add your own custom ones
-- **Personal Records** — automatically tracked when you log a workout (Brzycki estimated 1RM)
-- **Body Metrics** — log weight, body fat %, waist, hip, chest, arm with full history
-- **Insights** — weekly volume bar chart, exercise progression line chart, muscle group balance, workout calendar heatmap
-- **Authentication** — email/password sign-up and login via Supabase Auth
+### Workout Logging
+- Fast workout flow with exercise grouping and compact set logging.
+- Add normal sets, drop sets, and supersets.
+- "Add Set" copies the previous set values for faster entry.
+- Smart suggestions for workout name and duration based on recent history.
+- Required `weight` and `reps` validation before save.
+- Workout list grouped by date buckets: Today, Yesterday, Last 3 Days, Last 2 Weeks, Last 3 Months, Older.
+
+### Records & Data Integrity
+- Personal records are auto-calculated using estimated 1RM.
+- PRs are fully re-synced after workout create/update/delete.
+- Deleting a workout also removes stale PR state tied to removed data.
+
+### Body Metrics
+- Log body metrics with date, notes, and full history:
+  - Weight (kg)
+  - Body fat %
+  - Waist, hip, chest, arm (cm)
+- Delete body metric entries directly from history.
+
+### Insights
+- Workout calendar heatmap.
+- Muscle group volume balance.
+- Exercise progression chart.
+- Body Trends line chart with selector (Weight, Body Fat, Waist, Hip, Chest, Arm).
+- AI training analysis card.
+
+### UX & Navigation
+- Responsive app shell with desktop sidebar and mobile tab bar.
+- Mobile header with contextual title/subtitle (including live date on Home).
+- Route/tab switch resets scroll to top.
+- User menu auto-dismisses on outside tap and scroll.
+- Light/Dark mode toggle in user menu with persisted preference.
+- Mobile toasts are compact and positioned above the bottom tab bar.
+
+### Auth
+- Email/password authentication via Supabase Auth.
+- Protected app routes for authenticated users.
 
 ---
 
@@ -21,41 +53,37 @@ Track your workouts, weights, body measurements, and visualize your progress wit
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 15 (App Router, TypeScript) |
-| Styling | Tailwind CSS v4, Radix UI primitives |
-| Database | PostgreSQL via Supabase |
+| Framework | Next.js 16 (App Router, TypeScript) |
+| UI | Tailwind CSS v4, Radix UI primitives, Lucide icons |
+| Database | PostgreSQL (Supabase) |
 | ORM | Prisma 7 |
-| Auth | Supabase Auth (@supabase/ssr) |
+| Auth | Supabase Auth (`@supabase/ssr`) |
 | Charts | Recharts |
 | Validation | Zod |
-| Forms | React Hook Form |
 
 ---
 
 ## Getting Started
 
 ### 1. Prerequisites
-
 - Node.js 18+
-- A [Supabase](https://supabase.com) project (free tier works)
+- A Supabase project
 
-### 2. Clone and install
-
+### 2. Install
 ```bash
 git clone <your-repo-url>
 cd GymTrack
 npm install
 ```
 
-### 3. Configure environment variables
-
-Copy the example file and fill in your Supabase credentials:
+### 3. Configure environment
+Copy and fill environment variables:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local`:
+Required values:
 
 ```env
 DATABASE_URL=postgresql://postgres:<password>@<host>:5432/postgres
@@ -63,55 +91,51 @@ NEXT_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 ```
 
-Find these in your Supabase project under **Settings -> Database** and **Settings -> API**.
-
-### 4. Push the database schema
-
+### 4. Set up database schema
 ```bash
 npx prisma db push
 ```
 
-### 5. Seed the exercise library
-
+### 5. Seed exercises
 ```bash
 npx prisma db seed
 ```
 
-This adds 60+ built-in exercises across all muscle groups.
-
-### 6. Run the development server
-
+### 6. Run dev server
 ```bash
 npm run dev
 ```
 
-Open http://localhost:3000 and sign up for an account.
+Open `http://localhost:3000`.
 
 ---
 
 ## Project Structure
 
-```
-src/
-  actions/          # Server actions (auth, workouts, exercises, body metrics, insights)
-  app/
-    (app)/          # Protected routes (dashboard, workouts, exercises, body, insights, records)
-    auth/           # Login, register, reset-password pages
-    page.tsx        # Landing page
-  components/
-    body/           # Body metrics logger
-    exercises/      # Exercise library
-    insights/       # Recharts chart components
-    layout/         # App navigation sidebar
-    ui/             # Radix-based UI primitives (Button, Card, Dialog, etc.)
-    workouts/       # Workout logger, delete button
-  generated/        # Prisma generated client (do not edit)
-  lib/              # prisma.ts, supabase clients, utils, calculations
-  middleware.ts     # Auth route protection
-  types/            # Shared TypeScript types
+```text
 prisma/
-  schema.prisma     # Database schema (7 models)
-  seed.ts           # Exercise seed data
+  schema.prisma
+  seed.ts
+
+src/
+  actions/                # Server actions: auth, workouts, exercises, body metrics, insights
+  app/
+    (app)/                # Protected routes (dashboard, workouts, exercises, body, insights, records)
+    auth/                 # Login, register, reset password
+    globals.css
+    layout.tsx
+    page.tsx
+  components/
+    body/
+    exercises/
+    insights/
+    layout/
+    ui/
+    workouts/
+  generated/prisma/       # Generated Prisma client/types (do not edit)
+  lib/                    # Prisma client, Supabase clients, utils, calculations
+  proxy.ts                # Route protection / request proxy logic
+  types/
 ```
 
 ---
@@ -120,10 +144,11 @@ prisma/
 
 | Command | Description |
 |---|---|
-| npm run dev | Start development server |
-| npm run build | Build for production |
-| npm run start | Start production server |
-| npx prisma db push | Push schema to database |
-| npx prisma db seed | Seed exercise library |
-| npx prisma studio | Open Prisma Studio UI |
-| npx prisma generate | Regenerate Prisma client |
+| `npm run dev` | Start development server |
+| `npm run build` | Generate Prisma client and build app |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npx prisma db push` | Push schema to database |
+| `npx prisma db seed` | Seed built-in exercises |
+| `npx prisma studio` | Open Prisma Studio |
+| `npx prisma generate` | Regenerate Prisma client |
