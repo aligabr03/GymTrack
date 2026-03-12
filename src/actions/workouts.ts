@@ -23,6 +23,8 @@ const setSchema = z.object({
     formRating: z.number().int().min(1).max(5).optional().nullable(),
     rpe: z.number().min(1).max(10).optional().nullable(),
     notes: z.string().optional().nullable(),
+    isDropset: z.boolean().default(false),
+    supersetId: z.string().optional().nullable(),
 });
 
 const workoutSchema = z.object({
@@ -57,6 +59,8 @@ export async function createWorkout(data: z.infer<typeof workoutSchema>) {
                     formRating: s.formRating,
                     rpe: s.rpe,
                     notes: s.notes,
+                    isDropset: s.isDropset,
+                    supersetId: s.supersetId,
                 })),
             },
         },
@@ -108,6 +112,8 @@ export async function updateWorkout(
                     formRating: s.formRating,
                     rpe: s.rpe,
                     notes: s.notes,
+                    isDropset: s.isDropset,
+                    supersetId: s.supersetId,
                 })),
             },
         },

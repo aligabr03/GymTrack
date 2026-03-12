@@ -36,6 +36,8 @@ import {
     Search,
     Dumbbell,
     Star,
+    Link2,
+    Unlink2,
 } from "lucide-react";
 
 type SetRow = {
@@ -48,6 +50,7 @@ type SetRow = {
     formRating: number | null;
     rpe: string;
     notes: string;
+    isDropset: boolean;
 };
 
 type ExerciseGroup = {
@@ -55,6 +58,7 @@ type ExerciseGroup = {
     exerciseName: string;
     sets: SetRow[];
     collapsed: boolean;
+    supersetGroupId: string | null;
 };
 
 function makeId() {
@@ -65,6 +69,7 @@ function makeSet(
     exerciseId: string,
     exerciseName: string,
     setNumber: number,
+    isDropset = false,
 ): SetRow {
     return {
         id: makeId(),
@@ -76,6 +81,7 @@ function makeSet(
         formRating: null,
         rpe: "",
         notes: "",
+        isDropset,
     };
 }
 
@@ -104,6 +110,7 @@ export function WorkoutLogger({
     const [groups, setGroups] = useState<ExerciseGroup[]>(() => {
         if (!existing) return [];
         const byExercise = new Map<string, SetRow[]>();
+        const supersetMap = new Map<string, string>(); // exerciseId -> supersetGroupId
         for (const s of existing.sets) {
             if (!byExercise.has(s.exerciseId)) byExercise.set(s.exerciseId, []);
             byExercise.get(s.exerciseId)!.push({
@@ -116,13 +123,18 @@ export function WorkoutLogger({
                 formRating: s.formRating,
                 rpe: s.rpe?.toString() ?? "",
                 notes: s.notes ?? "",
+                isDropset: s.isDropset ?? false,
             });
+            if (s.supersetId && !supersetMap.has(s.exerciseId)) {
+                supersetMap.set(s.exerciseId, s.supersetId);
+            }
         }
         return Array.from(byExercise.entries()).map(([exerciseId, sets]) => ({
             exerciseId,
             exerciseName: sets[0].exerciseName,
             sets,
             collapsed: false,
+            supersetGroupId: supersetMap.get(exerciseId) ?? null,
         }));
     });
 
@@ -168,6 +180,7 @@ export function WorkoutLogger({
                     exerciseName: exercise.name,
                     sets: [makeSet(exercise.id, exercise.name, 1)],
                     collapsed: false,
+                    supersetGroupId: null,
                 },
             ];
         });
@@ -246,6 +259,76 @@ export function WorkoutLogger({
         );
     }
 
+    function toggleDropset(exerciseId: string, setId: string) {
+        setGroups((prev) =>
+            prev.map((g) =>
+                g.exerciseId === exerciseId
+                    ? {
+                          ...g,
+                          sets: g.sets.map((s) =>
+                              s.id === setId
+                                  ? { ...s, isDropset: !s.isDropset }
+                                  : s,
+                          ),
+                      }
+                    : g,
+            ),
+        );
+    }
+
+    function addDropSet(exerciseId: string) {
+        setGroups((prev) =>
+            prev.map((g) =>
+                g.exerciseId === exerciseId
+                    ? {
+                          ...g,
+                          sets: [
+                              ...g.sets,
+                              makeSet(
+                                  exerciseId,
+                                  g.exerciseName,
+                                  g.sets.length + 1,
+                                  true,
+                              ),
+                          ],
+                      }
+                    : g,
+            ),
+        );
+    }
+
+    function linkSuperset(exerciseId1: string, exerciseId2: string) {
+        const g1 = groups.find((g) => g.exerciseId === exerciseId1);
+        const g2 = groups.find((g) => g.exerciseId === exerciseId2);
+        const supersetGroupId =
+            g1?.supersetGroupId ?? g2?.supersetGroupId ?? makeId();
+        setGroups((prev) =>
+            prev.map((g) =>
+                g.exerciseId === exerciseId1 || g.exerciseId === exerciseId2
+                    ? { ...g, supersetGroupId }
+                    : g,
+            ),
+        );
+    }
+
+    function unlinkSuperset(exerciseId: string) {
+        const target = groups.find((g) => g.exerciseId === exerciseId);
+        if (!target?.supersetGroupId) return;
+        const ssId = target.supersetGroupId;
+        const ssMembers = groups.filter((g) => g.supersetGroupId === ssId);
+        setGroups((prev) =>
+            prev.map((g) =>
+                ssMembers.length <= 2
+                    ? g.supersetGroupId === ssId
+                        ? { ...g, supersetGroupId: null }
+                        : g
+                    : g.exerciseId === exerciseId
+                      ? { ...g, supersetGroupId: null }
+                      : g,
+            ),
+        );
+    }
+
     function handleSave() {
         const allSets = groups.flatMap((g) =>
             g.sets.map((s) => ({
@@ -256,6 +339,8 @@ export function WorkoutLogger({
                 formRating: s.formRating,
                 rpe: s.rpe ? parseFloat(s.rpe) : null,
                 notes: s.notes || null,
+                isDropset: s.isDropset,
+                supersetId: g.supersetGroupId,
             })),
         );
 
@@ -373,20 +458,139 @@ export function WorkoutLogger({
                 </div>
             )}
 
-            {/* Exercise groups */}
-            {groups.map((group) => (
-                <ExerciseGroupCard
-                    key={group.exerciseId}
-                    group={group}
-                    onAddSet={() => addSet(group.exerciseId)}
-                    onRemoveSet={(setId) => removeSet(group.exerciseId, setId)}
-                    onRemoveExercise={() => removeExercise(group.exerciseId)}
-                    onUpdateSet={(setId, field, value) =>
-                        updateSet(group.exerciseId, setId, field, value)
+            {/* Exercise groups — with superset visual grouping */}
+            {(() => {
+                type RenderItem =
+                    | { type: "single"; group: ExerciseGroup }
+                    | {
+                          type: "superset";
+                          ssId: string;
+                          groups: ExerciseGroup[];
+                      };
+                const items: RenderItem[] = [];
+                const seen = new Set<string>();
+                for (const group of groups) {
+                    if (group.supersetGroupId) {
+                        if (!seen.has(group.supersetGroupId)) {
+                            seen.add(group.supersetGroupId);
+                            items.push({
+                                type: "superset",
+                                ssId: group.supersetGroupId,
+                                groups: groups.filter(
+                                    (g) =>
+                                        g.supersetGroupId ===
+                                        group.supersetGroupId,
+                                ),
+                            });
+                        }
+                    } else {
+                        items.push({ type: "single", group });
                     }
-                    onToggleCollapse={() => toggleCollapse(group.exerciseId)}
-                />
-            ))}
+                }
+
+                return items.map((item) =>
+                    item.type === "single" ? (
+                        <ExerciseGroupCard
+                            key={item.group.exerciseId}
+                            group={item.group}
+                            otherGroups={groups.filter(
+                                (g) => g.exerciseId !== item.group.exerciseId,
+                            )}
+                            onAddSet={() => addSet(item.group.exerciseId)}
+                            onAddDropSet={() =>
+                                addDropSet(item.group.exerciseId)
+                            }
+                            onRemoveSet={(setId) =>
+                                removeSet(item.group.exerciseId, setId)
+                            }
+                            onRemoveExercise={() =>
+                                removeExercise(item.group.exerciseId)
+                            }
+                            onUpdateSet={(setId, field, value) =>
+                                updateSet(
+                                    item.group.exerciseId,
+                                    setId,
+                                    field,
+                                    value,
+                                )
+                            }
+                            onToggleCollapse={() =>
+                                toggleCollapse(item.group.exerciseId)
+                            }
+                            onToggleDropset={(setId) =>
+                                toggleDropset(item.group.exerciseId, setId)
+                            }
+                            onLinkSuperset={(targetId) =>
+                                linkSuperset(item.group.exerciseId, targetId)
+                            }
+                            onUnlinkSuperset={() =>
+                                unlinkSuperset(item.group.exerciseId)
+                            }
+                        />
+                    ) : (
+                        <div key={item.ssId} className="space-y-2">
+                            <div className="flex items-center gap-3 px-1">
+                                <div className="h-px flex-1 bg-[var(--border)]" />
+                                <span className="text-[10px] font-bold tracking-widest text-[var(--muted-foreground)] uppercase">
+                                    Superset
+                                </span>
+                                <div className="h-px flex-1 bg-[var(--border)]" />
+                            </div>
+                            <div className="pl-3 border-l-2 border-[var(--border)] space-y-2">
+                                {item.groups.map((group) => (
+                                    <ExerciseGroupCard
+                                        key={group.exerciseId}
+                                        group={group}
+                                        otherGroups={groups.filter(
+                                            (g) =>
+                                                g.exerciseId !==
+                                                group.exerciseId,
+                                        )}
+                                        onAddSet={() =>
+                                            addSet(group.exerciseId)
+                                        }
+                                        onAddDropSet={() =>
+                                            addDropSet(group.exerciseId)
+                                        }
+                                        onRemoveSet={(setId) =>
+                                            removeSet(group.exerciseId, setId)
+                                        }
+                                        onRemoveExercise={() =>
+                                            removeExercise(group.exerciseId)
+                                        }
+                                        onUpdateSet={(setId, field, value) =>
+                                            updateSet(
+                                                group.exerciseId,
+                                                setId,
+                                                field,
+                                                value,
+                                            )
+                                        }
+                                        onToggleCollapse={() =>
+                                            toggleCollapse(group.exerciseId)
+                                        }
+                                        onToggleDropset={(setId) =>
+                                            toggleDropset(
+                                                group.exerciseId,
+                                                setId,
+                                            )
+                                        }
+                                        onLinkSuperset={(targetId) =>
+                                            linkSuperset(
+                                                group.exerciseId,
+                                                targetId,
+                                            )
+                                        }
+                                        onUnlinkSuperset={() =>
+                                            unlinkSuperset(group.exerciseId)
+                                        }
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ),
+                );
+            })()}
 
             {/* Add exercise button */}
             <Dialog open={addExOpen} onOpenChange={setAddExOpen}>
@@ -484,14 +688,21 @@ export function WorkoutLogger({
 
 function ExerciseGroupCard({
     group,
+    otherGroups,
     onAddSet,
+    onAddDropSet,
     onRemoveSet,
     onRemoveExercise,
     onUpdateSet,
     onToggleCollapse,
+    onToggleDropset,
+    onLinkSuperset,
+    onUnlinkSuperset,
 }: {
     group: ExerciseGroup;
+    otherGroups: ExerciseGroup[];
     onAddSet: () => void;
+    onAddDropSet: () => void;
     onRemoveSet: (setId: string) => void;
     onRemoveExercise: () => void;
     onUpdateSet: (
@@ -500,22 +711,96 @@ function ExerciseGroupCard({
         value: string | number | null,
     ) => void;
     onToggleCollapse: () => void;
+    onToggleDropset: (setId: string) => void;
+    onLinkSuperset: (exerciseId: string) => void;
+    onUnlinkSuperset: () => void;
 }) {
+    const [supersetPickerOpen, setSupersetPickerOpen] = useState(false);
+
+    const linkableGroups = otherGroups.filter(
+        (g) =>
+            !g.supersetGroupId || g.supersetGroupId !== group.supersetGroupId,
+    );
+
     return (
         <Card>
             <div
                 className="flex items-center justify-between p-4 cursor-pointer select-none"
                 onClick={onToggleCollapse}
             >
-                <div className="flex items-center gap-2">
-                    <Dumbbell className="h-4 w-4 text-[var(--foreground)]" />
+                <div className="flex items-center gap-2 flex-wrap">
+                    <Dumbbell className="h-4 w-4 text-[var(--foreground)] shrink-0" />
                     <span className="font-semibold">{group.exerciseName}</span>
                     <Badge variant="secondary" className="text-xs">
                         {group.sets.length} set
                         {group.sets.length !== 1 ? "s" : ""}
                     </Badge>
+                    {group.sets.some((s) => s.isDropset) && (
+                        <Badge variant="outline" className="text-xs">
+                            ↓ drop
+                        </Badge>
+                    )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 shrink-0">
+                    {/* Superset controls */}
+                    {group.supersetGroupId ? (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onUnlinkSuperset();
+                            }}
+                            className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-[var(--secondary)] text-[var(--foreground)] hover:text-red-400 transition-colors"
+                            title="Remove from superset"
+                        >
+                            <Unlink2 className="h-3 w-3" />
+                            SS
+                        </button>
+                    ) : linkableGroups.length > 0 ? (
+                        <div className="relative">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSupersetPickerOpen((v) => !v);
+                                }}
+                                className="p-1.5 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                                title="Link as superset"
+                            >
+                                <Link2 className="h-3.5 w-3.5" />
+                            </button>
+                            {supersetPickerOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() =>
+                                            setSupersetPickerOpen(false)
+                                        }
+                                    />
+                                    <div className="absolute right-0 top-full mt-1 z-50 w-52 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl p-2 space-y-1 animate-scale-in">
+                                        <p className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-2 py-1">
+                                            Superset with…
+                                        </p>
+                                        {linkableGroups.map((g) => (
+                                            <button
+                                                key={g.exerciseId}
+                                                onClick={() => {
+                                                    onLinkSuperset(
+                                                        g.exerciseId,
+                                                    );
+                                                    setSupersetPickerOpen(
+                                                        false,
+                                                    );
+                                                }}
+                                                className="w-full text-left px-2 py-2 rounded-lg text-sm hover:bg-[var(--secondary)] transition-colors truncate"
+                                            >
+                                                {g.exerciseName}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    ) : null}
+
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
@@ -554,18 +839,30 @@ function ExerciseGroupCard({
                                 onUpdateSet(set.id, field, value)
                             }
                             onRemove={() => onRemoveSet(set.id)}
+                            onToggleDropset={() => onToggleDropset(set.id)}
                         />
                     ))}
 
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={onAddSet}
-                        className="w-full mt-2 border border-dashed border-[var(--border)]"
-                    >
-                        <Plus className="h-3 w-3" />
-                        Add Set
-                    </Button>
+                    <div className="flex gap-2 mt-2">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onAddSet}
+                            className="flex-1 border border-dashed border-[var(--border)]"
+                        >
+                            <Plus className="h-3 w-3" />
+                            Add Set
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onAddDropSet}
+                            className="flex-1 border border-dashed border-[var(--border)] text-[var(--muted-foreground)]"
+                        >
+                            <ChevronDown className="h-3 w-3" />
+                            Add Drop Set
+                        </Button>
+                    </div>
                 </CardContent>
             )}
         </Card>
@@ -576,10 +873,12 @@ function SetRow({
     set,
     onUpdate,
     onRemove,
+    onToggleDropset,
 }: {
     set: SetRow;
     onUpdate: (field: keyof SetRow, value: string | number | null) => void;
     onRemove: () => void;
+    onToggleDropset: () => void;
 }) {
     const estimatedRM =
         set.weightKg && set.reps
@@ -589,10 +888,20 @@ function SetRow({
     return (
         <div className="space-y-1">
             {/* Desktop: single row grid */}
-            <div className="hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 items-center">
-                <span className="text-xs text-[var(--muted-foreground)] text-center font-mono">
-                    {set.setNumber}
-                </span>
+            <div
+                className={`hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
+            >
+                <button
+                    onClick={onToggleDropset}
+                    className={`text-xs text-center font-mono w-full h-8 rounded transition-colors ${set.isDropset ? "text-[var(--foreground)] font-bold" : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"}`}
+                    title={
+                        set.isDropset
+                            ? "Click to unmark dropset"
+                            : "Click to mark as dropset"
+                    }
+                >
+                    {set.isDropset ? "↓" : set.setNumber}
+                </button>
                 <Input
                     type="number"
                     placeholder="0"
@@ -650,11 +959,21 @@ function SetRow({
             </div>
 
             {/* Mobile: compact card layout */}
-            <div className="md:hidden rounded-xl bg-[var(--secondary)]/50 p-3 space-y-2">
+            <div
+                className={`md:hidden rounded-xl p-3 space-y-2 transition-colors ${set.isDropset ? "bg-[var(--secondary)]" : "bg-[var(--secondary)]/50"}`}
+            >
                 <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-[var(--muted-foreground)]">
-                        Set {set.setNumber}
-                    </span>
+                    <button
+                        onClick={onToggleDropset}
+                        className={`text-xs font-medium px-2 py-0.5 rounded-lg transition-colors ${set.isDropset ? "bg-[var(--border)] text-[var(--foreground)]" : "text-[var(--muted-foreground)] hover:bg-[var(--border)]"}`}
+                        title={
+                            set.isDropset
+                                ? "Tap to unmark dropset"
+                                : "Tap to mark as dropset"
+                        }
+                    >
+                        {set.isDropset ? `↓ Drop` : `Set ${set.setNumber}`}
+                    </button>
                     <button
                         onClick={onRemove}
                         className="p-1.5 -mr-1 rounded-lg hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
