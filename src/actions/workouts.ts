@@ -19,8 +19,8 @@ async function getUserId(): Promise<string> {
 const setSchema = z.object({
     exerciseId: z.string(),
     setNumber: z.number().int().positive(),
-    weightKg: z.number().nonnegative().optional().nullable(),
-    reps: z.number().int().positive().optional().nullable(),
+    weightKg: z.number().nonnegative(),
+    reps: z.number().int().positive(),
     formRating: z.number().int().min(1).max(5).optional().nullable(),
     rpe: z.number().min(1).max(10).optional().nullable(),
     notes: z.string().optional().nullable(),

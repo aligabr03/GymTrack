@@ -398,6 +398,25 @@ export function WorkoutLogger({
             return;
         }
 
+        const incompleteSet = groups
+            .flatMap((group) =>
+                group.sets.map((set) => ({
+                    exerciseName: group.exerciseName,
+                    setNumber: set.setNumber,
+                    weightKg: set.weightKg.trim(),
+                    reps: set.reps.trim(),
+                })),
+            )
+            .find((set) => !set.weightKg || !set.reps);
+
+        if (incompleteSet) {
+            toast({
+                title: `Enter weight and reps for ${incompleteSet.exerciseName} set ${incompleteSet.setNumber}`,
+                variant: "destructive",
+            });
+            return;
+        }
+
         const payload = {
             date,
             name: workoutName || undefined,
