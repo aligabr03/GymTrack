@@ -88,7 +88,7 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
         muscleGroups: selectedMuscles,
       });
       if (!result.success) {
-        setFormError(result.error);
+        setFormError(result.error !== undefined ? result.error : null);
         return;
       }
       toast({ title: "Exercise created", variant: "success" });

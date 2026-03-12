@@ -6,7 +6,7 @@ import type {
   PersonalRecord,
   WorkoutTemplate,
   TemplateExercise,
-} from "@/generated/prisma";
+} from "@/generated/prisma/client";
 
 export type {
   Exercise,
