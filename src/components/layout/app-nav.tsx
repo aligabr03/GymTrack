@@ -164,7 +164,7 @@ export function AppNav({ user }: { user: User }) {
             </nav>
 
             {/* Mobile: top bar with user info */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-end px-4 py-3 bg-[var(--background)]/80 backdrop-blur-xl">
+            <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-end px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[var(--background)]/80 backdrop-blur-xl">
                 <div className="relative">
                     <button
                         onClick={() => setProfileOpen((v) => !v)}
