@@ -376,21 +376,22 @@ export function WorkoutLogger({
     }
 
     function handleSave() {
-        const allSets = groups.flatMap((g) =>
-            g.sets.map((s) => ({
-                exerciseId: s.exerciseId,
-                setNumber: s.setNumber,
-                weightKg: s.weightKg ? parseFloat(s.weightKg) : null,
-                reps: s.reps ? parseInt(s.reps, 10) : null,
-                formRating: s.formRating,
-                rpe: s.rpe ? parseFloat(s.rpe) : null,
-                notes: s.notes || null,
-                isDropset: s.isDropset,
-                supersetId: g.supersetGroupId,
+        const setDrafts = groups.flatMap((group) =>
+            group.sets.map((set) => ({
+                exerciseId: set.exerciseId,
+                exerciseName: group.exerciseName,
+                setNumber: set.setNumber,
+                weightKg: set.weightKg.trim(),
+                reps: set.reps.trim(),
+                formRating: set.formRating,
+                rpe: set.rpe.trim(),
+                notes: set.notes || null,
+                isDropset: set.isDropset,
+                supersetId: group.supersetGroupId,
             })),
         );
 
-        if (allSets.length === 0) {
+        if (setDrafts.length === 0) {
             toast({
                 title: "Add at least one set to save",
                 variant: "destructive",
@@ -398,15 +399,7 @@ export function WorkoutLogger({
             return;
         }
 
-        const incompleteSet = groups
-            .flatMap((group) =>
-                group.sets.map((set) => ({
-                    exerciseName: group.exerciseName,
-                    setNumber: set.setNumber,
-                    weightKg: set.weightKg.trim(),
-                    reps: set.reps.trim(),
-                })),
-            )
+        const incompleteSet = setDrafts
             .find((set) => !set.weightKg || !set.reps);
 
         if (incompleteSet) {
@@ -416,6 +409,18 @@ export function WorkoutLogger({
             });
             return;
         }
+
+        const allSets = setDrafts.map((set) => ({
+            exerciseId: set.exerciseId,
+            setNumber: set.setNumber,
+            weightKg: parseFloat(set.weightKg),
+            reps: parseInt(set.reps, 10),
+            formRating: set.formRating,
+            rpe: set.rpe ? parseFloat(set.rpe) : null,
+            notes: set.notes,
+            isDropset: set.isDropset,
+            supersetId: set.supersetId,
+        }));
 
         const payload = {
             date,
