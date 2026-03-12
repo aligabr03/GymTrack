@@ -239,10 +239,15 @@ export default async function DashboardPage() {
                                                 </div>
                                                 <div className="text-right shrink-0 ml-2">
                                                     <p className="text-sm font-semibold text-[var(--foreground)]">
-                                                        {pr.weightKg} lbs × {pr.reps}
+                                                        {pr.weightKg} lbs ×{" "}
+                                                        {pr.reps}
                                                     </p>
                                                     <p className="text-xs text-[var(--muted-foreground)]">
-                                                        ~{pr.estimatedOneRM?.toFixed(1)} lbs 1RM
+                                                        ~
+                                                        {pr.estimatedOneRM?.toFixed(
+                                                            1,
+                                                        )}{" "}
+                                                        lbs 1RM
                                                     </p>
                                                 </div>
                                             </div>

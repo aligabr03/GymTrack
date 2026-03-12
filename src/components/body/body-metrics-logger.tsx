@@ -248,7 +248,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                 <div className="space-y-3">
                     <h2 className="text-lg font-semibold">History</h2>
                     {metrics.map((m) => (
-                        <Card key={m.id} className="group">
+                        <Card key={m.id}>
                             <CardContent className="p-4">
                                 <div className="flex items-start justify-between gap-4">
                                     <div>
@@ -301,8 +301,9 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     </div>
                                     <button
                                         onClick={() => handleDelete(m.id)}
-                                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-red-900/40 text-[var(--muted-foreground)] hover:text-red-400 transition-all"
+                                        className="p-1.5 rounded hover:bg-red-900/40 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
                                         aria-label="Delete entry"
+                                        title="Delete entry"
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </button>
