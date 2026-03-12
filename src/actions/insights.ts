@@ -241,10 +241,8 @@ async function buildInsightSnapshot(
         orderBy: { workout: { date: "asc" } },
     });
 
-    const byEx: Record<
-        string,
-        { name: string; days: Map<string, number> }
-    > = {};
+    const byEx: Record<string, { name: string; days: Map<string, number> }> =
+        {};
     for (const s of sets) {
         if (!s.weightKg || !s.reps) continue;
         const rm = Math.round(s.weightKg * (1 + s.reps / 30));
@@ -302,7 +300,13 @@ async function buildInsightSnapshot(
         totalVol > 0
             ? Object.fromEntries(
                   Object.entries(catVol)
-                      .map(([k, v]) => [k, Math.round((v / totalVol) * 100)] as [string, number])
+                      .map(
+                          ([k, v]) =>
+                              [k, Math.round((v / totalVol) * 100)] as [
+                                  string,
+                                  number,
+                              ],
+                      )
                       .sort((a, b) => b[1] - a[1]),
               )
             : {};
@@ -333,7 +337,13 @@ async function buildInsightSnapshot(
         (p) => `${p.exercise.name} ~${Math.round(p.estimatedOneRM)} lbs`,
     );
 
-    return { weeklyWorkouts, topExercises, muscleBalance, bodyWeight, recentPRs };
+    return {
+        weeklyWorkouts,
+        topExercises,
+        muscleBalance,
+        bodyWeight,
+        recentPRs,
+    };
 }
 
 async function callOpenAI(snapshot: InsightSnapshot): Promise<string> {

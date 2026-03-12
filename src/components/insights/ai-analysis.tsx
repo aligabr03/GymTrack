@@ -44,8 +44,7 @@ export function AiAnalysisCard({ initial }: Props) {
             .filter((l) => l.startsWith("•") || l.startsWith("-"))
             .map((l) => l.replace(/^[•\-]\s*/, "")) ?? [];
 
-    const isPlaceholder =
-        data?.analysis.startsWith("Log at least") ?? false;
+    const isPlaceholder = data?.analysis.startsWith("Log at least") ?? false;
 
     return (
         <div className="space-y-4">
