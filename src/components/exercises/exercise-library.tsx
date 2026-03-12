@@ -256,9 +256,19 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                                         <CardContent className="p-4">
                                             <div className="flex items-start justify-between gap-2">
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-medium text-sm truncate">
-                                                        {ex.name}
-                                                    </p>
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <p className="font-medium text-sm truncate">
+                                                            {ex.name}
+                                                        </p>
+                                                        {ex.isCustom && (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="text-xs shrink-0"
+                                                            >
+                                                                Custom
+                                                            </Badge>
+                                                        )}
+                                                    </div>
                                                     <div className="flex flex-wrap gap-1 mt-2">
                                                         {ex.muscleGroups
                                                             .slice(0, 3)
@@ -281,21 +291,13 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                                                                 ex.name,
                                                             )
                                                         }
-                                                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-red-900/40 text-[var(--muted-foreground)] hover:text-red-400 transition-all"
+                                                        className="shrink-0 p-1.5 rounded hover:bg-red-900/40 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
                                                         aria-label="Delete exercise"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 )}
                                             </div>
-                                            {ex.isCustom && (
-                                                <Badge
-                                                    variant="outline"
-                                                    className="mt-2 text-xs"
-                                                >
-                                                    Custom
-                                                </Badge>
-                                            )}
                                         </CardContent>
                                     </Card>
                                 ))}
