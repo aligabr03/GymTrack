@@ -28,7 +28,7 @@ export default async function WorkoutsPage() {
                     </Button>
                 </Link>
             </div>
-            <Link href="/workouts/new" className="md:hidden">
+            <Link href="/workouts/new" className="block md:hidden mb-2">
                 <Button className="w-full">
                     <Plus className="h-4 w-4" />
                     Log Workout
