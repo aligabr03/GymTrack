@@ -13,7 +13,7 @@ export default async function BodyPage() {
 
     return (
         <div className="space-y-6">
-            <div>
+            <div className="animate-fade-in">
                 <h1 className="text-2xl font-bold">Body Metrics</h1>
                 <p className="text-[var(--muted-foreground)] text-sm mt-1">
                     Track your weight, body fat, and measurements over time.

@@ -13,9 +13,8 @@ import {
     TrendingUp,
     Scale,
     LogOut,
-    Menu,
-    X,
     Trophy,
+    User as UserIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,14 +24,23 @@ const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/workouts", icon: ClipboardList, label: "Workouts" },
     { href: "/exercises", icon: Library, label: "Exercises" },
-    { href: "/body", icon: Scale, label: "Body Metrics" },
+    { href: "/body", icon: Scale, label: "Body" },
+    { href: "/insights", icon: TrendingUp, label: "Insights" },
+    { href: "/records", icon: Trophy, label: "Records" },
+];
+
+// Bottom tab bar only shows 5 items — the most commonly used
+const mobileNavItems = [
+    { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
+    { href: "/workouts", icon: ClipboardList, label: "Workouts" },
+    { href: "/exercises", icon: Library, label: "Exercises" },
     { href: "/insights", icon: TrendingUp, label: "Insights" },
     { href: "/records", icon: Trophy, label: "Records" },
 ];
 
 export function AppNav({ user }: { user: User }) {
     const pathname = usePathname();
-    const [mobileOpen, setMobileOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
 
     const initials =
         (user.user_metadata?.name as string | undefined)
@@ -46,47 +54,16 @@ export function AppNav({ user }: { user: User }) {
 
     return (
         <>
-            {/* Mobile top bar */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-[var(--card)] border-b border-[var(--border)]">
-                <div className="flex items-center gap-2">
-                    <Dumbbell className="h-5 w-5 text-[var(--primary)]" />
-                    <span className="font-bold">GymTrack</span>
-                </div>
-                <button
-                    onClick={() => setMobileOpen((v) => !v)}
-                    className="p-2 rounded-md hover:bg-[var(--secondary)] transition-colors"
-                    aria-label="Toggle menu"
-                >
-                    {mobileOpen ? (
-                        <X className="h-5 w-5" />
-                    ) : (
-                        <Menu className="h-5 w-5" />
-                    )}
-                </button>
-            </div>
-
-            {/* Mobile overlay */}
-            {mobileOpen && (
-                <div
-                    className="md:hidden fixed inset-0 z-30 bg-black/50"
-                    onClick={() => setMobileOpen(false)}
-                />
-            )}
-
-            {/* Sidebar */}
-            <aside
-                className={cn(
-                    "fixed top-0 left-0 z-40 h-full w-64 flex flex-col bg-[var(--card)] border-r border-[var(--border)] transition-transform duration-200",
-                    "md:translate-x-0",
-                    mobileOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full md:translate-x-0",
-                )}
-            >
+            {/* ===== DESKTOP: Side navigation ===== */}
+            <aside className="hidden md:flex fixed top-0 left-0 z-40 h-full w-64 flex-col bg-[var(--card)]/80 backdrop-blur-xl border-r border-[var(--border)]">
                 {/* Logo */}
-                <div className="flex items-center gap-2 px-5 py-5 border-b border-[var(--border)]">
-                    <Dumbbell className="h-6 w-6 text-[var(--primary)]" />
-                    <span className="text-lg font-bold">GymTrack</span>
+                <div className="flex items-center gap-2.5 px-5 py-5 border-b border-[var(--border)]">
+                    <div className="p-1.5 rounded-lg bg-[var(--primary)]/10">
+                        <Dumbbell className="h-5 w-5 text-[var(--primary)]" />
+                    </div>
+                    <span className="text-lg font-bold tracking-tight">
+                        GymTrack
+                    </span>
                 </div>
 
                 {/* Nav links */}
@@ -99,11 +76,10 @@ export function AppNav({ user }: { user: User }) {
                             <Link
                                 key={href}
                                 href={href}
-                                onClick={() => setMobileOpen(false)}
                                 className={cn(
-                                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                                     active
-                                        ? "bg-[var(--primary)]/10 text-[var(--primary)]"
+                                        ? "bg-[var(--primary)]/10 text-[var(--primary)] shadow-sm"
                                         : "text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
                                 )}
                             >
@@ -118,7 +94,7 @@ export function AppNav({ user }: { user: User }) {
                 <div className="border-t border-[var(--border)] p-4 space-y-3">
                     <div className="flex items-center gap-3 px-1">
                         <Avatar className="h-8 w-8">
-                            <AvatarFallback className="text-xs">
+                            <AvatarFallback className="text-xs bg-[var(--primary)]/10 text-[var(--primary)]">
                                 {initials}
                             </AvatarFallback>
                         </Avatar>
@@ -147,8 +123,106 @@ export function AppNav({ user }: { user: User }) {
                 </div>
             </aside>
 
-            {/* Mobile spacer */}
-            <div className="md:hidden h-14" />
+            {/* ===== MOBILE: Bottom tab bar ===== */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--card)]/90 backdrop-blur-xl border-t border-[var(--border)] pb-[env(safe-area-inset-bottom)]">
+                <div className="flex items-center justify-around px-1 h-16">
+                    {mobileNavItems.map(({ href, icon: Icon, label }) => {
+                        const active =
+                            pathname === href ||
+                            pathname.startsWith(href + "/");
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                className={cn(
+                                    "flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 min-w-[3.5rem]",
+                                    active
+                                        ? "text-[var(--primary)]"
+                                        : "text-[var(--muted-foreground)]",
+                                )}
+                            >
+                                <div
+                                    className={cn(
+                                        "p-1 rounded-lg transition-all duration-200",
+                                        active && "bg-[var(--primary)]/10",
+                                    )}
+                                >
+                                    <Icon
+                                        className={cn(
+                                            "h-5 w-5 transition-transform duration-200",
+                                            active && "scale-110",
+                                        )}
+                                    />
+                                </div>
+                                <span className="text-[10px] font-medium">
+                                    {label}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </nav>
+
+            {/* Mobile: top bar with user info */}
+            <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-[var(--card)]/90 backdrop-blur-xl border-b border-[var(--border)]">
+                <div className="flex items-center gap-2">
+                    <div className="p-1 rounded-md bg-[var(--primary)]/10">
+                        <Dumbbell className="h-4 w-4 text-[var(--primary)]" />
+                    </div>
+                    <span className="font-bold tracking-tight">GymTrack</span>
+                </div>
+                <div className="relative">
+                    <button
+                        onClick={() => setProfileOpen((v) => !v)}
+                        className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[var(--secondary)] transition-colors"
+                    >
+                        <Avatar className="h-7 w-7">
+                            <AvatarFallback className="text-[10px] bg-[var(--primary)]/10 text-[var(--primary)]">
+                                {initials}
+                            </AvatarFallback>
+                        </Avatar>
+                    </button>
+                    {profileOpen && (
+                        <>
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setProfileOpen(false)}
+                            />
+                            <div className="absolute right-0 top-full mt-2 z-50 w-56 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl p-3 space-y-2 animate-scale-in">
+                                <div className="px-2 py-1.5">
+                                    <p className="text-sm font-medium truncate">
+                                        {(user.user_metadata?.name as
+                                            | string
+                                            | undefined) ?? "Athlete"}
+                                    </p>
+                                    <p className="text-xs text-[var(--muted-foreground)] truncate">
+                                        {user.email}
+                                    </p>
+                                </div>
+                                <div className="border-t border-[var(--border)] pt-2">
+                                    <Link
+                                        href="/body"
+                                        onClick={() => setProfileOpen(false)}
+                                        className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                    >
+                                        <Scale className="h-4 w-4" />
+                                        Body Metrics
+                                    </Link>
+                                    <form action={logout}>
+                                        <button
+                                            type="submit"
+                                            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-red-900/20 hover:text-red-400 transition-colors"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            Sign out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
         </>
     );
 }

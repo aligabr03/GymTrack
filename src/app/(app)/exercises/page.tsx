@@ -7,7 +7,7 @@ export default async function ExercisesPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 animate-fade-in">
                 <div className="p-2.5 rounded-lg bg-[var(--primary)]/10">
                     <Library className="h-6 w-6 text-[var(--primary)]" />
                 </div>

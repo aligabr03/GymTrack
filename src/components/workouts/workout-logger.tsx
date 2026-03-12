@@ -536,8 +536,8 @@ function ExerciseGroupCard({
 
             {!group.collapsed && (
                 <CardContent className="p-4 pt-0 space-y-2">
-                    {/* Header row */}
-                    <div className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 text-xs text-[var(--muted-foreground)] px-1 pb-1">
+                    {/* Header row - hidden on mobile, shown on md+ */}
+                    <div className="hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 text-xs text-[var(--muted-foreground)] px-1 pb-1">
                         <span>#</span>
                         <span>Weight (lbs)</span>
                         <span>Reps</span>
@@ -588,7 +588,8 @@ function SetRow({
 
     return (
         <div className="space-y-1">
-            <div className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 items-center">
+            {/* Desktop: single row grid */}
+            <div className="hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 items-center">
                 <span className="text-xs text-[var(--muted-foreground)] text-center font-mono">
                     {set.setNumber}
                 </span>
@@ -609,7 +610,6 @@ function SetRow({
                     className="h-8 text-sm"
                     min={1}
                 />
-                {/* Form rating */}
                 <Select
                     value={set.formRating?.toString() ?? ""}
                     onValueChange={(v) =>
@@ -648,8 +648,99 @@ function SetRow({
                     <Trash2 className="h-3.5 w-3.5" />
                 </button>
             </div>
+
+            {/* Mobile: compact card layout */}
+            <div className="md:hidden rounded-xl bg-[var(--secondary)]/50 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-[var(--muted-foreground)]">
+                        Set {set.setNumber}
+                    </span>
+                    <button
+                        onClick={onRemove}
+                        className="p-1.5 -mr-1 rounded-lg hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
+                        aria-label="Remove set"
+                    >
+                        <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
+                            Weight (lbs)
+                        </label>
+                        <Input
+                            type="number"
+                            placeholder="0"
+                            value={set.weightKg}
+                            onChange={(e) =>
+                                onUpdate("weightKg", e.target.value)
+                            }
+                            className="h-10 text-sm"
+                            min={0}
+                            step={0.5}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
+                            Reps
+                        </label>
+                        <Input
+                            type="number"
+                            placeholder="0"
+                            value={set.reps}
+                            onChange={(e) => onUpdate("reps", e.target.value)}
+                            className="h-10 text-sm"
+                            min={1}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
+                            Form
+                        </label>
+                        <Select
+                            value={set.formRating?.toString() ?? ""}
+                            onValueChange={(v) =>
+                                onUpdate(
+                                    "formRating",
+                                    v ? parseInt(v, 10) : null,
+                                )
+                            }
+                        >
+                            <SelectTrigger className="h-10 text-xs">
+                                <SelectValue placeholder="—" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {FORM_RATINGS.map((r) => (
+                                    <SelectItem
+                                        key={r.value}
+                                        value={r.value.toString()}
+                                    >
+                                        {r.value} – {r.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
+                            RPE
+                        </label>
+                        <Input
+                            type="number"
+                            placeholder="—"
+                            value={set.rpe}
+                            onChange={(e) => onUpdate("rpe", e.target.value)}
+                            className="h-10 text-sm"
+                            min={1}
+                            max={10}
+                            step={0.5}
+                        />
+                    </div>
+                </div>
+            </div>
+
             {estimatedRM && (
-                <p className="text-xs text-[var(--muted-foreground)] pl-10">
+                <p className="text-xs text-[var(--muted-foreground)] pl-2 md:pl-10">
                     ~{estimatedRM} lbs est. 1RM
                 </p>
             )}

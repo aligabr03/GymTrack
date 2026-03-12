@@ -18,7 +18,7 @@ export default async function WorkoutsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between animate-fade-in">
                 <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-lg bg-[var(--primary)]/10">
                         <ClipboardList className="h-6 w-6 text-[var(--primary)]" />
@@ -55,7 +55,7 @@ export default async function WorkoutsPage() {
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {workouts.map((workout) => {
+                    {workouts.map((workout, index) => {
                         const volume = calculateVolume(workout.sets);
                         const exercises = [
                             ...new Set(
@@ -67,7 +67,12 @@ export default async function WorkoutsPage() {
                                 key={workout.id}
                                 href={`/workouts/${workout.id}`}
                             >
-                                <Card className="hover:border-[var(--primary)]/40 transition-colors cursor-pointer">
+                                <Card
+                                    className="hover:border-[var(--primary)]/40 transition-all duration-200 cursor-pointer animate-fade-in-up"
+                                    style={{
+                                        animationDelay: `${index * 50}ms`,
+                                    }}
+                                >
                                     <CardContent className="p-4">
                                         <div className="flex items-center justify-between gap-4">
                                             <div className="flex-1 min-w-0">
@@ -123,7 +128,7 @@ export default async function WorkoutsPage() {
                                                         {Math.round(
                                                             volume,
                                                         ).toLocaleString()}{" "}
-                                                        kg
+                                                        lbs
                                                     </p>
                                                     <p className="text-xs text-[var(--muted-foreground)]">
                                                         {workout.sets.length}{" "}

@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
 :root {
-    --background: #0c0c0c;
+    --background: #0a0a0a;
     --foreground: #f4f4f5;
-    --card: #18181b;
+    --card: #141416;
     --card-foreground: #f4f4f5;
-    --popover: #1c1c1f;
+    --popover: #1a1a1e;
     --popover-foreground: #f4f4f5;
     --primary: #f97316;
     --primary-foreground: #ffffff;
-    --secondary: #27272a;
+    --secondary: #1e1e22;
     --secondary-foreground: #f4f4f5;
-    --muted: #27272a;
+    --muted: #1e1e22;
     --muted-foreground: #a1a1aa;
     --accent: #3b82f6;
     --accent-foreground: #ffffff;
     --destructive: #dc2626;
     --destructive-foreground: #ffffff;
-    --border: #27272a;
-    --input: #27272a;
+    --border: #232328;
+    --input: #1e1e22;
     --ring: #f97316;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 }
 
 @theme inline {
@@ -61,6 +61,7 @@ body {
     color: var(--foreground);
     font-family: var(--font-sans), system-ui, sans-serif;
     -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
     padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -71,6 +72,88 @@ h4,
 h5,
 h6 {
     font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+}
+
+/* Smooth page transitions */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.35s ease-out both;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out both;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.25s ease-out both;
+}
+
+/* Stagger children animations */
+.animate-stagger > * {
+    animation: fadeInUp 0.35s ease-out both;
+}
+.animate-stagger > *:nth-child(1) {
+    animation-delay: 0ms;
+}
+.animate-stagger > *:nth-child(2) {
+    animation-delay: 50ms;
+}
+.animate-stagger > *:nth-child(3) {
+    animation-delay: 100ms;
+}
+.animate-stagger > *:nth-child(4) {
+    animation-delay: 150ms;
+}
+.animate-stagger > *:nth-child(5) {
+    animation-delay: 200ms;
+}
+.animate-stagger > *:nth-child(6) {
+    animation-delay: 250ms;
+}
+.animate-stagger > *:nth-child(7) {
+    animation-delay: 300ms;
+}
+.animate-stagger > *:nth-child(8) {
+    animation-delay: 350ms;
 }
 
 /* Scrollbar styling */
@@ -89,8 +172,12 @@ h6 {
     background: var(--muted-foreground);
 }
 
-body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+/* Better touch targets on mobile */
+@media (max-width: 768px) {
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 16px !important; /* prevents iOS zoom on focus */
+    }
 }

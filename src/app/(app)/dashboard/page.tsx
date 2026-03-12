@@ -23,7 +23,7 @@ export default async function DashboardPage() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between animate-fade-in">
                 <div>
                     <h1 className="text-3xl font-bold">Dashboard</h1>
                     <p className="text-[var(--muted-foreground)] mt-1">
@@ -38,19 +38,21 @@ export default async function DashboardPage() {
                 <Link href="/workouts/new">
                     <Button>
                         <Plus className="h-4 w-4" />
-                        Log Workout
+                        <span className="hidden sm:inline">Log Workout</span>
+                        <span className="sm:hidden">Log</span>
                     </Button>
                 </Link>
             </div>
 
             {/* Stat cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <StatCard
                     icon={Dumbbell}
                     label="Total Workouts"
                     value={stats.totalWorkouts}
                     iconColor="text-[var(--primary)]"
                     iconBg="bg-[var(--primary)]/10"
+                    index={0}
                 />
                 <StatCard
                     icon={Flame}
@@ -58,6 +60,7 @@ export default async function DashboardPage() {
                     value={stats.workoutsThisWeek}
                     iconColor="text-amber-400"
                     iconBg="bg-amber-400/10"
+                    index={1}
                 />
                 <StatCard
                     icon={CalendarDays}
@@ -65,6 +68,7 @@ export default async function DashboardPage() {
                     value={stats.workoutsThisMonth}
                     iconColor="text-blue-400"
                     iconBg="bg-blue-400/10"
+                    index={2}
                 />
                 <StatCard
                     icon={Trophy}
@@ -72,6 +76,7 @@ export default async function DashboardPage() {
                     value={stats.personalRecords.length}
                     iconColor="text-yellow-400"
                     iconBg="bg-yellow-400/10"
+                    index={3}
                 />
             </div>
 
@@ -320,22 +325,27 @@ function StatCard({
     value,
     iconColor,
     iconBg,
+    index = 0,
 }: {
     icon: React.ComponentType<{ className?: string }>;
     label: string;
     value: number;
     iconColor: string;
     iconBg: string;
+    index?: number;
 }) {
     return (
-        <Card>
-            <CardContent className="p-4 flex items-center gap-4">
-                <div className={`p-2.5 rounded-lg ${iconBg}`}>
-                    <Icon className={`h-5 w-5 ${iconColor}`} />
+        <Card
+            className="animate-fade-in-up"
+            style={{ animationDelay: `${index * 80}ms` }}
+        >
+            <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                <div className={`p-2 sm:p-2.5 rounded-xl ${iconBg}`}>
+                    <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${iconColor}`} />
                 </div>
                 <div>
-                    <p className="text-2xl font-bold">{value}</p>
-                    <p className="text-xs text-[var(--muted-foreground)]">
+                    <p className="text-xl sm:text-2xl font-bold">{value}</p>
+                    <p className="text-[10px] sm:text-xs text-[var(--muted-foreground)]">
                         {label}
                     </p>
                 </div>
