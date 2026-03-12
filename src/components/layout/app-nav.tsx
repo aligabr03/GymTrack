@@ -15,8 +15,10 @@ import {
     LogOut,
     Trophy,
     User as UserIcon,
+    Sun,
+    Moon,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -67,6 +69,22 @@ const mobileNavItems = [
 export function AppNav({ user }: { user: User }) {
     const pathname = usePathname();
     const [profileOpen, setProfileOpen] = useState(false);
+    const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+    useEffect(() => {
+        const saved = localStorage.getItem("theme") as "dark" | "light" | null;
+        if (saved) {
+            setTheme(saved);
+            document.documentElement.classList.toggle("light", saved === "light");
+        }
+    }, []);
+
+    function toggleTheme() {
+        const next = theme === "dark" ? "light" : "dark";
+        setTheme(next);
+        localStorage.setItem("theme", next);
+        document.documentElement.classList.toggle("light", next === "light");
+    }
 
     // Get current page title from navItems
     const currentPage = navItems.find(
@@ -151,6 +169,17 @@ export function AppNav({ user }: { user: User }) {
                             </p>
                         </div>
                     </div>
+                    <button
+                        onClick={toggleTheme}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                    >
+                        {theme === "dark" ? (
+                            <Sun className="h-4 w-4" />
+                        ) : (
+                            <Moon className="h-4 w-4" />
+                        )}
+                        {theme === "dark" ? "Light mode" : "Dark mode"}
+                    </button>
                     <form action={logout}>
                         <Button
                             variant="ghost"
@@ -252,6 +281,20 @@ export function AppNav({ user }: { user: User }) {
                                         <Scale className="h-4 w-4" />
                                         Body Metrics
                                     </Link>
+                                    <button
+                                        onClick={() => {
+                                            toggleTheme();
+                                            setProfileOpen(false);
+                                        }}
+                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                    >
+                                        {theme === "dark" ? (
+                                            <Sun className="h-4 w-4" />
+                                        ) : (
+                                            <Moon className="h-4 w-4" />
+                                        )}
+                                        {theme === "dark" ? "Light mode" : "Dark mode"}
+                                    </button>
                                     <form action={logout}>
                                         <button
                                             type="submit"
