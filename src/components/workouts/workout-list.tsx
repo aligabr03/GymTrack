@@ -124,9 +124,9 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                             </div>
                             <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
                                 {grouped[group].map((workout, index) => {
-                                        const workoutDate = normalizeWorkoutDate(
-                                            workout.date,
-                                        );
+                                    const workoutDate = normalizeWorkoutDate(
+                                        workout.date,
+                                    );
                                     const volume = calculateVolume(
                                         workout.sets,
                                     );
@@ -157,13 +157,13 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                                                     <span className="text-sm font-medium truncate">
                                                         {workout.name ??
                                                             formatDate(
-                                                                    workoutDate,
+                                                                workoutDate,
                                                             )}
                                                     </span>
                                                 </div>
                                                 <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
                                                     {formatRelativeDate(
-                                                            workoutDate,
+                                                        workoutDate,
                                                     )}
                                                     {workout.durationMins
                                                         ? ` · ${workout.durationMins} min`

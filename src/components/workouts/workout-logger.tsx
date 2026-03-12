@@ -38,6 +38,7 @@ import { estimateOneRM } from "@/lib/calculations";
 import {
     Plus,
     Trash2,
+    Copy,
     ChevronDown,
     ChevronUp,
     Loader2,
@@ -319,6 +320,23 @@ export function WorkoutLogger({
                       }
                     : g,
             ),
+        );
+    }
+
+    function duplicateSet(exerciseId: string, setId: string) {
+        setGroups((prev) =>
+            prev.map((g) => {
+                if (g.exerciseId !== exerciseId) return g;
+                const idx = g.sets.findIndex((s) => s.id === setId);
+                if (idx === -1) return g;
+                const dup: SetRow = { ...g.sets[idx], id: makeId() };
+                const newSets = [
+                    ...g.sets.slice(0, idx + 1),
+                    dup,
+                    ...g.sets.slice(idx + 1),
+                ].map((s, i) => ({ ...s, setNumber: i + 1 }));
+                return { ...g, sets: newSets };
+            }),
         );
     }
 
@@ -606,6 +624,9 @@ export function WorkoutLogger({
                             onRemoveSet={(setId) =>
                                 removeSet(item.group.exerciseId, setId)
                             }
+                            onDuplicateSet={(setId) =>
+                                duplicateSet(item.group.exerciseId, setId)
+                            }
                             onRemoveExercise={() =>
                                 removeExercise(item.group.exerciseId)
                             }
@@ -657,6 +678,9 @@ export function WorkoutLogger({
                                         }
                                         onRemoveSet={(setId) =>
                                             removeSet(group.exerciseId, setId)
+                                        }
+                                        onDuplicateSet={(setId) =>
+                                            duplicateSet(group.exerciseId, setId)
                                         }
                                         onRemoveExercise={() =>
                                             removeExercise(group.exerciseId)
@@ -823,6 +847,7 @@ function ExerciseGroupCard({
     onAddSet,
     onAddDropSet,
     onRemoveSet,
+    onDuplicateSet,
     onRemoveExercise,
     onUpdateSet,
     onToggleCollapse,
@@ -835,6 +860,7 @@ function ExerciseGroupCard({
     onAddSet: () => void;
     onAddDropSet: () => void;
     onRemoveSet: (setId: string) => void;
+    onDuplicateSet: (setId: string) => void;
     onRemoveExercise: () => void;
     onUpdateSet: (
         setId: string,
@@ -872,7 +898,7 @@ function ExerciseGroupCard({
                         </Badge>
                     )}
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                     {/* Superset controls */}
                     {group.supersetGroupId ? (
                         <button
@@ -942,6 +968,7 @@ function ExerciseGroupCard({
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>
+                    <div className="w-px h-4 bg-[var(--border)]" />
                     {group.collapsed ? (
                         <ChevronDown className="h-4 w-4 text-[var(--muted-foreground)]" />
                     ) : (
@@ -970,6 +997,7 @@ function ExerciseGroupCard({
                                 onUpdateSet(set.id, field, value)
                             }
                             onRemove={() => onRemoveSet(set.id)}
+                            onDuplicate={() => onDuplicateSet(set.id)}
                             onToggleDropset={() => onToggleDropset(set.id)}
                         />
                     ))}
@@ -1004,11 +1032,13 @@ function SetRow({
     set,
     onUpdate,
     onRemove,
+    onDuplicate,
     onToggleDropset,
 }: {
     set: SetRow;
     onUpdate: (field: keyof SetRow, value: string | number | null) => void;
     onRemove: () => void;
+    onDuplicate: () => void;
     onToggleDropset: () => void;
 }) {
     const estimatedRM =
@@ -1020,7 +1050,7 @@ function SetRow({
         <div className="space-y-1">
             {/* Desktop: single row grid */}
             <div
-                className={`hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
+                className={`hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_auto] gap-2 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
             >
                 <button
                     onClick={onToggleDropset}
@@ -1083,13 +1113,23 @@ function SetRow({
                     max={10}
                     step={0.5}
                 />
-                <button
-                    onClick={onRemove}
-                    className="p-1 rounded hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors flex items-center justify-center"
-                    aria-label="Remove set"
-                >
-                    <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={onDuplicate}
+                        className="p-1 rounded hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors flex items-center justify-center"
+                        aria-label="Duplicate set"
+                        title="Duplicate set"
+                    >
+                        <Copy className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                        onClick={onRemove}
+                        className="p-1 rounded hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors flex items-center justify-center"
+                        aria-label="Remove set"
+                    >
+                        <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                </div>
             </div>
 
             {/* Mobile: compact card layout */}
@@ -1108,13 +1148,23 @@ function SetRow({
                     >
                         {set.isDropset ? `↓ Drop` : `Set ${set.setNumber}`}
                     </button>
-                    <button
-                        onClick={onRemove}
-                        className="p-1.5 -mr-1 rounded-lg hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
-                        aria-label="Remove set"
-                    >
-                        <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    <div className="flex items-center gap-0.5 -mr-1">
+                        <button
+                            onClick={onDuplicate}
+                            className="p-1.5 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                            aria-label="Duplicate set"
+                            title="Duplicate set"
+                        >
+                            <Copy className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                            onClick={onRemove}
+                            className="p-1.5 rounded-lg hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
+                            aria-label="Remove set"
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
