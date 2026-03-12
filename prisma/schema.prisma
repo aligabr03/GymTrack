@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Exercise {
+  id           String   @id @default(cuid())
+  name         String
+  category     String
+  muscleGroups String[]
+  isCustom     Boolean  @default(false)
+  userId       String?
+  createdAt    DateTime @default(now())
+
+  workoutSets       WorkoutSet[]
+  templateExercises TemplateExercise[]
+  personalRecords   PersonalRecord[]
+
+  @@index([userId])
+}
+
+model Workout {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime
+  name         String?
+  notes        String?
+  durationMins Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sets WorkoutSet[]
+
+  @@index([userId, date])
+}
+
+model WorkoutSet {
+  id         String  @id @default(cuid())
+  workoutId  String
+  exerciseId String
+  setNumber  Int
+  weightKg   Float?
+  reps       Int?
+  formRating Int?
+  rpe        Float?
+  notes      String?
+
+  workout  Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@index([workoutId])
+  @@index([exerciseId])
+}
+
+model BodyMetric {
+  id         String   @id @default(cuid())
+  userId     String
+  date       DateTime
+  weightKg   Float?
+  bodyFatPct Float?
+  waistCm    Float?
+  hipCm      Float?
+  chestCm    Float?
+  armCm      Float?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model WorkoutTemplate {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  exercises TemplateExercise[]
+
+  @@index([userId])
+}
+
+model TemplateExercise {
+  id           String  @id @default(cuid())
+  templateId   String
+  exerciseId   String
+  order        Int
+  targetSets   Int?
+  targetReps   String?
+  targetWeight Float?
+
+  template WorkoutTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  exercise Exercise        @relation(fields: [exerciseId], references: [id])
+
+  @@index([templateId])
+}
+
+model PersonalRecord {
+  id             String   @id @default(cuid())
+  userId         String
+  exerciseId     String
+  weightKg       Float
+  reps           Int
+  estimatedOneRM Float
+  achievedAt     DateTime
+  createdAt      DateTime @default(now())
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
+  @@index([userId])
+}
