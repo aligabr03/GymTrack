@@ -1,8 +1,14 @@
-// @ts-nocheck
-import "dotenv/config";
+import { config } from "dotenv";
+import { resolve } from "path";
+// Load .env.local first (Next.js convention), then fall back to .env
+config({ path: resolve(process.cwd(), ".env.local") });
+config({ path: resolve(process.cwd(), ".env") });
+
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-const prisma = new PrismaClient({ log: [] });
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 const exercises = [
     // Chest
