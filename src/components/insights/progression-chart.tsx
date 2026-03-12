@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
     LineChart,
     Line,
@@ -14,7 +14,13 @@ import {
 import { getProgressionData } from "@/actions/insights";
 import { estimateOneRM } from "@/lib/calculations";
 import type { Exercise } from "@/types";
-import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 type Props = {
     exercises: Exercise[];
@@ -31,6 +37,12 @@ export function ProgressionChart({ exercises }: Props) {
     const [data, setData] = useState<ChartPoint[]>([]);
     const [isPending, startTransition] = useTransition();
     const [loaded, setLoaded] = useState(false);
+
+    // Auto-load the first exercise on mount
+    useEffect(() => {
+        if (exercises[0]?.id) load(exercises[0].id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function load(exerciseId: string) {
         setSelected(exerciseId);
@@ -65,20 +77,28 @@ export function ProgressionChart({ exercises }: Props) {
         });
     }
 
+    if (exercises.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">
+                Log some workouts to see progression charts
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-                {exercises.slice(0, 20).map((ex) => (
-                    <Button
-                        key={ex.id}
-                        size="sm"
-                        variant={selected === ex.id ? "default" : "outline"}
-                        onClick={() => load(ex.id)}
-                    >
-                        {ex.name}
-                    </Button>
-                ))}
-            </div>
+            <Select value={selected} onValueChange={load}>
+                <SelectTrigger className="w-full max-w-xs">
+                    <SelectValue placeholder="Select an exercise" />
+                </SelectTrigger>
+                <SelectContent>
+                    {exercises.map((ex) => (
+                        <SelectItem key={ex.id} value={ex.id}>
+                            {ex.name}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
 
             {!loaded && (
                 <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">

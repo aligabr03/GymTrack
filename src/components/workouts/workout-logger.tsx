@@ -2,7 +2,11 @@
 
 import { useState, useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { createWorkout, updateWorkout } from "@/actions/workouts";
+import {
+    createWorkout,
+    updateWorkout,
+    getLastSetsForExercise,
+} from "@/actions/workouts";
 import type { Exercise, WorkoutWithSets } from "@/types";
 import { FORM_RATINGS } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -154,10 +158,10 @@ export function WorkoutLogger({
     });
 
     function addExercise(exercise: Exercise) {
-        setGroups((prev) => {
-            if (prev.some((g) => g.exerciseId === exercise.id)) {
-                // Add set to existing group
-                return prev.map((g) =>
+        if (groups.some((g) => g.exerciseId === exercise.id)) {
+            // Exercise already in workout — just add a blank set
+            setGroups((prev) =>
+                prev.map((g) =>
                     g.exerciseId === exercise.id
                         ? {
                               ...g,
@@ -171,21 +175,57 @@ export function WorkoutLogger({
                               ],
                           }
                         : g,
-                );
-            }
-            return [
-                ...prev,
-                {
-                    exerciseId: exercise.id,
-                    exerciseName: exercise.name,
-                    sets: [makeSet(exercise.id, exercise.name, 1)],
-                    collapsed: false,
-                    supersetGroupId: null,
-                },
-            ];
-        });
+                ),
+            );
+            setAddExOpen(false);
+            setExerciseSearch("");
+            return;
+        }
+
+        // New exercise — close sheet immediately, then fetch last session in background
         setAddExOpen(false);
         setExerciseSearch("");
+        setGroups((prev) => [
+            ...prev,
+            {
+                exerciseId: exercise.id,
+                exerciseName: exercise.name,
+                sets: [makeSet(exercise.id, exercise.name, 1)],
+                collapsed: false,
+                supersetGroupId: null,
+            },
+        ]);
+
+        // Pre-fill with last session data
+        startTransition(async () => {
+            try {
+                const lastSets = await getLastSetsForExercise(exercise.id);
+                if (lastSets.length === 0) return;
+                setGroups((prev) =>
+                    prev.map((g) =>
+                        g.exerciseId === exercise.id
+                            ? {
+                                  ...g,
+                                  sets: lastSets.map((s, i) => ({
+                                      id: makeId(),
+                                      exerciseId: exercise.id,
+                                      exerciseName: exercise.name,
+                                      setNumber: i + 1,
+                                      weightKg: s.weightKg?.toString() ?? "",
+                                      reps: s.reps?.toString() ?? "",
+                                      formRating: s.formRating,
+                                      rpe: s.rpe?.toString() ?? "",
+                                      notes: "",
+                                      isDropset: false,
+                                  })),
+                              }
+                            : g,
+                    ),
+                );
+            } catch {
+                // ignore — blank sets are already showing
+            }
+        });
     }
 
     function addSet(exerciseId: string) {
@@ -600,7 +640,7 @@ export function WorkoutLogger({
                         Add Exercise
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md max-h-[80vh] flex flex-col">
+                <DialogContent className="max-w-md flex flex-col min-h-[75dvh] md:min-h-0 md:max-h-[80vh]">
                     <DialogHeader>
                         <DialogTitle>Select Exercise</DialogTitle>
                     </DialogHeader>

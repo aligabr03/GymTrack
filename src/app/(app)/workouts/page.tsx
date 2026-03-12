@@ -1,17 +1,8 @@
 import { getWorkouts } from "@/actions/workouts";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { formatRelativeDate, formatDate } from "@/lib/utils";
-import { calculateVolume } from "@/lib/calculations";
-import {
-    Plus,
-    ClipboardList,
-    Clock,
-    Dumbbell,
-    ChevronRight,
-} from "lucide-react";
+import { Plus, ClipboardList, Dumbbell } from "lucide-react";
+import { WorkoutList } from "@/components/workouts/workout-list";
 
 export default async function WorkoutsPage() {
     const workouts = await getWorkouts();
@@ -54,96 +45,7 @@ export default async function WorkoutsPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="space-y-3">
-                    {workouts.map((workout, index) => {
-                        const volume = calculateVolume(workout.sets);
-                        const exercises = [
-                            ...new Set(
-                                workout.sets.map((s) => s.exercise.name),
-                            ),
-                        ];
-                        return (
-                            <Link
-                                key={workout.id}
-                                href={`/workouts/${workout.id}`}
-                            >
-                                <Card
-                                    className="hover:border-[var(--primary)]/40 transition-all duration-200 cursor-pointer animate-fade-in-up"
-                                    style={{
-                                        animationDelay: `${index * 50}ms`,
-                                    }}
-                                >
-                                    <CardContent className="p-4">
-                                        <div className="flex items-center justify-between gap-4">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 flex-wrap">
-                                                    <span className="font-semibold">
-                                                        {workout.name ??
-                                                            formatDate(
-                                                                workout.date,
-                                                            )}
-                                                    </span>
-                                                    <span className="text-xs text-[var(--muted-foreground)]">
-                                                        {formatRelativeDate(
-                                                            workout.date,
-                                                        )}
-                                                    </span>
-                                                    {workout.durationMins && (
-                                                        <span className="text-xs text-[var(--muted-foreground)] flex items-center gap-0.5">
-                                                            <Clock className="h-3 w-3" />
-                                                            {
-                                                                workout.durationMins
-                                                            }{" "}
-                                                            min
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-wrap gap-1 mt-2">
-                                                    {exercises
-                                                        .slice(0, 4)
-                                                        .map((ex) => (
-                                                            <Badge
-                                                                key={ex}
-                                                                variant="secondary"
-                                                                className="text-xs"
-                                                            >
-                                                                {ex}
-                                                            </Badge>
-                                                        ))}
-                                                    {exercises.length > 4 && (
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="text-xs"
-                                                        >
-                                                            +
-                                                            {exercises.length -
-                                                                4}
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-4 shrink-0 text-right">
-                                                <div>
-                                                    <p className="text-sm font-semibold">
-                                                        {Math.round(
-                                                            volume,
-                                                        ).toLocaleString()}{" "}
-                                                        lbs
-                                                    </p>
-                                                    <p className="text-xs text-[var(--muted-foreground)]">
-                                                        {workout.sets.length}{" "}
-                                                        sets
-                                                    </p>
-                                                </div>
-                                                <ChevronRight className="h-4 w-4 text-[var(--muted-foreground)]" />
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        );
-                    })}
-                </div>
+                <WorkoutList workouts={workouts} />
             )}
         </div>
     );

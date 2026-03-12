@@ -165,6 +165,32 @@ export async function getWorkouts(limit?: number) {
     return workouts;
 }
 
+export async function getLastSetsForExercise(exerciseId: string) {
+    const userId = await getUserId();
+
+    // Find the most recent workout that included this exercise
+    const lastSet = await prisma.workoutSet.findFirst({
+        where: { exerciseId, workout: { userId } },
+        orderBy: { workout: { date: "desc" } },
+        select: { workoutId: true },
+    });
+    if (!lastSet) return [];
+
+    const sets = await prisma.workoutSet.findMany({
+        where: { workoutId: lastSet.workoutId, exerciseId },
+        orderBy: { setNumber: "asc" },
+        select: {
+            setNumber: true,
+            weightKg: true,
+            reps: true,
+            formRating: true,
+            rpe: true,
+        },
+    });
+
+    return sets;
+}
+
 export async function getWorkout(id: string) {
     const userId = await getUserId();
 

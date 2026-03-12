@@ -151,6 +151,19 @@ export async function getMuscleGroupVolume(days = 30) {
         .sort((a, b) => b.volume - a.volume);
 }
 
+export async function getLoggedExercises() {
+    const userId = await getUserId();
+
+    const rows = await prisma.workoutSet.findMany({
+        where: { workout: { userId } },
+        select: { exercise: true },
+        distinct: ["exerciseId"],
+        orderBy: { exercise: { name: "asc" } },
+    });
+
+    return rows.map((r) => r.exercise);
+}
+
 export async function getWorkoutCalendar(year: number) {
     const userId = await getUserId();
     const start = new Date(year, 0, 1);

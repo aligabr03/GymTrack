@@ -2,8 +2,8 @@ import {
     getVolumeByWeek,
     getMuscleGroupVolume,
     getWorkoutCalendar,
+    getLoggedExercises,
 } from "@/actions/insights";
-import { getExercises } from "@/actions/exercises";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VolumeChart } from "@/components/insights/volume-chart";
 import { ProgressionChart } from "@/components/insights/progression-chart";
@@ -20,7 +20,7 @@ export default async function InsightsPage() {
             getVolumeByWeek(12),
             getMuscleGroupVolume(30),
             getWorkoutCalendar(year),
-            getExercises(),
+            getLoggedExercises(),
         ]).then((results) =>
             results.map((r) => (r.status === "fulfilled" ? r.value : null)),
         );
@@ -37,7 +37,8 @@ export default async function InsightsPage() {
             ReturnType<typeof getWorkoutCalendar>
         > | null) ?? {};
     const exerciseList =
-        (exercises as Awaited<ReturnType<typeof getExercises>> | null) ?? [];
+        (exercises as Awaited<ReturnType<typeof getLoggedExercises>> | null) ??
+        [];
 
     return (
         <div className="space-y-6">

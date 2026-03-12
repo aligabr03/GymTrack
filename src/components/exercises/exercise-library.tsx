@@ -154,11 +154,11 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                             Add Exercise
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-md flex flex-col min-h-[75dvh] md:min-h-0 md:max-h-[85vh]">
                         <DialogHeader>
                             <DialogTitle>Create Custom Exercise</DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-4">
+                        <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
                             {formError && (
                                 <p className="text-sm text-red-400">
                                     {formError}

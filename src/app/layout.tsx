@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Sora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,14 +19,25 @@ const jetbrainsMono = JetBrains_Mono({
     subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    viewportFit: "cover",
+    themeColor: "#09090b",
+};
+
 export const metadata: Metadata = {
     title: "GymTrack — Track Your Gains",
     description:
         "Log workouts, track body metrics, analyze progression, and smash PRs.",
-    viewport: {
-        width: "device-width",
-        initialScale: 1,
-        viewportFit: "cover",
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "black-translucent",
+        title: "GymTrack",
+    },
+    formatDetection: {
+        telephone: false,
     },
 };
 
