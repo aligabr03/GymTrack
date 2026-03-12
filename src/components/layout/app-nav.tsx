@@ -14,7 +14,6 @@ import {
     Scale,
     LogOut,
     Trophy,
-    User as UserIcon,
     Sun,
     Moon,
 } from "lucide-react";
@@ -92,6 +91,21 @@ export function AppNav({ user }: { user: User }) {
         });
         setProfileOpen(false);
     }, [pathname]);
+
+    useEffect(() => {
+        if (!profileOpen) return;
+
+        const close = () => setProfileOpen(false);
+        window.addEventListener("scroll", close, true);
+        window.addEventListener("wheel", close, { passive: true });
+        window.addEventListener("touchmove", close, { passive: true });
+
+        return () => {
+            window.removeEventListener("scroll", close, true);
+            window.removeEventListener("wheel", close);
+            window.removeEventListener("touchmove", close);
+        };
+    }, [profileOpen]);
 
     function toggleTheme() {
         const next = theme === "dark" ? "light" : "dark";
@@ -261,10 +275,10 @@ export function AppNav({ user }: { user: User }) {
                 <div className="relative">
                     <button
                         onClick={() => setProfileOpen((v) => !v)}
-                        className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[var(--secondary)] transition-colors"
+                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-[var(--secondary)] transition-colors"
                     >
-                        <Avatar className="h-7 w-7">
-                            <AvatarFallback className="text-[10px] bg-[var(--secondary)] text-[var(--foreground)]">
+                        <Avatar className="h-9 w-9">
+                            <AvatarFallback className="text-xs bg-[var(--secondary)] text-[var(--foreground)]">
                                 {initials}
                             </AvatarFallback>
                         </Avatar>
@@ -290,7 +304,7 @@ export function AppNav({ user }: { user: User }) {
                                     <Link
                                         href="/body"
                                         onClick={() => setProfileOpen(false)}
-                                        className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
                                     >
                                         <Scale className="h-4 w-4" />
                                         Body Metrics
