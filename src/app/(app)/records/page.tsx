@@ -16,7 +16,7 @@ export default async function RecordsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="animate-fade-in">
+            <div className="hidden md:block animate-fade-in">
                 <h1 className="text-2xl font-bold">Personal Records</h1>
                 <p className="text-[var(--muted-foreground)] text-sm mt-1">
                     Your all-time bests, automatically tracked when you log

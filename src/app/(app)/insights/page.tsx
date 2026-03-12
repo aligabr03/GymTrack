@@ -41,7 +41,7 @@ export default async function InsightsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="animate-fade-in">
+            <div className="hidden md:block animate-fade-in">
                 <h1 className="text-2xl font-bold">Insights</h1>
                 <p className="text-[var(--muted-foreground)] text-sm mt-1">
                     Analyze your training trends and progression.

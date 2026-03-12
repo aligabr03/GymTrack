@@ -9,7 +9,7 @@ export default async function WorkoutsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between animate-fade-in">
+            <div className="hidden md:flex items-center justify-between animate-fade-in">
                 <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
                         <ClipboardList className="h-6 w-6 text-[var(--foreground)]" />
@@ -28,6 +28,12 @@ export default async function WorkoutsPage() {
                     </Button>
                 </Link>
             </div>
+            <Link href="/workouts/new" className="md:hidden">
+                <Button className="w-full">
+                    <Plus className="h-4 w-4" />
+                    Log Workout
+                </Button>
+            </Link>
 
             {workouts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center py-24 gap-4">

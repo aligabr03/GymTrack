@@ -25,7 +25,9 @@ export default async function DashboardPage() {
             {/* Header */}
             <div className="flex items-center justify-between animate-fade-in">
                 <div>
-                    <h1 className="text-3xl font-bold hidden md:block">Dashboard</h1>
+                    <h1 className="text-3xl font-bold hidden md:block">
+                        Dashboard
+                    </h1>
                     <p className="text-[var(--muted-foreground)] mt-1">
                         {new Date().toLocaleDateString("en-US", {
                             weekday: "long",

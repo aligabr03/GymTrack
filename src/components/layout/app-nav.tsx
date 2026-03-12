@@ -21,12 +21,12 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const navItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/workouts", icon: ClipboardList, label: "Workouts" },
-    { href: "/exercises", icon: Library, label: "Exercises" },
-    { href: "/body", icon: Scale, label: "Body" },
-    { href: "/insights", icon: TrendingUp, label: "Insights" },
-    { href: "/records", icon: Trophy, label: "Records" },
+    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", subtitle: null },
+    { href: "/workouts", icon: ClipboardList, label: "Workouts", subtitle: null },
+    { href: "/exercises", icon: Library, label: "Exercises", subtitle: null },
+    { href: "/body", icon: Scale, label: "Body", subtitle: "Weight, body fat & measurements" },
+    { href: "/insights", icon: TrendingUp, label: "Insights", subtitle: "Training trends & progression" },
+    { href: "/records", icon: Trophy, label: "Records", subtitle: "All-time bests" },
 ];
 
 // Bottom tab bar only shows 5 items — the most commonly used
@@ -43,11 +43,12 @@ export function AppNav({ user }: { user: User }) {
     const [profileOpen, setProfileOpen] = useState(false);
 
     // Get current page title from navItems
-    const currentPageTitle =
-        navItems.find(
-            (item) =>
-                pathname === item.href || pathname.startsWith(item.href + "/")
-        )?.label ?? "GymTrack";
+    const currentPage = navItems.find(
+        (item) =>
+            pathname === item.href || pathname.startsWith(item.href + "/"),
+    );
+    const currentPageTitle = currentPage?.label ?? "GymTrack";
+    const currentPageSubtitle = currentPage?.subtitle ?? null;
 
     const initials =
         (user.user_metadata?.name as string | undefined)
@@ -172,7 +173,14 @@ export function AppNav({ user }: { user: User }) {
 
             {/* Mobile: top bar with user info */}
             <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[var(--background)]/80 backdrop-blur-xl">
-                <h1 className="text-lg font-bold">{currentPageTitle}</h1>
+                <div>
+                    <h1 className="text-lg font-bold">{currentPageTitle}</h1>
+                    {currentPageSubtitle && (
+                        <p className="text-xs text-[var(--muted-foreground)]">
+                            {currentPageSubtitle}
+                        </p>
+                    )}
+                </div>
                 <div className="relative">
                     <button
                         onClick={() => setProfileOpen((v) => !v)}
