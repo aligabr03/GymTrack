@@ -25,7 +25,7 @@ export default async function DashboardPage() {
             {/* Header */}
             <div className="hidden md:flex items-center justify-between animate-fade-in">
                 <div>
-                    <h1 className="text-3xl font-bold">Dashboard</h1>
+                    <h1 className="text-2xl font-bold">Dashboard</h1>
                     <p className="text-[var(--muted-foreground)] mt-1">
                         {new Date().toLocaleDateString("en-US", {
                             weekday: "long",
@@ -239,12 +239,10 @@ export default async function DashboardPage() {
                                                 </div>
                                                 <div className="text-right shrink-0 ml-2">
                                                     <p className="text-sm font-semibold text-[var(--foreground)]">
-                                                        {pr.weightKg}lbs ×{" "}
-                                                        {pr.reps}
+                                                        {pr.weightKg} lbs × {pr.reps}
                                                     </p>
                                                     <p className="text-xs text-[var(--muted-foreground)]">
-                                                        ~{pr.estimatedOneRM}lbs
-                                                        1RM
+                                                        ~{pr.estimatedOneRM?.toFixed(1)} lbs 1RM
                                                     </p>
                                                 </div>
                                             </div>
