@@ -129,13 +129,6 @@ export function WorkoutCalendar({ year, data }: Props) {
                     </div>
                 </div>
 
-                {/* Legend */}
-                <div className="flex items-center gap-2 mt-3 ml-8 text-[10px] text-[var(--muted-foreground)]">
-                    <span>Off</span>
-                    <div className="w-3 h-3 rounded-[2px] bg-[var(--secondary)]" />
-                    <div className="w-3 h-3 rounded-[2px] bg-[var(--foreground)]" />
-                    <span>On</span>
-                </div>
             </div>
         </div>
     );

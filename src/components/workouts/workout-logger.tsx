@@ -276,9 +276,8 @@ export function WorkoutLogger({
             if (!result.success || !result.data) {
                 toast({
                     title:
-                        ("error" in result
-                            ? result.error
-                            : undefined) ?? "Could not create exercise",
+                        ("error" in result ? result.error : undefined) ??
+                        "Could not create exercise",
                     variant: "destructive",
                 });
                 return;

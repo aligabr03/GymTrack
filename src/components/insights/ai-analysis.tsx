@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { RefreshCw } from "lucide-react";
 import { refreshAiInsight } from "@/actions/insights";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 type Props = {
     initial: { analysis: string; updatedAt: string } | null;
@@ -50,17 +50,6 @@ export function AiAnalysisCard({ initial }: Props) {
 
     return (
         <div className="space-y-4">
-            <div className="space-y-2">
-                <p className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider">
-                    Optional context
-                </p>
-                <Textarea
-                    placeholder="e.g. Deload week, shoulder pain, sleep has been low, cutting calories..."
-                    value={contextInput}
-                    onChange={(e) => setContextInput(e.target.value)}
-                    className="min-h-20"
-                />
-            </div>
             {data && !isPlaceholder ? (
                 <>
                     {bullets.length > 0 ? (
@@ -124,6 +113,17 @@ export function AiAnalysisCard({ initial }: Props) {
             )}
 
             {error && <p className="text-xs text-red-400">{error}</p>}
+
+            <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                <p className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider">
+                    Optional context
+                </p>
+                <Input
+                    placeholder="e.g. Deload week, shoulder pain, low sleep, cutting"
+                    value={contextInput}
+                    onChange={(e) => setContextInput(e.target.value)}
+                />
+            </div>
         </div>
     );
 }

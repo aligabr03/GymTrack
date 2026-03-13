@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Trophy, Medal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
     Select,
     SelectContent,
@@ -27,6 +28,9 @@ type RecordItem = {
 
 export function RecordsShowcase({ records }: { records: RecordItem[] }) {
     const [category, setCategory] = useState("all");
+    const [selectedRecord, setSelectedRecord] = useState<RecordItem | null>(
+        null,
+    );
 
     const categories = useMemo(
         () =>
@@ -78,9 +82,14 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                         const isTop3 = topRank <= 3;
 
                         return (
-                            <Card
+                            <button
                                 key={record.id}
-                                className={`relative overflow-hidden aspect-square animate-fade-in-up ${
+                                type="button"
+                                onClick={() => setSelectedRecord(record)}
+                                className="text-left"
+                            >
+                            <Card
+                                className={`relative overflow-hidden aspect-square animate-fade-in-up cursor-pointer transition-transform hover:scale-[1.01] ${
                                     isTop3 ? "border-amber-400/40" : ""
                                 }`}
                                 style={{ animationDelay: `${index * 50}ms` }}
@@ -126,10 +135,69 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                     </div>
                                 </CardContent>
                             </Card>
+                            </button>
                         );
                     })}
                 </div>
             )}
+
+            <Dialog
+                open={Boolean(selectedRecord)}
+                onOpenChange={(open) => {
+                    if (!open) setSelectedRecord(null);
+                }}
+            >
+                <DialogContent className="inset-0 h-[100dvh] max-h-none w-screen max-w-none rounded-none border-0 p-6 md:inset-0 md:left-0 md:top-0 md:h-[100dvh] md:w-screen md:max-w-none md:translate-x-0 md:translate-y-0 md:rounded-none md:p-10">
+                    <DialogTitle className="sr-only">Record details</DialogTitle>
+                    {selectedRecord && (
+                        <div className="h-full flex items-center justify-center">
+                            <Card className="w-full max-w-xl border-amber-400/40 overflow-hidden">
+                                <CardContent className="p-8 md:p-10 space-y-6 relative">
+                                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shine-sweep" />
+                                    <div className="relative flex items-start justify-between gap-4">
+                                        <div>
+                                            <p className="text-2xl md:text-3xl font-bold">
+                                                {selectedRecord.exercise.name}
+                                            </p>
+                                            <Badge
+                                                variant="outline"
+                                                className="mt-2"
+                                            >
+                                                {selectedRecord.exercise.category}
+                                            </Badge>
+                                        </div>
+                                        <Trophy className="h-10 w-10 text-amber-300 shrink-0" />
+                                    </div>
+
+                                    <div className="relative space-y-3">
+                                        <p className="text-4xl md:text-5xl font-bold tabular-nums leading-none">
+                                            {selectedRecord.estimatedOneRM.toFixed(1)}
+                                            <span className="text-xl md:text-2xl ml-2 text-[var(--muted-foreground)]">
+                                                lbs
+                                            </span>
+                                        </p>
+                                        <p className="text-sm uppercase tracking-wider text-[var(--muted-foreground)]">
+                                            Estimated 1RM
+                                        </p>
+                                        <p className="text-lg text-[var(--muted-foreground)]">
+                                            {selectedRecord.weightKg} lbs x{" "}
+                                            {selectedRecord.reps} reps
+                                        </p>
+                                        <p className="text-sm text-[var(--muted-foreground)]">
+                                            Achieved on{" "}
+                                            <strong className="text-[var(--foreground)]">
+                                                {formatDate(
+                                                    selectedRecord.achievedAt,
+                                                )}
+                                            </strong>
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
