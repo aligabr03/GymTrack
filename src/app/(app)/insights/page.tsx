@@ -13,6 +13,7 @@ import { AiAnalysisCard } from "@/components/insights/ai-analysis";
 import { BodyTrendsChart } from "@/components/insights/body-trends-chart";
 
 export const metadata = { title: "Insights — GymTrack" };
+export const dynamic = "force-dynamic";
 
 export default async function InsightsPage() {
     const year = new Date().getFullYear();
