@@ -88,53 +88,57 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                 onClick={() => setSelectedRecord(record)}
                                 className="text-left"
                             >
-                            <Card
-                                className={`relative overflow-hidden aspect-square animate-fade-in-up cursor-pointer transition-transform hover:scale-[1.01] ${
-                                    isTop3 ? "border-amber-400/40" : ""
-                                }`}
-                                style={{ animationDelay: `${index * 50}ms` }}
-                            >
-                                {isTop3 && (
-                                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shine-sweep" />
-                                )}
-                                <CardContent className="p-4 h-full flex flex-col justify-between">
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div className="min-w-0">
-                                            <p className="font-semibold text-sm truncate">
-                                                {record.exercise.name}
-                                            </p>
-                                            <Badge
-                                                variant="outline"
-                                                className="text-[10px] mt-1"
-                                            >
-                                                {record.exercise.category}
-                                            </Badge>
+                                <Card
+                                    className={`relative overflow-hidden aspect-square animate-fade-in-up cursor-pointer transition-transform hover:scale-[1.01] ${
+                                        isTop3 ? "border-amber-400/40" : ""
+                                    }`}
+                                    style={{
+                                        animationDelay: `${index * 50}ms`,
+                                    }}
+                                >
+                                    {isTop3 && (
+                                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shine-sweep" />
+                                    )}
+                                    <CardContent className="p-4 h-full flex flex-col justify-between">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-sm truncate">
+                                                    {record.exercise.name}
+                                                </p>
+                                                <Badge
+                                                    variant="outline"
+                                                    className="text-[10px] mt-1"
+                                                >
+                                                    {record.exercise.category}
+                                                </Badge>
+                                            </div>
+                                            {isTop3 ? (
+                                                <Medal className="h-5 w-5 text-amber-300 shrink-0" />
+                                            ) : (
+                                                <Trophy className="h-5 w-5 text-[var(--muted-foreground)] shrink-0" />
+                                            )}
                                         </div>
-                                        {isTop3 ? (
-                                            <Medal className="h-5 w-5 text-amber-300 shrink-0" />
-                                        ) : (
-                                            <Trophy className="h-5 w-5 text-[var(--muted-foreground)] shrink-0" />
-                                        )}
-                                    </div>
 
-                                    <div className="space-y-1 mt-2">
-                                        <p className="text-lg font-bold tabular-nums">
-                                            {record.estimatedOneRM.toFixed(1)}{" "}
-                                            lbs
-                                        </p>
-                                        <p className="text-xs text-[var(--muted-foreground)]">
-                                            Est. 1RM
-                                        </p>
-                                        <p className="text-xs text-[var(--muted-foreground)]">
-                                            {record.weightKg} lbs x{" "}
-                                            {record.reps} reps
-                                        </p>
-                                        <p className="text-[10px] text-[var(--muted-foreground)] pt-1 uppercase tracking-wider">
-                                            {formatDate(record.achievedAt)}
-                                        </p>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        <div className="space-y-1 mt-2">
+                                            <p className="text-lg font-bold tabular-nums">
+                                                {record.estimatedOneRM.toFixed(
+                                                    1,
+                                                )}{" "}
+                                                lbs
+                                            </p>
+                                            <p className="text-xs text-[var(--muted-foreground)]">
+                                                Est. 1RM
+                                            </p>
+                                            <p className="text-xs text-[var(--muted-foreground)]">
+                                                {record.weightKg} lbs x{" "}
+                                                {record.reps} reps
+                                            </p>
+                                            <p className="text-[10px] text-[var(--muted-foreground)] pt-1 uppercase tracking-wider">
+                                                {formatDate(record.achievedAt)}
+                                            </p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             </button>
                         );
                     })}
@@ -148,7 +152,9 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                 }}
             >
                 <DialogContent className="inset-0 h-[100dvh] max-h-none w-screen max-w-none rounded-none border-0 p-6 md:inset-0 md:left-0 md:top-0 md:h-[100dvh] md:w-screen md:max-w-none md:translate-x-0 md:translate-y-0 md:rounded-none md:p-10">
-                    <DialogTitle className="sr-only">Record details</DialogTitle>
+                    <DialogTitle className="sr-only">
+                        Record details
+                    </DialogTitle>
                     {selectedRecord && (
                         <div className="h-full flex items-center justify-center">
                             <Card className="w-full max-w-xl border-amber-400/40 overflow-hidden">
@@ -163,7 +169,10 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                                 variant="outline"
                                                 className="mt-2"
                                             >
-                                                {selectedRecord.exercise.category}
+                                                {
+                                                    selectedRecord.exercise
+                                                        .category
+                                                }
                                             </Badge>
                                         </div>
                                         <Trophy className="h-10 w-10 text-amber-300 shrink-0" />
@@ -171,7 +180,9 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
 
                                     <div className="relative space-y-3">
                                         <p className="text-4xl md:text-5xl font-bold tabular-nums leading-none">
-                                            {selectedRecord.estimatedOneRM.toFixed(1)}
+                                            {selectedRecord.estimatedOneRM.toFixed(
+                                                1,
+                                            )}
                                             <span className="text-xl md:text-2xl ml-2 text-[var(--muted-foreground)]">
                                                 lbs
                                             </span>

@@ -128,7 +128,6 @@ export function WorkoutCalendar({ year, data }: Props) {
                         ))}
                     </div>
                 </div>
-
             </div>
         </div>
     );
