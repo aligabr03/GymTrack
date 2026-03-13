@@ -28,6 +28,7 @@ export async function getDashboardStats() {
         workoutsThisMonth,
         recentWorkouts,
         personalRecords,
+        personalRecordsCount,
         latestMetric,
     ] = await Promise.all([
         prisma.workout.count({ where: { userId } }),
@@ -44,9 +45,10 @@ export async function getDashboardStats() {
         prisma.personalRecord.findMany({
             where: { userId },
             include: { exercise: true },
-            orderBy: { achievedAt: "desc" },
+            orderBy: { estimatedOneRM: "desc" },
             take: 5,
         }),
+        prisma.personalRecord.count({ where: { userId } }),
         prisma.bodyMetric.findFirst({
             where: { userId },
             orderBy: { date: "desc" },
@@ -59,6 +61,7 @@ export async function getDashboardStats() {
         workoutsThisMonth,
         recentWorkouts,
         personalRecords,
+        personalRecordsCount,
         latestMetric,
     };
 }
@@ -346,7 +349,10 @@ async function buildInsightSnapshot(
     };
 }
 
-async function callOpenAI(snapshot: InsightSnapshot): Promise<string> {
+async function callOpenAI(
+    snapshot: InsightSnapshot,
+    userContext?: string,
+): Promise<string> {
     const key = process.env.OPENAI_API_KEY;
     if (!key) throw new Error("OPENAI_API_KEY not configured");
 
@@ -366,7 +372,9 @@ async function callOpenAI(snapshot: InsightSnapshot): Promise<string> {
                 },
                 {
                     role: "user",
-                    content: JSON.stringify(snapshot),
+                    content: userContext?.trim()
+                        ? `Snapshot: ${JSON.stringify(snapshot)}\n\nExtra context from user: ${userContext.trim()}`
+                        : JSON.stringify(snapshot),
                 },
             ],
             max_tokens: 380,
@@ -435,7 +443,7 @@ export async function getAiInsight(): Promise<{
     }
 }
 
-export async function refreshAiInsight(): Promise<{
+export async function refreshAiInsight(userContext?: string): Promise<{
     analysis: string;
     updatedAt: string;
 } | null> {
@@ -456,7 +464,7 @@ export async function refreshAiInsight(): Promise<{
             .digest("hex")
             .slice(0, 32);
 
-        const analysis = await callOpenAI(snapshot);
+        const analysis = await callOpenAI(snapshot, userContext);
 
         const row = await prisma.aiInsight.upsert({
             where: { userId },

@@ -187,7 +187,7 @@ export async function getWorkouts(limit?: number) {
         include: {
             sets: {
                 include: { exercise: true },
-                orderBy: [{ exerciseId: "asc" }, { setNumber: "asc" }],
+                orderBy: [{ id: "asc" }, { setNumber: "asc" }],
             },
         },
         orderBy: { date: "desc" },
@@ -249,12 +249,23 @@ export async function getWorkoutMetaSuggestions(): Promise<WorkoutMetaSuggestion
     return { names, durations };
 }
 
-export async function getLastSetsForExercise(exerciseId: string) {
+export async function getLastSetsForExercise(
+    exerciseId: string,
+    excludeWorkoutId?: string,
+) {
     const userId = await getUserId();
 
     // Find the most recent workout that included this exercise
     const lastSet = await prisma.workoutSet.findFirst({
-        where: { exerciseId, workout: { userId } },
+        where: {
+            exerciseId,
+            workout: {
+                userId,
+                ...(excludeWorkoutId
+                    ? { id: { not: excludeWorkoutId } }
+                    : {}),
+            },
+        },
         orderBy: { workout: { date: "desc" } },
         select: { workoutId: true },
     });
@@ -283,7 +294,7 @@ export async function getWorkout(id: string) {
         include: {
             sets: {
                 include: { exercise: true },
-                orderBy: [{ exerciseId: "asc" }, { setNumber: "asc" }],
+                orderBy: [{ id: "asc" }, { setNumber: "asc" }],
             },
         },
     });

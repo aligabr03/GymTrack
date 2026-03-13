@@ -130,18 +130,6 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                                     const volume = calculateVolume(
                                         workout.sets,
                                     );
-                                    const exercises = [
-                                        ...new Set(
-                                            workout.sets.map(
-                                                (s) => s.exercise.name,
-                                            ),
-                                        ),
-                                    ];
-                                    const exerciseSummary =
-                                        exercises.slice(0, 3).join(" · ") +
-                                        (exercises.length > 3
-                                            ? ` · +${exercises.length - 3}`
-                                            : "");
 
                                     return (
                                         <Link
@@ -167,9 +155,6 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                                                     )}
                                                     {workout.durationMins
                                                         ? ` · ${workout.durationMins} min`
-                                                        : ""}
-                                                    {exerciseSummary
-                                                        ? ` · ${exerciseSummary}`
                                                         : ""}
                                                 </p>
                                             </div>

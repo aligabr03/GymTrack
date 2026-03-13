@@ -24,8 +24,6 @@ const MONTHS = [
 
 function intensity(count: number): string {
     if (count === 0) return "bg-[var(--secondary)]";
-    if (count === 1) return "bg-zinc-700";
-    if (count === 2) return "bg-zinc-500";
     return "bg-[var(--foreground)]";
 }
 
@@ -133,12 +131,10 @@ export function WorkoutCalendar({ year, data }: Props) {
 
                 {/* Legend */}
                 <div className="flex items-center gap-2 mt-3 ml-8 text-[10px] text-[var(--muted-foreground)]">
-                    <span>Less</span>
+                    <span>Off</span>
                     <div className="w-3 h-3 rounded-[2px] bg-[var(--secondary)]" />
-                    <div className="w-3 h-3 rounded-[2px] bg-zinc-700" />
-                    <div className="w-3 h-3 rounded-[2px] bg-zinc-500" />
                     <div className="w-3 h-3 rounded-[2px] bg-[var(--foreground)]" />
-                    <span>More</span>
+                    <span>On</span>
                 </div>
             </div>
         </div>

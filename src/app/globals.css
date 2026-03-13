@@ -148,6 +148,15 @@ h6 {
     }
 }
 
+@keyframes shineSweep {
+    from {
+        transform: translateX(-120%);
+    }
+    to {
+        transform: translateX(220%);
+    }
+}
+
 .animate-fade-in-up {
     animation: fadeInUp 0.35s ease-out both;
 }
@@ -158,6 +167,10 @@ h6 {
 
 .animate-scale-in {
     animation: scaleIn 0.25s ease-out both;
+}
+
+.animate-shine-sweep {
+    animation: shineSweep 2.8s linear infinite;
 }
 
 /* Stagger children animations */

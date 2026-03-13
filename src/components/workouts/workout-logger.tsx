@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { createWorkout, updateWorkout } from "@/actions/workouts";
+import {
+    createWorkout,
+    getLastSetsForExercise,
+    updateWorkout,
+} from "@/actions/workouts";
+import { createExercise } from "@/actions/exercises";
 import type {
     Exercise,
     WorkoutMetaSuggestions,
     WorkoutWithSets,
 } from "@/types";
-import { FORM_RATINGS } from "@/types";
+import { EXERCISE_CATEGORIES, FORM_RATINGS } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -87,6 +92,26 @@ function makeSet(
     };
 }
 
+function getBestEstimatedOneRM(
+    sets: Array<
+        {
+            weightKg: string | number | null;
+            reps: string | number | null;
+        }
+    >,
+): number | null {
+    let best: number | null = null;
+    for (const set of sets) {
+        const weight = Number(set.weightKg ?? 0);
+        const reps = Number(set.reps ?? 0);
+        if (!Number.isFinite(weight) || !Number.isFinite(reps)) continue;
+        if (weight <= 0 || reps <= 0) continue;
+        const e1rm = estimateOneRM(weight, reps);
+        if (best == null || e1rm > best) best = e1rm;
+    }
+    return best;
+}
+
 export function WorkoutLogger({
     exercises,
     existing,
@@ -109,6 +134,13 @@ export function WorkoutLogger({
     const [durationMins, setDurationMins] = useState(
         existing?.durationMins?.toString() ?? "",
     );
+    const [exerciseOptions, setExerciseOptions] = useState(exercises);
+    const [createExerciseName, setCreateExerciseName] = useState("");
+    const [createExerciseCategory, setCreateExerciseCategory] =
+        useState<(typeof EXERCISE_CATEGORIES)[number]>(EXERCISE_CATEGORIES[0]);
+    const [previousBestByExercise, setPreviousBestByExercise] = useState<
+        Record<string, number | null>
+    >({});
 
     // Build groups from existing workout
     const [groups, setGroups] = useState<ExerciseGroup[]>(() => {
@@ -136,8 +168,8 @@ export function WorkoutLogger({
         return Array.from(byExercise.entries()).map(([exerciseId, sets]) => ({
             exerciseId,
             exerciseName: sets[0].exerciseName,
-            sets,
-            collapsed: false,
+            sets: sets.sort((a, b) => a.setNumber - b.setNumber),
+            collapsed: Boolean(existing),
             supersetGroupId: supersetMap.get(exerciseId) ?? null,
         }));
     });
@@ -146,9 +178,9 @@ export function WorkoutLogger({
     const [exerciseSearch, setExerciseSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
 
-    const categories = [...new Set(exercises.map((e) => e.category))].sort();
+    const categories = [...new Set(exerciseOptions.map((e) => e.category))].sort();
 
-    const filteredExercises = exercises.filter((e) => {
+    const filteredExercises = exerciseOptions.filter((e) => {
         const matchSearch = e.name
             .toLowerCase()
             .includes(exerciseSearch.toLowerCase());
@@ -156,6 +188,30 @@ export function WorkoutLogger({
             categoryFilter === "all" || e.category === categoryFilter;
         return matchSearch && matchCat;
     });
+
+    async function loadPreviousBestForExercise(exerciseId: string) {
+        try {
+            const lastSets = await getLastSetsForExercise(exerciseId, existing?.id);
+            const best = getBestEstimatedOneRM(lastSets);
+            setPreviousBestByExercise((prev) => ({
+                ...prev,
+                [exerciseId]: best,
+            }));
+        } catch {
+            setPreviousBestByExercise((prev) => ({
+                ...prev,
+                [exerciseId]: null,
+            }));
+        }
+    }
+
+    useEffect(() => {
+        for (const group of groups) {
+            if (previousBestByExercise[group.exerciseId] !== undefined) continue;
+            void loadPreviousBestForExercise(group.exerciseId);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [groups]);
 
     function addExercise(exercise: Exercise) {
         if (groups.some((g) => g.exerciseId === exercise.id)) {
@@ -186,7 +242,7 @@ export function WorkoutLogger({
         setAddExOpen(false);
         setExerciseSearch("");
         setGroups((prev) => [
-            ...prev,
+            ...prev.map((g) => ({ ...g, collapsed: true })),
             {
                 exerciseId: exercise.id,
                 exerciseName: exercise.name,
@@ -195,6 +251,44 @@ export function WorkoutLogger({
                 supersetGroupId: null,
             },
         ]);
+
+        if (previousBestByExercise[exercise.id] === undefined) {
+            void loadPreviousBestForExercise(exercise.id);
+        }
+    }
+
+    function handleCreateExercise() {
+        const name = createExerciseName.trim();
+        if (!name) return;
+
+        startTransition(async () => {
+            const result = await createExercise({
+                name,
+                category: createExerciseCategory,
+                muscleGroups: [createExerciseCategory],
+            });
+
+            if (!result.success) {
+                toast({
+                    title: result.error ?? "Could not create exercise",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            const exercise = result.data;
+            setExerciseOptions((prev) =>
+                [...prev, exercise].sort(
+                    (a, b) =>
+                        a.category.localeCompare(b.category) ||
+                        a.name.localeCompare(b.name),
+                ),
+            );
+            setCreateExerciseName("");
+            setCategoryFilter(exercise.category);
+            addExercise(exercise);
+            toast({ title: "Exercise created", variant: "success" });
+        });
     }
 
     function addSet(exerciseId: string) {
@@ -575,6 +669,10 @@ export function WorkoutLogger({
                         <ExerciseGroupCard
                             key={item.group.exerciseId}
                             group={item.group}
+                            previousBest={
+                                previousBestByExercise[item.group.exerciseId] ??
+                                null
+                            }
                             otherGroups={groups.filter(
                                 (g) => g.exerciseId !== item.group.exerciseId,
                             )}
@@ -626,6 +724,11 @@ export function WorkoutLogger({
                                     <ExerciseGroupCard
                                         key={group.exerciseId}
                                         group={group}
+                                        previousBest={
+                                            previousBestByExercise[
+                                                group.exerciseId
+                                            ] ?? null
+                                        }
                                         otherGroups={groups.filter(
                                             (g) =>
                                                 g.exerciseId !==
@@ -745,6 +848,50 @@ export function WorkoutLogger({
                                 ))
                             )}
                         </div>
+                        <div className="border-t border-[var(--border)] pt-3 space-y-2">
+                            <p className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+                                Create new exercise
+                            </p>
+                            <Input
+                                placeholder="Exercise name"
+                                value={createExerciseName}
+                                onChange={(e) =>
+                                    setCreateExerciseName(e.target.value)
+                                }
+                            />
+                            <Select
+                                value={createExerciseCategory}
+                                onValueChange={(value) =>
+                                    setCreateExerciseCategory(
+                                        value as (typeof EXERCISE_CATEGORIES)[number],
+                                    )
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {EXERCISE_CATEGORIES.map((category) => (
+                                        <SelectItem
+                                            key={category}
+                                            value={category}
+                                        >
+                                            {category}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleCreateExercise}
+                                disabled={!createExerciseName.trim() || isPending}
+                                className="w-full"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Create & Add
+                            </Button>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -807,6 +954,7 @@ function SuggestionRow({
 
 function ExerciseGroupCard({
     group,
+    previousBest,
     otherGroups,
     onAddSet,
     onAddDropSet,
@@ -820,6 +968,7 @@ function ExerciseGroupCard({
     onUnlinkSuperset,
 }: {
     group: ExerciseGroup;
+    previousBest: number | null;
     otherGroups: ExerciseGroup[];
     onAddSet: () => void;
     onAddDropSet: () => void;
@@ -837,6 +986,30 @@ function ExerciseGroupCard({
     onUnlinkSuperset: () => void;
 }) {
     const [supersetPickerOpen, setSupersetPickerOpen] = useState(false);
+    const currentBest = getBestEstimatedOneRM(group.sets);
+    const delta =
+        previousBest == null || currentBest == null
+            ? null
+            : currentBest - previousBest;
+    const trend =
+        delta == null
+            ? null
+            : delta > 0.15
+              ? {
+                    label: `+${delta.toFixed(1)} lbs`,
+                    className:
+                        "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
+                }
+              : delta < -0.15
+                ? {
+                      label: `${delta.toFixed(1)} lbs`,
+                      className: "border-red-500/40 bg-red-500/10 text-red-300",
+                  }
+                : {
+                      label: "same as last",
+                      className:
+                          "border-amber-500/40 bg-amber-500/10 text-amber-300",
+                  };
 
     const linkableGroups = otherGroups.filter(
         (g) =>
@@ -861,8 +1034,13 @@ function ExerciseGroupCard({
                             ↓ drop
                         </Badge>
                     )}
+                    {trend && (
+                        <Badge className={`text-[10px] ${trend.className}`}>
+                            {trend.label}
+                        </Badge>
+                    )}
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-3 shrink-0">
                     {/* Superset controls */}
                     {group.supersetGroupId ? (
                         <button
@@ -925,19 +1103,29 @@ function ExerciseGroupCard({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            onRemoveExercise();
+                            if (confirm(`Remove ${group.exerciseName} from this workout?`)) {
+                                onRemoveExercise();
+                            }
                         }}
-                        className="p-1.5 rounded hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
+                        className="p-2 rounded-lg hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
                         aria-label="Remove exercise"
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>
-                    <div className="w-px h-4 bg-[var(--border)]" />
-                    {group.collapsed ? (
-                        <ChevronDown className="h-4 w-4 text-[var(--muted-foreground)]" />
-                    ) : (
-                        <ChevronUp className="h-4 w-4 text-[var(--muted-foreground)]" />
-                    )}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleCollapse();
+                        }}
+                        className="p-2 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                        aria-label={group.collapsed ? "Expand exercise" : "Collapse exercise"}
+                    >
+                        {group.collapsed ? (
+                            <ChevronDown className="h-4 w-4" />
+                        ) : (
+                            <ChevronUp className="h-4 w-4" />
+                        )}
+                    </button>
                 </div>
             </div>
 

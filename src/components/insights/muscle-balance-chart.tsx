@@ -16,15 +16,15 @@ type Props = {
 };
 
 const COLORS = [
-    "#fafafa",
-    "#a1a1aa",
-    "#71717a",
+    "#6b7280",
+    "#64748b",
+    "#4b5563",
+    "#334155",
+    "#475569",
     "#52525b",
-    "#3f3f46",
-    "#27272a",
-    "#d4d4d8",
-    "#e4e4e7",
-    "#18181b",
+    "#71717a",
+    "#9ca3af",
+    "#94a3b8",
 ];
 
 export function MuscleBalanceChart({ data }: Props) {
@@ -41,7 +41,7 @@ export function MuscleBalanceChart({ data }: Props) {
             <BarChart
                 data={data}
                 layout="vertical"
-                margin={{ top: 4, right: 8, left: 60, bottom: 4 }}
+                margin={{ top: 4, right: 8, left: 12, bottom: 4 }}
             >
                 <CartesianGrid
                     strokeDasharray="3 3"
@@ -61,7 +61,7 @@ export function MuscleBalanceChart({ data }: Props) {
                     tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
                     axisLine={false}
                     tickLine={false}
-                    width={56}
+                    width={44}
                 />
                 <Tooltip
                     contentStyle={{
@@ -71,6 +71,8 @@ export function MuscleBalanceChart({ data }: Props) {
                         color: "var(--foreground)",
                         fontSize: "12px",
                     }}
+                    labelStyle={{ color: "var(--foreground)" }}
+                    itemStyle={{ color: "var(--foreground)" }}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [
                         `${Number(value ?? 0).toLocaleString()} lbs`,

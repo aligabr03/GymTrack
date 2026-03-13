@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { RefreshCw } from "lucide-react";
 import { refreshAiInsight } from "@/actions/insights";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
     initial: { analysis: string; updatedAt: string } | null;
@@ -23,12 +24,13 @@ export function AiAnalysisCard({ initial }: Props) {
     const [data, setData] = useState(initial);
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
+    const [contextInput, setContextInput] = useState("");
 
     function handleRefresh() {
         setError(null);
         startTransition(async () => {
             try {
-                const result = await refreshAiInsight();
+                const result = await refreshAiInsight(contextInput);
                 if (result) setData(result);
             } catch {
                 setError("Failed to generate analysis. Check your API key.");
@@ -48,6 +50,17 @@ export function AiAnalysisCard({ initial }: Props) {
 
     return (
         <div className="space-y-4">
+            <div className="space-y-2">
+                <p className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider">
+                    Optional context
+                </p>
+                <Textarea
+                    placeholder="e.g. Deload week, shoulder pain, sleep has been low, cutting calories..."
+                    value={contextInput}
+                    onChange={(e) => setContextInput(e.target.value)}
+                    className="min-h-20"
+                />
+            </div>
             {data && !isPlaceholder ? (
                 <>
                     {bullets.length > 0 ? (

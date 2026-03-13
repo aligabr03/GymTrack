@@ -33,16 +33,23 @@ type ChartPoint = {
 };
 
 export function ProgressionChart({ exercises }: Props) {
+    const [category, setCategory] = useState<string>("all");
     const [selected, setSelected] = useState<string>(exercises[0]?.id ?? "");
     const [data, setData] = useState<ChartPoint[]>([]);
     const [isPending, startTransition] = useTransition();
     const [loaded, setLoaded] = useState(false);
 
+    const categories = [...new Set(exercises.map((exercise) => exercise.category))].sort();
+    const filteredExercises =
+        category === "all"
+            ? exercises
+            : exercises.filter((exercise) => exercise.category === category);
+
     // Auto-load the first exercise on mount
     useEffect(() => {
-        if (exercises[0]?.id) load(exercises[0].id);
+        if (filteredExercises[0]?.id) load(filteredExercises[0].id);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [category]);
 
     function load(exerciseId: string) {
         setSelected(exerciseId);
@@ -87,19 +94,43 @@ export function ProgressionChart({ exercises }: Props) {
 
     return (
         <div className="space-y-4">
-            <Select value={selected} onValueChange={load}>
-                <SelectTrigger className="w-full max-w-xs">
-                    <SelectValue placeholder="Select an exercise" />
-                </SelectTrigger>
-                <SelectContent>
-                    {exercises.map((ex) => (
-                        <SelectItem key={ex.id} value={ex.id}>
-                            {ex.name}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+            <div className="flex flex-wrap items-center gap-2">
+                <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                        <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All categories</SelectItem>
+                        {categories.map((c) => (
+                            <SelectItem key={c} value={c}>
+                                {c}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
+                <Select value={selected} onValueChange={load}>
+                    <SelectTrigger className="w-full sm:max-w-xs">
+                        <SelectValue placeholder="Select an exercise" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {filteredExercises.map((ex) => (
+                            <SelectItem key={ex.id} value={ex.id}>
+                                {ex.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            {filteredExercises.length === 0 && (
+                <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">
+                    No logged exercises in this category yet
+                </div>
+            )}
+
+            {filteredExercises.length > 0 && (
+                <>
             {!loaded && (
                 <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">
                     Select an exercise above to view progression
@@ -182,6 +213,8 @@ export function ProgressionChart({ exercises }: Props) {
                         />
                     </LineChart>
                 </ResponsiveContainer>
+            )}
+                </>
             )}
         </div>
     );

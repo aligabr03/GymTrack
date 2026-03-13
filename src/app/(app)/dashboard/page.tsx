@@ -72,7 +72,7 @@ export default async function DashboardPage() {
                 <StatCard
                     icon={Trophy}
                     label="Personal Records"
-                    value={stats.personalRecords.length}
+                    value={stats.personalRecordsCount}
                     iconColor="text-[var(--foreground)]"
                     iconBg="bg-[var(--secondary)]"
                     index={3}
@@ -200,9 +200,14 @@ export default async function DashboardPage() {
                     {/* Personal Records */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-semibold">
-                                Top Records
-                            </h2>
+                            <div>
+                                <h2 className="text-lg font-semibold">
+                                    Top Records
+                                </h2>
+                                <p className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider">
+                                    Sorted by estimated 1RM
+                                </p>
+                            </div>
                             <Link
                                 href="/records"
                                 className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1 transition-colors"
