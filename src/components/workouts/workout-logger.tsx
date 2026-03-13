@@ -273,9 +273,12 @@ export function WorkoutLogger({
                 muscleGroups: [createExerciseCategory],
             });
 
-            if (!result.success) {
+            if (!result.success || !result.data) {
                 toast({
-                    title: result.error ?? "Could not create exercise",
+                    title:
+                        ("error" in result
+                            ? result.error
+                            : undefined) ?? "Could not create exercise",
                     variant: "destructive",
                 });
                 return;
