@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { Trophy, Medal } from "lucide-react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogTitle } from "@/components/ui/dialog";
 import {
     Select,
     SelectContent,
@@ -151,16 +152,20 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                     if (!open) setSelectedRecord(null);
                 }}
             >
-                <DialogContent className="inset-0 h-[100dvh] max-h-none w-screen max-w-none rounded-none border-0 p-6 md:inset-0 md:left-0 md:top-0 md:h-[100dvh] md:w-screen md:max-w-none md:translate-x-0 md:translate-y-0 md:rounded-none md:p-10">
-                    <DialogTitle className="sr-only">
-                        Record details
-                    </DialogTitle>
-                    {selectedRecord && (
-                        <div className="h-full flex items-center justify-center">
-                            <Card className="w-full max-w-xl border-amber-400/40 overflow-hidden">
-                                <CardContent className="p-8 md:p-10 space-y-6 relative">
-                                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shine-sweep" />
-                                    <div className="relative flex items-start justify-between gap-4">
+                <DialogPrimitive.Portal>
+                    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-200" />
+                    <DialogPrimitive.Content
+                        className="fixed inset-0 z-50 flex items-center justify-center p-6 md:p-10 duration-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 outline-none"
+                        onClick={() => setSelectedRecord(null)}
+                    >
+                        <DialogTitle className="sr-only">
+                            Record details
+                        </DialogTitle>
+                        {selectedRecord && (
+                            <Card className="relative w-full max-w-xl border-amber-400/40 overflow-hidden">
+                                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent animate-shine-sweep z-0" />
+                                <CardContent className="p-8 md:p-10 space-y-6 relative z-10">
+                                    <div className="flex items-start justify-between gap-4">
                                         <div>
                                             <p className="text-2xl md:text-3xl font-bold">
                                                 {selectedRecord.exercise.name}
@@ -169,20 +174,15 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                                 variant="outline"
                                                 className="mt-2"
                                             >
-                                                {
-                                                    selectedRecord.exercise
-                                                        .category
-                                                }
+                                                {selectedRecord.exercise.category}
                                             </Badge>
                                         </div>
                                         <Trophy className="h-10 w-10 text-amber-300 shrink-0" />
                                     </div>
 
-                                    <div className="relative space-y-3">
+                                    <div className="space-y-3">
                                         <p className="text-4xl md:text-5xl font-bold tabular-nums leading-none">
-                                            {selectedRecord.estimatedOneRM.toFixed(
-                                                1,
-                                            )}
+                                            {selectedRecord.estimatedOneRM.toFixed(1)}
                                             <span className="text-xl md:text-2xl ml-2 text-[var(--muted-foreground)]">
                                                 lbs
                                             </span>
@@ -191,23 +191,21 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                             Estimated 1RM
                                         </p>
                                         <p className="text-lg text-[var(--muted-foreground)]">
-                                            {selectedRecord.weightKg} lbs x{" "}
+                                            {selectedRecord.weightKg} lbs &times;{" "}
                                             {selectedRecord.reps} reps
                                         </p>
                                         <p className="text-sm text-[var(--muted-foreground)]">
                                             Achieved on{" "}
                                             <strong className="text-[var(--foreground)]">
-                                                {formatDate(
-                                                    selectedRecord.achievedAt,
-                                                )}
+                                                {formatDate(selectedRecord.achievedAt)}
                                             </strong>
                                         </p>
                                     </div>
                                 </CardContent>
                             </Card>
-                        </div>
-                    )}
-                </DialogContent>
+                        )}
+                    </DialogPrimitive.Content>
+                </DialogPrimitive.Portal>
             </Dialog>
         </div>
     );

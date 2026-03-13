@@ -8,7 +8,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
     Dumbbell,
-    TrendingUp,
     Trophy,
     CalendarDays,
     Scale,
@@ -44,7 +43,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Stat cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 <StatCard
                     icon={Dumbbell}
                     label="Total Workouts"
@@ -68,14 +67,6 @@ export default async function DashboardPage() {
                     iconColor="text-[var(--foreground)]"
                     iconBg="bg-[var(--secondary)]"
                     index={2}
-                />
-                <StatCard
-                    icon={Trophy}
-                    label="Personal Records"
-                    value={stats.personalRecordsCount}
-                    iconColor="text-[var(--foreground)]"
-                    iconBg="bg-[var(--secondary)]"
-                    index={3}
                 />
             </div>
 
@@ -195,8 +186,59 @@ export default async function DashboardPage() {
                     )}
                 </div>
 
-                {/* Sidebar: PRs + Body */}
-                <div className="space-y-4">
+                {/* Sidebar: Top Records + Body */}
+                <div className="space-y-6">
+                    {/* Top Records */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-lg font-semibold">
+                                Top Records
+                            </h2>
+                            <Link
+                                href="/records"
+                                className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1 transition-colors"
+                            >
+                                View all{" "}
+                                <ChevronRight className="h-3 w-3" />
+                            </Link>
+                        </div>
+
+                        {stats.personalRecords.length === 0 ? (
+                            <EmptyCard
+                                icon={Trophy}
+                                title="No records yet"
+                                desc="Complete workouts to set personal records."
+                                href="/workouts/new"
+                                cta="Log a workout"
+                            />
+                        ) : (
+                            <Card>
+                                <CardContent className="p-4 divide-y divide-[var(--border)]">
+                                    {stats.personalRecords.map((pr) => (
+                                        <div
+                                            key={pr.id}
+                                            className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3"
+                                        >
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium truncate">
+                                                    {pr.exercise.name}
+                                                </p>
+                                                <p className="text-xs text-[var(--muted-foreground)]">
+                                                    {pr.weightKg} lbs &times;{" "}
+                                                    {pr.reps} reps
+                                                </p>
+                                            </div>
+                                            <p className="text-sm font-bold tabular-nums shrink-0">
+                                                {pr.estimatedOneRM.toFixed(1)}{" "}
+                                                lbs
+                                            </p>
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+
                     {/* Latest body metric */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
