@@ -93,12 +93,10 @@ function makeSet(
 }
 
 function getBestEstimatedOneRM(
-    sets: Array<
-        {
-            weightKg: string | number | null;
-            reps: string | number | null;
-        }
-    >,
+    sets: Array<{
+        weightKg: string | number | null;
+        reps: string | number | null;
+    }>,
 ): number | null {
     let best: number | null = null;
     for (const set of sets) {
@@ -136,8 +134,9 @@ export function WorkoutLogger({
     );
     const [exerciseOptions, setExerciseOptions] = useState(exercises);
     const [createExerciseName, setCreateExerciseName] = useState("");
-    const [createExerciseCategory, setCreateExerciseCategory] =
-        useState<(typeof EXERCISE_CATEGORIES)[number]>(EXERCISE_CATEGORIES[0]);
+    const [createExerciseCategory, setCreateExerciseCategory] = useState<
+        (typeof EXERCISE_CATEGORIES)[number]
+    >(EXERCISE_CATEGORIES[0]);
     const [previousBestByExercise, setPreviousBestByExercise] = useState<
         Record<string, number | null>
     >({});
@@ -178,7 +177,9 @@ export function WorkoutLogger({
     const [exerciseSearch, setExerciseSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
 
-    const categories = [...new Set(exerciseOptions.map((e) => e.category))].sort();
+    const categories = [
+        ...new Set(exerciseOptions.map((e) => e.category)),
+    ].sort();
 
     const filteredExercises = exerciseOptions.filter((e) => {
         const matchSearch = e.name
@@ -191,7 +192,10 @@ export function WorkoutLogger({
 
     async function loadPreviousBestForExercise(exerciseId: string) {
         try {
-            const lastSets = await getLastSetsForExercise(exerciseId, existing?.id);
+            const lastSets = await getLastSetsForExercise(
+                exerciseId,
+                existing?.id,
+            );
             const best = getBestEstimatedOneRM(lastSets);
             setPreviousBestByExercise((prev) => ({
                 ...prev,
@@ -207,7 +211,8 @@ export function WorkoutLogger({
 
     useEffect(() => {
         for (const group of groups) {
-            if (previousBestByExercise[group.exerciseId] !== undefined) continue;
+            if (previousBestByExercise[group.exerciseId] !== undefined)
+                continue;
             void loadPreviousBestForExercise(group.exerciseId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -885,7 +890,9 @@ export function WorkoutLogger({
                                 type="button"
                                 variant="outline"
                                 onClick={handleCreateExercise}
-                                disabled={!createExerciseName.trim() || isPending}
+                                disabled={
+                                    !createExerciseName.trim() || isPending
+                                }
                                 className="w-full"
                             >
                                 <Plus className="h-4 w-4" />
@@ -1103,7 +1110,11 @@ function ExerciseGroupCard({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            if (confirm(`Remove ${group.exerciseName} from this workout?`)) {
+                            if (
+                                confirm(
+                                    `Remove ${group.exerciseName} from this workout?`,
+                                )
+                            ) {
                                 onRemoveExercise();
                             }
                         }}
@@ -1118,7 +1129,11 @@ function ExerciseGroupCard({
                             onToggleCollapse();
                         }}
                         className="p-2 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
-                        aria-label={group.collapsed ? "Expand exercise" : "Collapse exercise"}
+                        aria-label={
+                            group.collapsed
+                                ? "Expand exercise"
+                                : "Collapse exercise"
+                        }
                     >
                         {group.collapsed ? (
                             <ChevronDown className="h-4 w-4" />

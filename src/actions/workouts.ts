@@ -261,9 +261,7 @@ export async function getLastSetsForExercise(
             exerciseId,
             workout: {
                 userId,
-                ...(excludeWorkoutId
-                    ? { id: { not: excludeWorkoutId } }
-                    : {}),
+                ...(excludeWorkoutId ? { id: { not: excludeWorkoutId } } : {}),
             },
         },
         orderBy: { workout: { date: "desc" } },

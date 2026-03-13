@@ -29,7 +29,10 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
     const [category, setCategory] = useState("all");
 
     const categories = useMemo(
-        () => [...new Set(records.map((record) => record.exercise.category))].sort(),
+        () =>
+            [
+                ...new Set(records.map((record) => record.exercise.category)),
+            ].sort(),
         [records],
     );
 
@@ -37,7 +40,9 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
         () =>
             category === "all"
                 ? records
-                : records.filter((record) => record.exercise.category === category),
+                : records.filter(
+                      (record) => record.exercise.category === category,
+                  ),
         [category, records],
     );
 
@@ -89,7 +94,10 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                             <p className="font-semibold text-sm truncate">
                                                 {record.exercise.name}
                                             </p>
-                                            <Badge variant="outline" className="text-[10px] mt-1">
+                                            <Badge
+                                                variant="outline"
+                                                className="text-[10px] mt-1"
+                                            >
                                                 {record.exercise.category}
                                             </Badge>
                                         </div>
@@ -102,13 +110,15 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
 
                                     <div className="space-y-1 mt-2">
                                         <p className="text-lg font-bold tabular-nums">
-                                            {record.estimatedOneRM.toFixed(1)} lbs
+                                            {record.estimatedOneRM.toFixed(1)}{" "}
+                                            lbs
                                         </p>
                                         <p className="text-xs text-[var(--muted-foreground)]">
                                             Est. 1RM
                                         </p>
                                         <p className="text-xs text-[var(--muted-foreground)]">
-                                            {record.weightKg} lbs x {record.reps} reps
+                                            {record.weightKg} lbs x{" "}
+                                            {record.reps} reps
                                         </p>
                                         <p className="text-[10px] text-[var(--muted-foreground)] pt-1 uppercase tracking-wider">
                                             {formatDate(record.achievedAt)}

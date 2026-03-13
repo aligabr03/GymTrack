@@ -39,7 +39,9 @@ export function ProgressionChart({ exercises }: Props) {
     const [isPending, startTransition] = useTransition();
     const [loaded, setLoaded] = useState(false);
 
-    const categories = [...new Set(exercises.map((exercise) => exercise.category))].sort();
+    const categories = [
+        ...new Set(exercises.map((exercise) => exercise.category)),
+    ].sort();
     const filteredExercises =
         category === "all"
             ? exercises
@@ -131,89 +133,98 @@ export function ProgressionChart({ exercises }: Props) {
 
             {filteredExercises.length > 0 && (
                 <>
-            {!loaded && (
-                <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">
-                    Select an exercise above to view progression
-                </div>
-            )}
+                    {!loaded && (
+                        <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">
+                            Select an exercise above to view progression
+                        </div>
+                    )}
 
-            {loaded && !isPending && data.length === 0 && (
-                <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">
-                    No data yet for this exercise
-                </div>
-            )}
+                    {loaded && !isPending && data.length === 0 && (
+                        <div className="flex items-center justify-center h-48 text-[var(--muted-foreground)] text-sm">
+                            No data yet for this exercise
+                        </div>
+                    )}
 
-            {(loaded || isPending) && data.length > 0 && (
-                <ResponsiveContainer width="100%" height={240}>
-                    <LineChart
-                        data={data}
-                        margin={{ top: 4, right: 8, left: 0, bottom: 4 }}
-                    >
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="rgba(255,255,255,0.05)"
-                        />
-                        <XAxis
-                            dataKey="date"
-                            tick={{
-                                fill: "var(--muted-foreground)",
-                                fontSize: 11,
-                            }}
-                            axisLine={false}
-                            tickLine={false}
-                        />
-                        <YAxis
-                            tick={{
-                                fill: "var(--muted-foreground)",
-                                fontSize: 11,
-                            }}
-                            axisLine={false}
-                            tickLine={false}
-                            unit=" lbs"
-                        />
-                        <Tooltip
-                            contentStyle={{
-                                background: "var(--card)",
-                                border: "1px solid var(--border)",
-                                borderRadius: "8px",
-                                color: "var(--foreground)",
-                                fontSize: "12px",
-                            }}
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            formatter={(value: any, name: any) => [
-                                `${Number(value ?? 0)} lbs`,
-                                name === "weight" ? "Top weight" : "Est. 1RM",
-                            ]}
-                        />
-                        <Legend
-                            formatter={(value) =>
-                                value === "weight" ? "Top weight" : "Est. 1RM"
-                            }
-                            wrapperStyle={{
-                                fontSize: "12px",
-                                color: "var(--muted-foreground)",
-                            }}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="weight"
-                            stroke="var(--foreground)"
-                            strokeWidth={2}
-                            dot={{ r: 3, fill: "var(--foreground)" }}
-                            activeDot={{ r: 5 }}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="estimatedOneRM"
-                            stroke="#71717a"
-                            strokeWidth={2}
-                            strokeDasharray="5 5"
-                            dot={{ r: 2, fill: "#71717a" }}
-                            activeDot={{ r: 4 }}
-                        />
-                    </LineChart>
-                </ResponsiveContainer>
-            )}
+                    {(loaded || isPending) && data.length > 0 && (
+                        <ResponsiveContainer width="100%" height={240}>
+                            <LineChart
+                                data={data}
+                                margin={{
+                                    top: 4,
+                                    right: 8,
+                                    left: 0,
+                                    bottom: 4,
+                                }}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke="rgba(255,255,255,0.05)"
+                                />
+                                <XAxis
+                                    dataKey="date"
+                                    tick={{
+                                        fill: "var(--muted-foreground)",
+                                        fontSize: 11,
+                                    }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                />
+                                <YAxis
+                                    tick={{
+                                        fill: "var(--muted-foreground)",
+                                        fontSize: 11,
+                                    }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    unit=" lbs"
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        background: "var(--card)",
+                                        border: "1px solid var(--border)",
+                                        borderRadius: "8px",
+                                        color: "var(--foreground)",
+                                        fontSize: "12px",
+                                    }}
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    formatter={(value: any, name: any) => [
+                                        `${Number(value ?? 0)} lbs`,
+                                        name === "weight"
+                                            ? "Top weight"
+                                            : "Est. 1RM",
+                                    ]}
+                                />
+                                <Legend
+                                    formatter={(value) =>
+                                        value === "weight"
+                                            ? "Top weight"
+                                            : "Est. 1RM"
+                                    }
+                                    wrapperStyle={{
+                                        fontSize: "12px",
+                                        color: "var(--muted-foreground)",
+                                    }}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="weight"
+                                    stroke="var(--foreground)"
+                                    strokeWidth={2}
+                                    dot={{ r: 3, fill: "var(--foreground)" }}
+                                    activeDot={{ r: 5 }}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="estimatedOneRM"
+                                    stroke="#71717a"
+                                    strokeWidth={2}
+                                    strokeDasharray="5 5"
+                                    dot={{ r: 2, fill: "#71717a" }}
+                                    activeDot={{ r: 4 }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    )}
                 </>
             )}
         </div>
