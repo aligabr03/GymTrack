@@ -9,7 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
 import { calculateVolume, estimateOneRM } from "@/lib/calculations";
 import { FORM_RATINGS } from "@/types";
-import type { WorkoutWithSets, Exercise, WorkoutMetaSuggestions } from "@/types";
+import type {
+    WorkoutWithSets,
+    Exercise,
+    WorkoutMetaSuggestions,
+} from "@/types";
 import { ArrowLeft, Clock, Dumbbell, Edit } from "lucide-react";
 import { DeleteWorkoutButton } from "@/components/workouts/delete-workout-button";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
