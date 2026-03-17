@@ -13,6 +13,7 @@ import type {
     WorkoutMetaSuggestions,
     WorkoutWithSets,
 } from "@/types";
+import { toESTDateStr, todayEST } from "@/lib/utils";
 import { EXERCISE_CATEGORIES, FORM_RATINGS } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,7 +111,6 @@ function getBestEstimatedOneRM(
     return best;
 }
 
-
 export function WorkoutLogger({
     exercises,
     existing,
@@ -128,9 +128,7 @@ export function WorkoutLogger({
     const [isPending, startTransition] = useTransition();
 
     const [date, setDate] = useState(
-        existing?.date
-            ? new Date(existing.date).toISOString().split("T")[0]
-            : new Date().toISOString().split("T")[0],
+        existing?.date ? toESTDateStr(existing.date) : todayEST(),
     );
     const [workoutName, setWorkoutName] = useState(existing?.name ?? "");
     const [notes, setNotes] = useState(existing?.notes ?? "");
@@ -201,10 +199,7 @@ export function WorkoutLogger({
         );
         if (missing.length === 0) return;
         try {
-            const batch = await getBatchPreviousBestSets(
-                missing,
-                existing?.id,
-            );
+            const batch = await getBatchPreviousBestSets(missing, existing?.id);
             setPreviousBestByExercise((prev) => ({ ...prev, ...batch }));
         } catch {
             setPreviousBestByExercise((prev) => ({

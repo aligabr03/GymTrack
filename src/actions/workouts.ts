@@ -335,8 +335,7 @@ export async function getBatchPreviousBestSets(
         let best: { weightKg: number; reps: number; e1rm: number } | null =
             null;
         for (const s of sets) {
-            if (s.exerciseId !== exerciseId || !s.weightKg || !s.reps)
-                continue;
+            if (s.exerciseId !== exerciseId || !s.weightKg || !s.reps) continue;
             const e1rm = estimateOneRM(s.weightKg, s.reps);
             if (!best || e1rm > best.e1rm)
                 best = { weightKg: s.weightKg, reps: s.reps, e1rm };

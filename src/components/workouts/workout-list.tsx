@@ -29,31 +29,22 @@ const WORKOUT_GROUPS = [
     "Older",
 ] as const;
 
-function normalizeWorkoutDate(date: Date) {
-    const value = new Date(date);
-    return new Date(
-        value.getUTCFullYear(),
-        value.getUTCMonth(),
-        value.getUTCDate(),
-    );
+// Stored dates are UTC midnight (calendar date the user entered).
+// Extract the UTC YYYY-MM-DD string to get that calendar date.
+function utcDateStr(date: Date | string): string {
+    return new Date(date).toLocaleDateString("en-CA", { timeZone: "UTC" });
 }
 
-function getWorkoutGroup(date: Date) {
-    const workoutDate = normalizeWorkoutDate(date);
-    const now = new Date();
-    const startOfToday = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-    );
-    const startOfWorkoutDay = new Date(
-        workoutDate.getFullYear(),
-        workoutDate.getMonth(),
-        workoutDate.getDate(),
-    );
-    const diffDays = Math.floor(
-        (startOfToday.getTime() - startOfWorkoutDay.getTime()) /
-            (1000 * 60 * 60 * 24),
+function getWorkoutGroup(date: Date | string) {
+    // Build two midnight-UTC dates so the diff is always a clean integer.
+    const workoutDay = new Date(utcDateStr(date) + "T00:00:00Z");
+    // "Today" is anchored to EST so it tracks the user's wall clock.
+    const todayStr = new Date().toLocaleDateString("en-CA", {
+        timeZone: "America/New_York",
+    });
+    const today = new Date(todayStr + "T00:00:00Z");
+    const diffDays = Math.round(
+        (today.getTime() - workoutDay.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     if (diffDays <= 0) return "Today";
@@ -124,9 +115,6 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                             </div>
                             <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
                                 {grouped[group].map((workout, index) => {
-                                    const workoutDate = normalizeWorkoutDate(
-                                        workout.date,
-                                    );
                                     const volume = calculateVolume(
                                         workout.sets,
                                     );
@@ -145,13 +133,13 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                                                     <span className="text-sm font-medium truncate">
                                                         {workout.name ??
                                                             formatDate(
-                                                                workoutDate,
+                                                                workout.date,
                                                             )}
                                                     </span>
                                                 </div>
                                                 <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
                                                     {formatRelativeDate(
-                                                        workoutDate,
+                                                        workout.date,
                                                     )}
                                                     {workout.durationMins
                                                         ? ` · ${workout.durationMins} min`

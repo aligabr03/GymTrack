@@ -29,19 +29,24 @@ type FormData = {
     notes: string;
 };
 
-const initialForm: FormData = {
-    date: new Date().toISOString().split("T")[0],
-    weightKg: "",
-    bodyFatPct: "",
-    waistCm: "",
-    hipCm: "",
-    chestCm: "",
-    armCm: "",
-    notes: "",
-};
+function makeInitialForm(): FormData {
+    const todayStr = new Date().toLocaleDateString("en-CA", {
+        timeZone: "America/New_York",
+    });
+    return {
+        date: todayStr,
+        weightKg: "",
+        bodyFatPct: "",
+        waistCm: "",
+        hipCm: "",
+        chestCm: "",
+        armCm: "",
+        notes: "",
+    };
+}
 
 export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
-    const [form, setForm] = useState<FormData>(initialForm);
+    const [form, setForm] = useState<FormData>(makeInitialForm);
     const [showForm, setShowForm] = useState(metrics.length === 0);
     const [isPending, startTransition] = useTransition();
 
@@ -84,7 +89,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                 return;
             }
             toast({ title: "Metrics saved!", variant: "success" });
-            setForm(initialForm);
+            setForm(makeInitialForm());
             setShowForm(false);
         });
     }
@@ -227,7 +232,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     variant="outline"
                                     onClick={() => {
                                         setShowForm(false);
-                                        setForm(initialForm);
+                                        setForm(makeInitialForm());
                                     }}
                                 >
                                     Cancel
