@@ -80,7 +80,7 @@ export function AiAnalysisCard({ initial }: Props) {
                             size="sm"
                             onClick={handleRefresh}
                             disabled={isPending}
-                            className="text-xs gap-1.5"
+                            className="text-xs gap-2"
                         >
                             <RefreshCw
                                 className={`h-3 w-3 ${isPending ? "animate-spin" : ""}`}

@@ -110,14 +110,37 @@ function getBestEstimatedOneRM(
     return best;
 }
 
+function getBestSetByOneRM(
+    sets: Array<{
+        weightKg: string | number | null;
+        reps: string | number | null;
+    }>,
+): { weightKg: number; reps: number; e1rm: number } | null {
+    let best: { weightKg: number; reps: number; e1rm: number } | null = null;
+    for (const set of sets) {
+        const weight = Number(set.weightKg ?? 0);
+        const reps = Number(set.reps ?? 0);
+        if (!Number.isFinite(weight) || !Number.isFinite(reps)) continue;
+        if (weight <= 0 || reps <= 0) continue;
+        const e1rm = estimateOneRM(weight, reps);
+        if (best === null || e1rm > best.e1rm)
+            best = { weightKg: weight, reps, e1rm };
+    }
+    return best;
+}
+
 export function WorkoutLogger({
     exercises,
     existing,
     suggestions,
+    onSuccess,
+    onCancel,
 }: {
     exercises: Exercise[];
     existing?: WorkoutWithSets;
     suggestions: WorkoutMetaSuggestions;
+    onSuccess?: () => void;
+    onCancel?: () => void;
 }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -138,7 +161,7 @@ export function WorkoutLogger({
         (typeof EXERCISE_CATEGORIES)[number]
     >(EXERCISE_CATEGORIES[0]);
     const [previousBestByExercise, setPreviousBestByExercise] = useState<
-        Record<string, number | null>
+        Record<string, { weightKg: number; reps: number; e1rm: number } | null>
     >({});
 
     // Build groups from existing workout
@@ -196,7 +219,7 @@ export function WorkoutLogger({
                 exerciseId,
                 existing?.id,
             );
-            const best = getBestEstimatedOneRM(lastSets);
+            const best = getBestSetByOneRM(lastSets);
             setPreviousBestByExercise((prev) => ({
                 ...prev,
                 [exerciseId]: best,
@@ -528,7 +551,11 @@ export function WorkoutLogger({
                 title: existing ? "Workout updated" : "Workout saved! 💪",
                 variant: "success",
             });
-            router.push("/workouts");
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                router.push("/workouts");
+            }
         });
     }
 
@@ -909,7 +936,9 @@ export function WorkoutLogger({
             <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
                 <Button
                     variant="outline"
-                    onClick={() => router.push("/workouts")}
+                    onClick={() =>
+                        onCancel ? onCancel() : router.push("/workouts")
+                    }
                 >
                     Cancel
                 </Button>
@@ -977,7 +1006,7 @@ function ExerciseGroupCard({
     onUnlinkSuperset,
 }: {
     group: ExerciseGroup;
-    previousBest: number | null;
+    previousBest: { weightKg: number; reps: number; e1rm: number } | null;
     otherGroups: ExerciseGroup[];
     onAddSet: () => void;
     onAddDropSet: () => void;
@@ -995,30 +1024,25 @@ function ExerciseGroupCard({
     onUnlinkSuperset: () => void;
 }) {
     const [supersetPickerOpen, setSupersetPickerOpen] = useState(false);
-    const currentBest = getBestEstimatedOneRM(group.sets);
+    const currentBestE1rm = getBestEstimatedOneRM(group.sets);
     const delta =
-        previousBest == null || currentBest == null
+        previousBest == null || currentBestE1rm == null
             ? null
-            : currentBest - previousBest;
+            : currentBestE1rm - previousBest.e1rm;
     const trend =
-        delta == null
+        previousBest == null
             ? null
-            : delta > 0.15
-              ? {
-                    label: `+${delta.toFixed(1)} lbs`,
-                    className:
-                        "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
-                }
-              : delta < -0.15
-                ? {
-                      label: `${delta.toFixed(1)} lbs`,
-                      className: "border-red-500/40 bg-red-500/10 text-red-300",
-                  }
-                : {
-                      label: "same as last",
-                      className:
-                          "border-amber-500/40 bg-amber-500/10 text-amber-300",
-                  };
+            : {
+                  label: `${previousBest.weightKg} lbs × ${previousBest.reps}`,
+                  className:
+                      delta == null
+                          ? "border-[var(--border)] bg-[var(--secondary)] text-[var(--muted-foreground)]"
+                          : delta > 0.15
+                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                            : delta < -0.15
+                              ? "border-red-500/40 bg-red-500/10 text-red-300"
+                              : "border-amber-500/40 bg-amber-500/10 text-amber-300",
+              };
 
     const linkableGroups = otherGroups.filter(
         (g) =>
@@ -1317,7 +1341,7 @@ function SetRow({
                     >
                         {set.isDropset ? `↓ Drop` : `Set ${set.setNumber}`}
                     </button>
-                    <div className="flex items-center gap-0.5 -mr-1">
+                    <div className="flex items-center gap-1 -mr-1">
                         <button
                             onClick={onDuplicate}
                             className="p-1.5 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"

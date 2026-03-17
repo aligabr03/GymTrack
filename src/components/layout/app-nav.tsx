@@ -234,7 +234,7 @@ export function AppNav({ user }: { user: User }) {
                                 key={href}
                                 href={href}
                                 className={cn(
-                                    "flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation",
+                                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation",
                                     active
                                         ? "text-[var(--foreground)]"
                                         : "text-[var(--muted-foreground)]",

@@ -174,7 +174,10 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                                 variant="outline"
                                                 className="mt-2"
                                             >
-                                                {selectedRecord.exercise.category}
+                                                {
+                                                    selectedRecord.exercise
+                                                        .category
+                                                }
                                             </Badge>
                                         </div>
                                         <Trophy className="h-10 w-10 text-amber-300 shrink-0" />
@@ -182,7 +185,9 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
 
                                     <div className="space-y-3">
                                         <p className="text-4xl md:text-5xl font-bold tabular-nums leading-none">
-                                            {selectedRecord.estimatedOneRM.toFixed(1)}
+                                            {selectedRecord.estimatedOneRM.toFixed(
+                                                1,
+                                            )}
                                             <span className="text-xl md:text-2xl ml-2 text-[var(--muted-foreground)]">
                                                 lbs
                                             </span>
@@ -191,13 +196,15 @@ export function RecordsShowcase({ records }: { records: RecordItem[] }) {
                                             Estimated 1RM
                                         </p>
                                         <p className="text-lg text-[var(--muted-foreground)]">
-                                            {selectedRecord.weightKg} lbs &times;{" "}
-                                            {selectedRecord.reps} reps
+                                            {selectedRecord.weightKg} lbs
+                                            &times; {selectedRecord.reps} reps
                                         </p>
                                         <p className="text-sm text-[var(--muted-foreground)]">
                                             Achieved on{" "}
                                             <strong className="text-[var(--foreground)]">
-                                                {formatDate(selectedRecord.achievedAt)}
+                                                {formatDate(
+                                                    selectedRecord.achievedAt,
+                                                )}
                                             </strong>
                                         </p>
                                     </div>

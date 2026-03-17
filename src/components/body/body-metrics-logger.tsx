@@ -255,7 +255,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                         <p className="font-medium text-sm">
                                             {formatRelativeDate(m.date)}
                                         </p>
-                                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                                        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
                                             {m.weightKg && (
                                                 <MetricPill
                                                     label="Weight"

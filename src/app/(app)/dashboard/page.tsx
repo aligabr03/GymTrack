@@ -94,7 +94,7 @@ export default async function DashboardPage() {
                             cta="Log your first workout"
                         />
                     ) : (
-                        <div className="space-y-3">
+                        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
                             {stats.recentWorkouts.map((workout) => {
                                 const volume = calculateVolume(workout.sets);
                                 const exercises = [
@@ -104,81 +104,46 @@ export default async function DashboardPage() {
                                         ),
                                     ),
                                 ].slice(0, 3);
+                                const extraExercises =
+                                    [
+                                        ...new Set(
+                                            workout.sets.map(
+                                                (s) => s.exerciseId,
+                                            ),
+                                        ),
+                                    ].length - exercises.length;
                                 return (
                                     <Link
                                         key={workout.id}
                                         href={`/workouts/${workout.id}`}
+                                        className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40"
                                     >
-                                        <Card className="hover:border-[var(--primary)]/50 transition-colors cursor-pointer">
-                                            <CardContent className="p-4">
-                                                <div className="flex items-start justify-between gap-4">
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2 flex-wrap">
-                                                            <span className="font-medium">
-                                                                {workout.name ??
-                                                                    "Workout"}
-                                                            </span>
-                                                            <span className="text-xs text-[var(--muted-foreground)]">
-                                                                {formatRelativeDate(
-                                                                    workout.date,
-                                                                )}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-1 mt-2">
-                                                            {exercises.map(
-                                                                (ex) => (
-                                                                    <Badge
-                                                                        key={ex}
-                                                                        variant="secondary"
-                                                                        className="text-xs"
-                                                                    >
-                                                                        {ex}
-                                                                    </Badge>
-                                                                ),
-                                                            )}
-                                                            {workout.sets
-                                                                .length > 3 && (
-                                                                <Badge
-                                                                    variant="outline"
-                                                                    className="text-xs"
-                                                                >
-                                                                    +
-                                                                    {
-                                                                        workout.sets.filter(
-                                                                            (
-                                                                                s,
-                                                                                i,
-                                                                                arr,
-                                                                            ) =>
-                                                                                arr.findIndex(
-                                                                                    (
-                                                                                        x,
-                                                                                    ) =>
-                                                                                        x.exerciseId ===
-                                                                                        s.exerciseId,
-                                                                                ) !==
-                                                                                i,
-                                                                        ).length
-                                                                    }{" "}
-                                                                    more
-                                                                </Badge>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right shrink-0">
-                                                        <p className="text-sm font-semibold">
-                                                            {Math.round(
-                                                                volume,
-                                                            ).toLocaleString()}{" "}
-                                                            lbs
-                                                        </p>
-                                                        <p className="text-xs text-[var(--muted-foreground)]">
-                                                            volume
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <span className="text-sm font-medium truncate">
+                                                    {workout.name ?? "Workout"}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
+                                                {formatRelativeDate(
+                                                    workout.date,
+                                                )}
+                                                {exercises.length > 0 &&
+                                                    ` · ${exercises.join(", ")}${extraExercises > 0 ? ` +${extraExercises}` : ""}`}
+                                            </p>
+                                        </div>
+                                        <div className="shrink-0 text-right">
+                                            <p className="text-sm font-medium tabular-nums">
+                                                {Math.round(
+                                                    volume,
+                                                ).toLocaleString()}{" "}
+                                                lbs
+                                            </p>
+                                            <p className="text-xs text-[var(--muted-foreground)]">
+                                                {workout.sets.length} sets
+                                            </p>
+                                        </div>
+                                        <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
                                     </Link>
                                 );
                             })}
@@ -198,8 +163,7 @@ export default async function DashboardPage() {
                                 href="/records"
                                 className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1 transition-colors"
                             >
-                                View all{" "}
-                                <ChevronRight className="h-3 w-3" />
+                                View all <ChevronRight className="h-3 w-3" />
                             </Link>
                         </div>
 
