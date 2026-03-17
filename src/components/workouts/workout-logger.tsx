@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
     createWorkout,
-    getLastSetsForExercise,
+    getBatchPreviousBestSets,
     updateWorkout,
 } from "@/actions/workouts";
 import { createExercise } from "@/actions/exercises";
@@ -110,24 +110,6 @@ function getBestEstimatedOneRM(
     return best;
 }
 
-function getBestSetByOneRM(
-    sets: Array<{
-        weightKg: string | number | null;
-        reps: string | number | null;
-    }>,
-): { weightKg: number; reps: number; e1rm: number } | null {
-    let best: { weightKg: number; reps: number; e1rm: number } | null = null;
-    for (const set of sets) {
-        const weight = Number(set.weightKg ?? 0);
-        const reps = Number(set.reps ?? 0);
-        if (!Number.isFinite(weight) || !Number.isFinite(reps)) continue;
-        if (weight <= 0 || reps <= 0) continue;
-        const e1rm = estimateOneRM(weight, reps);
-        if (best === null || e1rm > best.e1rm)
-            best = { weightKg: weight, reps, e1rm };
-    }
-    return best;
-}
 
 export function WorkoutLogger({
     exercises,
@@ -213,31 +195,30 @@ export function WorkoutLogger({
         return matchSearch && matchCat;
     });
 
-    async function loadPreviousBestForExercise(exerciseId: string) {
+    async function loadPreviousBestForExercises(exerciseIds: string[]) {
+        const missing = exerciseIds.filter(
+            (id) => previousBestByExercise[id] === undefined,
+        );
+        if (missing.length === 0) return;
         try {
-            const lastSets = await getLastSetsForExercise(
-                exerciseId,
+            const batch = await getBatchPreviousBestSets(
+                missing,
                 existing?.id,
             );
-            const best = getBestSetByOneRM(lastSets);
-            setPreviousBestByExercise((prev) => ({
-                ...prev,
-                [exerciseId]: best,
-            }));
+            setPreviousBestByExercise((prev) => ({ ...prev, ...batch }));
         } catch {
             setPreviousBestByExercise((prev) => ({
                 ...prev,
-                [exerciseId]: null,
+                ...Object.fromEntries(missing.map((id) => [id, null])),
             }));
         }
     }
 
     useEffect(() => {
-        for (const group of groups) {
-            if (previousBestByExercise[group.exerciseId] !== undefined)
-                continue;
-            void loadPreviousBestForExercise(group.exerciseId);
-        }
+        const missing = groups
+            .map((g) => g.exerciseId)
+            .filter((id) => previousBestByExercise[id] === undefined);
+        if (missing.length > 0) void loadPreviousBestForExercises(missing);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groups]);
 
@@ -281,7 +262,7 @@ export function WorkoutLogger({
         ]);
 
         if (previousBestByExercise[exercise.id] === undefined) {
-            void loadPreviousBestForExercise(exercise.id);
+            void loadPreviousBestForExercises([exercise.id]);
         }
     }
 

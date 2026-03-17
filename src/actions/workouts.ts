@@ -284,6 +284,69 @@ export async function getLastSetsForExercise(
     return sets;
 }
 
+/**
+ * Batch version: returns the best-1RM set from the most recent workout for
+ * each of the supplied exerciseIds in just 2 DB round-trips regardless of
+ * how many exercises are requested.
+ */
+export async function getBatchPreviousBestSets(
+    exerciseIds: string[],
+    excludeWorkoutId?: string,
+): Promise<
+    Record<string, { weightKg: number; reps: number; e1rm: number } | null>
+> {
+    if (exerciseIds.length === 0) return {};
+    const userId = await getUserId();
+
+    // 1 query — most recent workoutId per exercise (DISTINCT ON exerciseId)
+    const latestPerExercise = await prisma.workoutSet.findMany({
+        where: {
+            exerciseId: { in: exerciseIds },
+            workout: {
+                userId,
+                ...(excludeWorkoutId ? { id: { not: excludeWorkoutId } } : {}),
+            },
+        },
+        orderBy: { workout: { date: "desc" } },
+        distinct: ["exerciseId"],
+        select: { exerciseId: true, workoutId: true },
+    });
+
+    const result: Record<
+        string,
+        { weightKg: number; reps: number; e1rm: number } | null
+    > = Object.fromEntries(exerciseIds.map((id) => [id, null]));
+
+    if (latestPerExercise.length === 0) return result;
+
+    // 1 query — all sets for those (workoutId, exerciseId) pairs
+    const sets = await prisma.workoutSet.findMany({
+        where: {
+            OR: latestPerExercise.map(({ exerciseId, workoutId }) => ({
+                exerciseId,
+                workoutId,
+            })),
+        },
+        select: { exerciseId: true, weightKg: true, reps: true },
+    });
+
+    // group by exerciseId and pick the set with the highest estimated 1RM
+    for (const { exerciseId } of latestPerExercise) {
+        let best: { weightKg: number; reps: number; e1rm: number } | null =
+            null;
+        for (const s of sets) {
+            if (s.exerciseId !== exerciseId || !s.weightKg || !s.reps)
+                continue;
+            const e1rm = estimateOneRM(s.weightKg, s.reps);
+            if (!best || e1rm > best.e1rm)
+                best = { weightKg: s.weightKg, reps: s.reps, e1rm };
+        }
+        result[exerciseId] = best;
+    }
+
+    return result;
+}
+
 export async function getWorkout(id: string) {
     const userId = await getUserId();
 
