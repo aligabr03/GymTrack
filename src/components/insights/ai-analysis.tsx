@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
 import { refreshAiInsight } from "@/actions/insights";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+const CONTEXT_KEY = "gymtrack:ai-context";
 
 type Props = {
     initial: { analysis: string; updatedAt: string } | null;
@@ -25,6 +27,17 @@ export function AiAnalysisCard({ initial }: Props) {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
     const [contextInput, setContextInput] = useState("");
+
+    // Load saved context on mount
+    useEffect(() => {
+        const saved = localStorage.getItem(CONTEXT_KEY);
+        if (saved) setContextInput(saved);
+    }, []);
+
+    function handleContextChange(value: string) {
+        setContextInput(value);
+        localStorage.setItem(CONTEXT_KEY, value);
+    }
 
     function handleRefresh() {
         setError(null);
@@ -121,7 +134,7 @@ export function AiAnalysisCard({ initial }: Props) {
                 <Input
                     placeholder="e.g. Deload week, shoulder pain, low sleep, cutting"
                     value={contextInput}
-                    onChange={(e) => setContextInput(e.target.value)}
+                    onChange={(e) => handleContextChange(e.target.value)}
                 />
             </div>
         </div>

@@ -362,7 +362,7 @@ async function callOpenAI(
                 {
                     role: "system",
                     content:
-                        "You are a fitness coach giving a brief snapshot. Output exactly brief bullet points starting with •. Cover what you think is important given the data. Use exact numbers only, all weights provided are in lbs. No filler.",
+                        "You are a fitness coach giving a brief snapshot. Output exactly 4 brief bullet points starting with •. Cover important tips given the data and what you think is important, comment on progression and give tips if needed. Use exact numbers only, all weights provided are in lbs. No filler.",
                 },
                 {
                     role: "user",
