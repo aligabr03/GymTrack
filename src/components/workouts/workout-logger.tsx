@@ -954,7 +954,7 @@ export function WorkoutLogger({
         {/* PR Celebration Popup */}
         {prCelebration && (
             <Dialog open={true} onOpenChange={(open) => { if (!open) closePrCelebration(); }}>
-                <DialogContent className="overflow-hidden border-amber-500/50 p-0 max-w-sm">
+                <DialogContent className="overflow-hidden border-amber-500/50 p-0 md:max-w-sm">
                     <div className="relative overflow-hidden rounded-xl">
                         <div className="animate-gold-shimmer p-8 pb-6 text-center relative overflow-hidden">
                             <div className="pointer-events-none absolute inset-0 overflow-hidden">
