@@ -362,7 +362,7 @@ async function callOpenAI(
                 {
                     role: "system",
                     content:
-                        "You are a fitness coach giving a brief snapshot. Output exactly 4 bullet points starting with •. Each bullet must be ≤12 words. Cover: consistency, top lift progress, muscle balance gap, one actionable tip. Use exact numbers only. No filler.",
+                        "You are a fitness coach giving a brief snapshot. Output exactly brief bullet points starting with •. Cover what you think is important given the data. Use exact numbers only, all weights provided are in lbs. No filler.",
                 },
                 {
                     role: "user",
