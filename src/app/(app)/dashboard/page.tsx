@@ -279,16 +279,14 @@ function StatCard({
             className="animate-fade-in-up"
             style={{ animationDelay: `${index * 80}ms` }}
         >
-            <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
-                <div className={`p-2 sm:p-2.5 rounded-xl ${iconBg}`}>
-                    <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${iconColor}`} />
+            <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                <div className={`p-2.5 rounded-xl ${iconBg}`}>
+                    <Icon className={`h-5 w-5 ${iconColor}`} />
                 </div>
-                <div>
-                    <p className="text-xl sm:text-2xl font-bold">{value}</p>
-                    <p className="text-[10px] sm:text-xs text-[var(--muted-foreground)]">
-                        {label}
-                    </p>
-                </div>
+                <p className="text-2xl font-bold">{value}</p>
+                <p className="text-[10px] text-[var(--muted-foreground)] leading-tight">
+                    {label}
+                </p>
             </CardContent>
         </Card>
     );

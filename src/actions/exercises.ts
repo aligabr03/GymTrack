@@ -61,6 +61,17 @@ export async function deleteExercise(id: string) {
         return { success: false, error: "Cannot delete this exercise" };
     }
 
+    const usedInWorkout = await prisma.workoutSet.findFirst({
+        where: { exerciseId: id },
+        select: { id: true },
+    });
+    if (usedInWorkout) {
+        return {
+            success: false,
+            error: `"${exercise.name}" is used in one or more workouts and cannot be deleted.`,
+        };
+    }
+
     await prisma.exercise.delete({ where: { id } });
     revalidatePath("/exercises");
     return { success: true };

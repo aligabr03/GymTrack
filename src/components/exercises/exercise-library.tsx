@@ -322,7 +322,7 @@ export function ExerciseLibrary({
                                                     )}
                                                     {bestWeights[ex.id] && (
                                                         <span className="ml-2 text-amber-400/80">
-                                                            · Best: {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
+                                                        Best: {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
                                                         </span>
                                                     )}
                                                 </p>
