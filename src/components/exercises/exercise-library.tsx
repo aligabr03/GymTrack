@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createExercise, deleteExercise } from "@/actions/exercises";
+import { createExercise, deleteExercise, updateExercise } from "@/actions/exercises";
 import type { Exercise } from "@/types";
 import { EXERCISE_CATEGORIES } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
-import { Plus, Trash2, Search, Loader2, Sparkles } from "lucide-react";
+import { Plus, Trash2, Search, Loader2, Sparkles, Pencil } from "lucide-react";
 
 const MUSCLE_GROUPS = [
     "Chest",
@@ -53,6 +53,48 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
     const [category, setCategory] = useState("");
     const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
+
+    // Edit exercise state
+    const [editTarget, setEditTarget] = useState<Exercise | null>(null);
+    const [editName, setEditName] = useState("");
+    const [editMuscles, setEditMuscles] = useState<string[]>([]);
+    const [editError, setEditError] = useState<string | null>(null);
+
+    function openEdit(ex: Exercise) {
+        setEditTarget(ex);
+        setEditName(ex.name);
+        setEditMuscles(ex.muscleGroups);
+        setEditError(null);
+    }
+
+    function toggleEditMuscle(muscle: string) {
+        setEditMuscles((prev) =>
+            prev.includes(muscle)
+                ? prev.filter((m) => m !== muscle)
+                : [...prev, muscle],
+        );
+    }
+
+    function handleEdit() {
+        setEditError(null);
+        if (!editTarget) return;
+        if (!editName.trim()) return setEditError("Name is required");
+        if (editMuscles.length === 0)
+            return setEditError("Select at least one muscle group");
+
+        startTransition(async () => {
+            const result = await updateExercise(editTarget.id, {
+                name: editName.trim(),
+                muscleGroups: editMuscles,
+            });
+            if (!result.success) {
+                setEditError(result.error ?? "Update failed");
+                return;
+            }
+            toast({ title: "Exercise updated", variant: "success" });
+            setEditTarget(null);
+        });
+    }
 
     const filtered = exercises.filter((e) => {
         const matchSearch = e.name.toLowerCase().includes(search.toLowerCase());
@@ -259,7 +301,7 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                                             key={ex.id}
                                             className="flex items-center gap-3 px-4 py-3 group"
                                         >
-                                            <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 min-w-0">
                                                     <span className="text-sm font-medium truncate">
                                                         {ex.name}
@@ -275,6 +317,14 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                                                 </p>
                                             </div>
                                             {ex.isCustom && (
+                                                <div className="flex items-center gap-1">
+                                                <button
+                                                    onClick={() => openEdit(ex)}
+                                                    className="shrink-0 p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors"
+                                                    aria-label="Edit exercise"
+                                                >
+                                                    <Pencil className="h-3.5 w-3.5" />
+                                                </button>
                                                 <button
                                                     onClick={() =>
                                                         handleDelete(
@@ -287,6 +337,7 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
                                                 </button>
+                                                </div>
                                             )}
                                         </div>
                                     ))}
@@ -295,6 +346,69 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                         ))}
                 </div>
             )}
+
+            {/* Edit exercise dialog */}
+            <Dialog
+                open={editTarget !== null}
+                onOpenChange={(open) => !open && setEditTarget(null)}
+            >
+                <DialogContent className="max-w-md flex flex-col min-h-[75dvh] md:min-h-0 md:max-h-[85vh]">
+                    <DialogHeader>
+                        <DialogTitle>Edit Exercise</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
+                        {editError && (
+                            <p className="text-sm text-red-400">{editError}</p>
+                        )}
+                        <div className="space-y-2">
+                            <Label>Exercise Name</Label>
+                            <Input
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                placeholder="e.g. Bulgarian Split Squat"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Muscle Groups</Label>
+                            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                                {MUSCLE_GROUPS.map((muscle) => (
+                                    <div
+                                        key={muscle}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <Checkbox
+                                            id={`edit-${muscle}`}
+                                            checked={editMuscles.includes(
+                                                muscle,
+                                            )}
+                                            onCheckedChange={() =>
+                                                toggleEditMuscle(muscle)
+                                            }
+                                        />
+                                        <label
+                                            htmlFor={`edit-${muscle}`}
+                                            className="text-sm cursor-pointer"
+                                        >
+                                            {muscle}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <Button
+                            onClick={handleEdit}
+                            disabled={isPending}
+                            className="w-full"
+                        >
+                            {isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                "Save Changes"
+                            )}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

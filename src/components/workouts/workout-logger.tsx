@@ -13,7 +13,7 @@ import type {
     WorkoutMetaSuggestions,
     WorkoutWithSets,
 } from "@/types";
-import { toESTDateStr, todayEST } from "@/lib/utils";
+import { toStoredDateStr, todayEST } from "@/lib/utils";
 import { EXERCISE_CATEGORIES, FORM_RATINGS } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,7 +128,7 @@ export function WorkoutLogger({
     const [isPending, startTransition] = useTransition();
 
     const [date, setDate] = useState(
-        existing?.date ? toESTDateStr(existing.date) : todayEST(),
+        existing?.date ? toStoredDateStr(existing.date) : todayEST(),
     );
     const [workoutName, setWorkoutName] = useState(existing?.name ?? "");
     const [notes, setNotes] = useState(existing?.notes ?? "");

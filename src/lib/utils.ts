@@ -18,6 +18,15 @@ export function toESTDateStr(date: Date | string): string {
     return new Date(date).toLocaleDateString("en-CA", { timeZone: EST });
 }
 
+/**
+ * Returns the YYYY-MM-DD string for a stored UTC-midnight date.
+ * Use this to populate a date input from a DB date value so the
+ * calendar date is never shifted by the local timezone offset.
+ */
+export function toStoredDateStr(date: Date | string): string {
+    return new Date(date).toLocaleDateString("en-CA", { timeZone: "UTC" });
+}
+
 /** Today's date as YYYY-MM-DD in America/New_York. */
 export function todayEST(): string {
     return toESTDateStr(new Date());

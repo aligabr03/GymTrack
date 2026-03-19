@@ -65,3 +65,35 @@ export async function deleteExercise(id: string) {
     revalidatePath("/exercises");
     return { success: true };
 }
+
+export async function updateExercise(
+    id: string,
+    data: { name: string; muscleGroups: string[] },
+) {
+    const userId = await getUserId();
+
+    const exercise = await prisma.exercise.findUnique({ where: { id } });
+    if (!exercise || !exercise.isCustom || exercise.userId !== userId) {
+        return { success: false, error: "Cannot edit this exercise" };
+    }
+
+    const parsed = z
+        .object({
+            name: z.string().min(2, "Name must be at least 2 characters"),
+            muscleGroups: z
+                .array(z.string())
+                .min(1, "Select at least one muscle group"),
+        })
+        .safeParse(data);
+    if (!parsed.success) {
+        return { success: false, error: parsed.error.issues[0].message };
+    }
+
+    const updated = await prisma.exercise.update({
+        where: { id },
+        data: { name: parsed.data.name, muscleGroups: parsed.data.muscleGroups },
+    });
+
+    revalidatePath("/exercises");
+    return { success: true, data: updated };
+}
