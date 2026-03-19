@@ -134,24 +134,18 @@ export async function getMuscleGroupVolume(days = 30) {
     since.setDate(since.getDate() - days);
 
     const sets = await prisma.workoutSet.findMany({
-        where: {
-            workout: { userId, date: { gte: since } },
-            weightKg: { not: null },
-            reps: { not: null },
-        },
-        include: { exercise: { select: { category: true } } },
+        where: { workout: { userId, date: { gte: since } } },
+        select: { exercise: { select: { category: true } } },
     });
 
-    const volumeByCategory: Record<string, number> = {};
+    const countByCategory: Record<string, number> = {};
     for (const s of sets) {
-        if (!s.weightKg || !s.reps) continue;
         const cat = s.exercise.category;
-        volumeByCategory[cat] =
-            (volumeByCategory[cat] ?? 0) + s.weightKg * s.reps;
+        countByCategory[cat] = (countByCategory[cat] ?? 0) + 1;
     }
 
-    return Object.entries(volumeByCategory)
-        .map(([category, volume]) => ({ category, volume: Math.round(volume) }))
+    return Object.entries(countByCategory)
+        .map(([category, volume]) => ({ category, volume }))
         .sort((a, b) => b.volume - a.volume);
 }
 
@@ -368,7 +362,7 @@ async function callOpenAI(
                 {
                     role: "system",
                     content:
-                        "You are a concise fitness coach AI. Given a user's training snapshot (est1RM in lbs, weekly workout counts oldest→newest, muscle volume %, body weight in lbs), output exactly 4-5 bullet points each starting with •. Cover: consistency trend, strength progress or plateau per key exercise (plateau = est1RM_recent ≤ est1RM_prev), muscle balance gaps, body composition change, and one specific actionable recommendation. Reference actual numbers from the data. Max 220 words.",
+                        "You are a fitness coach giving a brief snapshot. Output exactly 4 bullet points starting with •. Each bullet must be ≤12 words. Cover: consistency, top lift progress, muscle balance gap, one actionable tip. Use exact numbers only. No filler.",
                 },
                 {
                     role: "user",
@@ -377,7 +371,7 @@ async function callOpenAI(
                         : JSON.stringify(snapshot),
                 },
             ],
-            max_tokens: 380,
+            max_tokens: 200,
             temperature: 0.3,
         }),
     });

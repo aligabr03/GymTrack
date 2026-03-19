@@ -53,7 +53,7 @@ export function MuscleBalanceChart({ data }: Props) {
                     tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v) => `${v}`}
                 />
                 <YAxis
                     type="category"
@@ -75,8 +75,8 @@ export function MuscleBalanceChart({ data }: Props) {
                     itemStyle={{ color: "var(--foreground)" }}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [
-                        `${Number(value ?? 0).toLocaleString()} lbs`,
-                        "Volume",
+                        `${Number(value ?? 0)} sets`,
+                        "Sets",
                     ]}
                 />
                 <Bar dataKey="volume" radius={[0, 4, 4, 0]} maxBarSize={24}>

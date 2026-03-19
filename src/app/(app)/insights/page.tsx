@@ -2,14 +2,15 @@ import {
     getMuscleGroupVolume,
     getWorkoutCalendar,
     getLoggedExercises,
-    getAiInsight,
 } from "@/actions/insights";
 import { getBodyMetrics } from "@/actions/body-metrics";
+import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressionChart } from "@/components/insights/progression-chart";
 import { MuscleBalanceChart } from "@/components/insights/muscle-balance-chart";
 import { WorkoutCalendar } from "@/components/insights/workout-calendar";
-import { AiAnalysisCard } from "@/components/insights/ai-analysis";
+import { AiInsightSection } from "@/components/insights/ai-insight-section";
 import { BodyTrendsChart } from "@/components/insights/body-trends-chart";
 
 export const metadata = { title: "Insights — GymTrack" };
@@ -18,12 +19,11 @@ export const dynamic = "force-dynamic";
 export default async function InsightsPage() {
     const year = new Date().getFullYear();
 
-    const [muscleData, calendarCounts, exercises, aiInsight, bodyMetrics] =
+    const [muscleData, calendarCounts, exercises, bodyMetrics] =
         await Promise.allSettled([
             getMuscleGroupVolume(30),
             getWorkoutCalendar(year),
             getLoggedExercises(),
-            getAiInsight(),
             getBodyMetrics(180),
         ]).then((results) =>
             results.map((r) => (r.status === "fulfilled" ? r.value : null)),
@@ -40,8 +40,6 @@ export default async function InsightsPage() {
     const exerciseList =
         (exercises as Awaited<ReturnType<typeof getLoggedExercises>> | null) ??
         [];
-    const aiData =
-        (aiInsight as Awaited<ReturnType<typeof getAiInsight>> | null) ?? null;
     const bodyData =
         (bodyMetrics as Awaited<ReturnType<typeof getBodyMetrics>> | null) ??
         [];
@@ -55,22 +53,10 @@ export default async function InsightsPage() {
                 </p>
             </div>
 
-            {/* AI Analysis */}
-            {aiData && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                            <span>AI Training Analysis</span>
-                            <span className="text-[10px] font-normal px-1.5 py-0.5 rounded-md bg-[var(--secondary)] text-[var(--muted-foreground)] tracking-wide uppercase">
-                                GPT-4o mini
-                            </span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <AiAnalysisCard initial={aiData} />
-                    </CardContent>
-                </Card>
-            )}
+            {/* AI Analysis — streams in independently */}
+            <Suspense fallback={<AiInsightCardSkeleton />}>
+                <AiInsightSection />
+            </Suspense>
 
             {/* Workout calendar */}
             <Card>
@@ -118,5 +104,29 @@ export default async function InsightsPage() {
                 </CardContent>
             </Card>
         </div>
+    );
+}
+
+function AiInsightCardSkeleton() {
+    return (
+        <Card>
+            <CardHeader>
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-4 w-20 rounded-md" />
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-2.5">
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex gap-2.5 items-start">
+                        <Skeleton className="h-3 w-3 shrink-0 mt-0.5 rounded-full" />
+                        <Skeleton
+                            className="h-4"
+                            style={{ width: `${72 - i * 8}%` }}
+                        />
+                    </div>
+                ))}
+            </CardContent>
+        </Card>
     );
 }

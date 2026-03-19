@@ -41,7 +41,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Stat cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-3 gap-3">
                 <StatCard
                     icon={Dumbbell}
                     label="Total Workouts"
@@ -157,12 +157,6 @@ export default async function DashboardPage() {
                             <h2 className="text-lg font-semibold">
                                 Top Records
                             </h2>
-                            <Link
-                                href="/records"
-                                className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1 transition-colors"
-                            >
-                                View all <ChevronRight className="h-3 w-3" />
-                            </Link>
                         </div>
 
                         {stats.personalRecords.length === 0 ? (

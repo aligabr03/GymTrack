@@ -294,14 +294,6 @@ export function AppNav({ user }: { user: User }) {
                                     </p>
                                 </div>
                                 <div className="border-t border-[var(--border)] pt-2">
-                                    <Link
-                                        href="/body"
-                                        onClick={() => setProfileOpen(false)}
-                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
-                                    >
-                                        <Scale className="h-4 w-4" />
-                                        Body Metrics
-                                    </Link>
                                     <button
                                         onClick={() => {
                                             toggleTheme();
