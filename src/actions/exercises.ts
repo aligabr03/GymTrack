@@ -97,3 +97,16 @@ export async function updateExercise(
     revalidatePath("/exercises");
     return { success: true, data: updated };
 }
+
+export async function getExerciseBestWeights(): Promise<
+    Record<string, { weightKg: number; reps: number } | null>
+> {
+    const userId = await getUserId();
+    const records = await prisma.personalRecord.findMany({
+        where: { userId },
+        select: { exerciseId: true, weightKg: true, reps: true },
+    });
+    return Object.fromEntries(
+        records.map((r) => [r.exerciseId, { weightKg: r.weightKg, reps: r.reps }]),
+    );
+}

@@ -126,6 +126,16 @@ export function WorkoutLogger({
 }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
+    const [prCelebration, setPrCelebration] = useState<{ names: string[]; isExisting: boolean } | null>(null);
+
+    function closePrCelebration() {
+        setPrCelebration(null);
+        if (onSuccess) {
+            onSuccess();
+        } else {
+            router.push("/workouts");
+        }
+    }
 
     const [date, setDate] = useState(
         existing?.date ? toStoredDateStr(existing.date) : todayEST(),
@@ -523,14 +533,18 @@ export function WorkoutLogger({
                 return;
             }
 
-            toast({
-                title: existing ? "Workout updated" : "Workout saved! 💪",
-                variant: "success",
-            });
-            if (onSuccess) {
-                onSuccess();
+            if (result.newPRs && result.newPRs.length > 0) {
+                setPrCelebration({ names: result.newPRs, isExisting: !!existing });
             } else {
-                router.push("/workouts");
+                toast({
+                    title: existing ? "Workout updated" : "Workout saved! 💪",
+                    variant: "success",
+                });
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    router.push("/workouts");
+                }
             }
         });
     }
@@ -561,6 +575,7 @@ export function WorkoutLogger({
         .slice(0, 4);
 
     return (
+        <>
         <div className="space-y-6">
             {/* Workout meta */}
             <Card>
@@ -935,6 +950,43 @@ export function WorkoutLogger({
                 </Button>
             </div>
         </div>
+
+        {/* PR Celebration Popup */}
+        {prCelebration && (
+            <Dialog open={true} onOpenChange={(open) => { if (!open) closePrCelebration(); }}>
+                <DialogContent className="overflow-hidden border-amber-500/50 p-0 max-w-sm">
+                    <div className="relative overflow-hidden rounded-xl">
+                        <div className="animate-gold-shimmer p-8 pb-6 text-center relative overflow-hidden">
+                            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                                <div className="animate-shine-sweep absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent -skew-x-12" />
+                            </div>
+                            <div className="relative">
+                                <div className="text-5xl mb-3">🏆</div>
+                                <h2 className="text-2xl font-bold text-amber-950">New PR!</h2>
+                                <p className="text-amber-800 text-sm mt-1">Personal Record Achieved</p>
+                            </div>
+                        </div>
+                        <div className="bg-[var(--card)] p-5 space-y-3">
+                            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)]">
+                                {prCelebration.names.length === 1 ? "Exercise" : "Exercises"}
+                            </p>
+                            <ul className="space-y-2">
+                                {prCelebration.names.map((name) => (
+                                    <li key={name} className="flex items-center gap-2 text-sm font-medium">
+                                        <span className="text-lg">🥇</span>
+                                        {name}
+                                    </li>
+                                ))}
+                            </ul>
+                            <Button className="w-full mt-2" onClick={closePrCelebration}>
+                                Let&apos;s go! 💪
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        )}
+        </>
     );
 }
 

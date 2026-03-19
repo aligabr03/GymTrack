@@ -1,9 +1,13 @@
 import { getExercises } from "@/actions/exercises";
+import { getExerciseBestWeights } from "@/actions/exercises";
 import { ExerciseLibrary } from "@/components/exercises/exercise-library";
 import { Library } from "lucide-react";
 
 export default async function ExercisesPage() {
-    const exercises = await getExercises();
+    const [exercises, bestWeights] = await Promise.all([
+        getExercises(),
+        getExerciseBestWeights(),
+    ]);
 
     return (
         <div className="space-y-6">
@@ -20,7 +24,7 @@ export default async function ExercisesPage() {
                 </div>
             </div>
 
-            <ExerciseLibrary exercises={exercises} />
+            <ExerciseLibrary exercises={exercises} bestWeights={bestWeights} />
         </div>
     );
 }

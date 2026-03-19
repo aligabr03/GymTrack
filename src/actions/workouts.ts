@@ -68,7 +68,7 @@ export async function createWorkout(data: z.infer<typeof workoutSchema>) {
         include: { sets: true },
     });
 
-    await syncPersonalRecordsForExercises(
+    const newPRs = await syncPersonalRecordsForExercises(
         userId,
         parsed.data.sets.map((set) => set.exerciseId),
     );
@@ -76,9 +76,8 @@ export async function createWorkout(data: z.infer<typeof workoutSchema>) {
     revalidatePath("/workouts");
     revalidatePath("/dashboard");
     revalidatePath("/insights");
-    revalidatePath("/records");
 
-    return { success: true, data: workout };
+    return { success: true as const, data: workout, newPRs };
 }
 
 export async function updateWorkout(
@@ -133,7 +132,7 @@ export async function updateWorkout(
         include: { sets: true },
     });
 
-    await syncPersonalRecordsForExercises(userId, [
+    const newPRs = await syncPersonalRecordsForExercises(userId, [
         ...existing.sets.map((set) => set.exerciseId),
         ...parsed.data.sets.map((set) => set.exerciseId),
     ]);
@@ -142,9 +141,8 @@ export async function updateWorkout(
     revalidatePath(`/workouts/${id}`);
     revalidatePath("/dashboard");
     revalidatePath("/insights");
-    revalidatePath("/records");
 
-    return { success: true, data: workout };
+    return { success: true as const, data: workout, newPRs };
 }
 
 export async function deleteWorkout(id: string) {
@@ -174,7 +172,6 @@ export async function deleteWorkout(id: string) {
     revalidatePath("/workouts");
     revalidatePath("/dashboard");
     revalidatePath("/insights");
-    revalidatePath("/records");
 
     return { success: true };
 }
@@ -366,28 +363,33 @@ export async function getWorkout(id: string) {
 async function syncPersonalRecordsForExercises(
     userId: string,
     exerciseIds: string[],
-) {
+): Promise<string[]> {
     const uniqueExerciseIds = [...new Set(exerciseIds)];
-    if (uniqueExerciseIds.length === 0) return;
+    if (uniqueExerciseIds.length === 0) return [];
+
+    const newPRExerciseNames: string[] = [];
 
     for (const exerciseId of uniqueExerciseIds) {
-        const sets = await prisma.workoutSet.findMany({
-            where: {
-                exerciseId,
-                workout: { userId },
-                weightKg: { not: null },
-                reps: { not: null },
-            },
-            select: {
-                weightKg: true,
-                reps: true,
-                workout: {
-                    select: {
-                        date: true,
-                    },
+        const [sets, existingPR] = await Promise.all([
+            prisma.workoutSet.findMany({
+                where: {
+                    exerciseId,
+                    workout: { userId },
+                    weightKg: { not: null },
+                    reps: { not: null },
                 },
-            },
-        });
+                select: {
+                    weightKg: true,
+                    reps: true,
+                    workout: { select: { date: true } },
+                    exercise: { select: { name: true } },
+                },
+            }),
+            prisma.personalRecord.findUnique({
+                where: { userId_exerciseId: { userId, exerciseId } },
+                select: { estimatedOneRM: true },
+            }),
+        ]);
 
         let best: {
             weightKg: number;
@@ -395,9 +397,11 @@ async function syncPersonalRecordsForExercises(
             estimatedOneRM: number;
             achievedAt: Date;
         } | null = null;
+        let exerciseName = "";
 
         for (const set of sets) {
             if (set.weightKg == null || set.reps == null) continue;
+            exerciseName = set.exercise.name;
             const estimatedOneRM = estimateOneRM(set.weightKg, set.reps);
             if (!best || estimatedOneRM > best.estimatedOneRM) {
                 best = {
@@ -416,6 +420,11 @@ async function syncPersonalRecordsForExercises(
             continue;
         }
 
+        const prevBestE1rm = existingPR?.estimatedOneRM ?? 0;
+        if (best.estimatedOneRM > prevBestE1rm && exerciseName) {
+            newPRExerciseNames.push(exerciseName);
+        }
+
         await prisma.personalRecord.upsert({
             where: { userId_exerciseId: { userId, exerciseId } },
             update: best,
@@ -426,4 +435,6 @@ async function syncPersonalRecordsForExercises(
             },
         });
     }
+
+    return newPRExerciseNames;
 }

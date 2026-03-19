@@ -157,6 +157,18 @@ h6 {
     }
 }
 
+@keyframes goldShimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.animate-gold-shimmer {
+    background: linear-gradient(135deg, #92400e, #b45309, #d97706, #fbbf24, #d97706, #b45309, #92400e);
+    background-size: 300% 300%;
+    animation: goldShimmer 3s ease infinite;
+}
+
 .animate-fade-in-up {
     animation: fadeInUp 0.35s ease-out both;
 }

@@ -13,7 +13,6 @@ import {
     TrendingUp,
     Scale,
     LogOut,
-    Trophy,
     Sun,
     Moon,
 } from "lucide-react";
@@ -48,12 +47,6 @@ const navItems = [
         label: "Insights",
         subtitle: "Training trends & progression",
     },
-    {
-        href: "/records",
-        icon: Trophy,
-        label: "Records",
-        subtitle: "All-time bests",
-    },
 ];
 
 // Bottom tab bar only shows 5 items — the most commonly used
@@ -62,7 +55,7 @@ const mobileNavItems = [
     { href: "/workouts", icon: ClipboardList, label: "Workouts" },
     { href: "/exercises", icon: Library, label: "Exercises" },
     { href: "/insights", icon: TrendingUp, label: "Insights" },
-    { href: "/records", icon: Trophy, label: "Records" },
+    { href: "/body", icon: Scale, label: "Body" },
 ];
 
 export function AppNav({ user }: { user: User }) {

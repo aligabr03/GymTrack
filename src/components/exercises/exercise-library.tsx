@@ -42,7 +42,13 @@ const MUSCLE_GROUPS = [
     "Traps",
 ];
 
-export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
+export function ExerciseLibrary({
+    exercises,
+    bestWeights = {},
+}: {
+    exercises: Exercise[];
+    bestWeights?: Record<string, { weightKg: number; reps: number } | null>;
+}) {
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [open, setOpen] = useState(false);
@@ -313,6 +319,11 @@ export function ExerciseLibrary({ exercises }: { exercises: Exercise[] }) {
                                                 <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
                                                     {ex.muscleGroups.join(
                                                         " · ",
+                                                    )}
+                                                    {bestWeights[ex.id] && (
+                                                        <span className="ml-2 text-amber-400/80">
+                                                            · Best: {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
+                                                        </span>
                                                     )}
                                                 </p>
                                             </div>
