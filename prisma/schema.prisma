@@ -127,3 +127,28 @@ model AiInsight {
 
   @@index([userId])
 }
+
+model UserProfile {
+  userId      String   @id
+  displayName String
+  bio         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  followers Follow[] @relation("FollowTarget")
+  following Follow[] @relation("FollowSource")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  UserProfile @relation("FollowSource", fields: [followerId], references: [userId], onDelete: Cascade)
+  following UserProfile @relation("FollowTarget", fields: [followingId], references: [userId], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}

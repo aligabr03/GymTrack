@@ -15,6 +15,8 @@ import {
     LogOut,
     Sun,
     Moon,
+    Users,
+    Pencil,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -47,6 +49,12 @@ const navItems = [
         label: "Insights",
         subtitle: "Training trends & progression",
     },
+    {
+        href: "/friends",
+        icon: Users,
+        label: "Friends",
+        subtitle: "Activity & people",
+    },
 ];
 
 // Bottom tab bar only shows 5 items — the most commonly used
@@ -55,7 +63,7 @@ const mobileNavItems = [
     { href: "/workouts", icon: ClipboardList, label: "Workouts" },
     { href: "/exercises", icon: Library, label: "Exercises" },
     { href: "/insights", icon: TrendingUp, label: "Insights" },
-    { href: "/body", icon: Scale, label: "Body" },
+    { href: "/friends", icon: Users, label: "Friends" },
 ];
 
 export function AppNav({ user }: { user: User }) {
@@ -190,6 +198,13 @@ export function AppNav({ user }: { user: User }) {
                             </p>
                         </div>
                     </div>
+                    <Link
+                        href={`/profile/${user.id}`}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                    >
+                        <Pencil className="h-4 w-4" />
+                        Edit profile
+                    </Link>
                     <button
                         onClick={toggleTheme}
                         className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
@@ -294,6 +309,14 @@ export function AppNav({ user }: { user: User }) {
                                     </p>
                                 </div>
                                 <div className="border-t border-[var(--border)] pt-2">
+                                    <Link
+                                        href={`/profile/${user.id}`}
+                                        onClick={() => setProfileOpen(false)}
+                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                        Edit profile
+                                    </Link>
                                     <button
                                         onClick={() => {
                                             toggleTheme();
