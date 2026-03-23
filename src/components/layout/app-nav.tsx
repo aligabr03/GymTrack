@@ -275,7 +275,9 @@ export function AppNav({ user }: { user: User }) {
             {/* Mobile: top bar with user info */}
             <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[var(--background)]/80 backdrop-blur-xl">
                 <div>
-                    <h1 className="text-lg font-bold">{currentPageTitle}</h1>
+                    {currentPageTitle && (
+                        <h1 className="text-lg font-bold">{currentPageTitle}</h1>
+                    )}
                     {currentPageSubtitle && (
                         <p className="text-xs text-[var(--muted-foreground)]">
                             {currentPageSubtitle}
