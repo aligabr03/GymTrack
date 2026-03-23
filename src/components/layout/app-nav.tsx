@@ -21,6 +21,7 @@ import {
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { usePageTitle } from "@/components/layout/page-title-context";
 
 const navItems = [
     {
@@ -70,6 +71,7 @@ export function AppNav({ user }: { user: User }) {
     const pathname = usePathname();
     const [profileOpen, setProfileOpen] = useState(false);
     const [theme, setTheme] = useState<"dark" | "light">("dark");
+    const { title: contextTitle } = usePageTitle();
 
     useEffect(() => {
         const saved = localStorage.getItem("theme") as "dark" | "light" | null;
@@ -121,7 +123,7 @@ export function AppNav({ user }: { user: User }) {
             pathname === item.href || pathname.startsWith(item.href + "/"),
     ) as ((typeof navItems)[0] & { mobileLabel?: string }) | undefined;
     const currentPageTitle =
-        currentPage?.mobileLabel ?? currentPage?.label ?? "GymTrack";
+        currentPage?.mobileLabel ?? currentPage?.label ?? contextTitle ?? "GymTrack";
     const currentPageSubtitle =
         currentPage?.subtitle === "date"
             ? new Date().toLocaleDateString("en-US", {
