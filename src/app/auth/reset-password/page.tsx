@@ -15,6 +15,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function ResetPasswordPage() {
     const [error, setError] = useState<string | null>(null);
@@ -36,10 +37,10 @@ export default function ResetPasswordPage() {
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-2xl">Reset password</CardTitle>
-                <CardDescription>
+        <Card className="border-[var(--border)] bg-[var(--card)] shadow-2xl shadow-black/20">
+            <CardHeader className="pb-4">
+                <CardTitle className="text-2xl font-bold">Reset password</CardTitle>
+                <CardDescription className="text-[var(--muted-foreground)]">
                     Enter your email and we&apos;ll send you a reset link.
                 </CardDescription>
             </CardHeader>
@@ -47,17 +48,17 @@ export default function ResetPasswordPage() {
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {error && (
-                        <div className="flex items-center gap-2 rounded-md border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-300">
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                            {error}
-                        </div>
+                        <Alert variant="destructive" className="border-red-800/50 bg-red-950/50">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription className="text-red-300">{error}</AlertDescription>
+                        </Alert>
                     )}
 
                     {success && (
-                        <div className="flex items-center gap-2 rounded-md border border-emerald-800 bg-emerald-950 px-3 py-2 text-sm text-emerald-300">
-                            <CheckCircle2 className="h-4 w-4 shrink-0" />
-                            {success}
-                        </div>
+                        <Alert className="border-[var(--primary)]/30 bg-[var(--primary)]/10">
+                            <CheckCircle2 className="h-4 w-4 text-[var(--primary)]" />
+                            <AlertDescription className="text-[var(--primary)]">{success}</AlertDescription>
+                        </Alert>
                     )}
 
                     <div className="space-y-2">
@@ -74,7 +75,7 @@ export default function ResetPasswordPage() {
 
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_12px_var(--primary-glow)] h-10"
                         disabled={isPending || !!success}
                     >
                         {isPending ? (

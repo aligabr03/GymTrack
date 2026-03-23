@@ -652,7 +652,7 @@ export function WorkoutLogger({
                         sets
                     </span>
                     <span>
-                        <strong className="text-[var(--foreground)]">
+                        <strong className="text-[var(--primary)]">
                             {Math.round(totalVolume).toLocaleString()} lbs
                         </strong>{" "}
                         volume
@@ -815,7 +815,7 @@ export function WorkoutLogger({
             {/* Add exercise button */}
             <Dialog open={addExOpen} onOpenChange={setAddExOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full border-dashed">
+                    <Button variant="outline" className="w-full border-dashed border-[var(--primary)]/30 text-[var(--primary)] hover:bg-[var(--primary)]/8 hover:border-[var(--primary)]/50">
                         <Plus className="h-4 w-4" />
                         Add Exercise
                     </Button>
@@ -937,6 +937,7 @@ export function WorkoutLogger({
                 <Button
                     onClick={handleSave}
                     disabled={isPending || groups.length === 0}
+                    className="bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_12px_var(--primary-glow)] disabled:opacity-50"
                 >
                     {isPending ? (
                         <>
@@ -1081,11 +1082,11 @@ function ExerciseGroupCard({
     return (
         <Card>
             <div
-                className="flex items-center justify-between p-4 cursor-pointer select-none"
+                className="flex items-center justify-between p-4 cursor-pointer select-none hover:bg-[var(--primary)]/5 transition-colors"
                 onClick={onToggleCollapse}
             >
                 <div className="flex items-center gap-2 flex-wrap">
-                    <Dumbbell className="h-4 w-4 text-[var(--foreground)] shrink-0" />
+                    <Dumbbell className="h-4 w-4 text-[var(--primary)] shrink-0" />
                     <span className="font-semibold">{group.exerciseName}</span>
                     <Badge variant="secondary" className="text-xs">
                         {group.sets.length} set

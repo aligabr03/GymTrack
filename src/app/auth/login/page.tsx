@@ -16,6 +16,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { AlertCircle, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
@@ -35,10 +36,10 @@ export default function LoginPage() {
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-2xl">Welcome back</CardTitle>
-                <CardDescription>
+        <Card className="border-[var(--border)] bg-[var(--card)] shadow-2xl shadow-black/20">
+            <CardHeader className="pb-4">
+                <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+                <CardDescription className="text-[var(--muted-foreground)]">
                     Sign in to your GymTrack account
                 </CardDescription>
             </CardHeader>
@@ -46,10 +47,10 @@ export default function LoginPage() {
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {error && (
-                        <div className="flex items-center gap-2 rounded-md border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-300">
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                            {error}
-                        </div>
+                        <Alert variant="destructive" className="border-red-800/50 bg-red-950/50">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription className="text-red-300">{error}</AlertDescription>
+                        </Alert>
                     )}
 
                     <div className="space-y-2">
@@ -86,7 +87,7 @@ export default function LoginPage() {
 
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_12px_var(--primary-glow)] h-10"
                         disabled={isPending}
                     >
                         {isPending ? (

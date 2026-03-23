@@ -27,8 +27,8 @@ export default async function FriendsPage() {
         <div className="space-y-8">
             {/* Desktop header */}
             <div className="hidden md:flex items-center gap-3 animate-fade-in">
-                <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
-                    <Users className="h-6 w-6 text-[var(--foreground)]" />
+                <div className="p-2.5 rounded-lg bg-[var(--primary)]/10 border border-[var(--primary)]/20">
+                    <Users className="h-6 w-6 text-[var(--primary)]" />
                 </div>
                 <div>
                     <h1 className="text-2xl font-bold">Friends</h1>
@@ -53,7 +53,7 @@ export default async function FriendsPage() {
                 </div>
 
                 {feed.length === 0 ? (
-                    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-8 text-center">
+                    <div className="rounded-2xl border border-dashed border-[var(--border)] p-8 text-center">
                         <Dumbbell className="h-8 w-8 text-[var(--muted-foreground)]/40 mx-auto mb-3" />
                         <p className="text-sm font-medium">No activity yet</p>
                         <p className="text-xs text-[var(--muted-foreground)] mt-1">
@@ -90,7 +90,7 @@ export default async function FriendsPage() {
                                         </p>
                                     </div>
                                     <div className="shrink-0 text-right">
-                                        <p className="text-sm font-medium tabular-nums">
+                                        <p className="text-sm font-bold text-[var(--primary)] tabular-nums">
                                             {Math.round(
                                                 volume,
                                             ).toLocaleString()}{" "}

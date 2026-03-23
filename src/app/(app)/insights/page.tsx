@@ -12,6 +12,7 @@ import { MuscleBalanceChart } from "@/components/insights/muscle-balance-chart";
 import { WorkoutCalendar } from "@/components/insights/workout-calendar";
 import { AiInsightSection } from "@/components/insights/ai-insight-section";
 import { BodyTrendsChart } from "@/components/insights/body-trends-chart";
+import { BarChart2, Calendar, Activity, TrendingUp, Dumbbell } from "lucide-react";
 
 export const metadata = { title: "Insights — GymTrack" };
 export const dynamic = "force-dynamic";
@@ -59,47 +60,53 @@ export default async function InsightsPage() {
             </Suspense>
 
             {/* Workout calendar */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">
+            <Card className="border-[var(--border)] rounded-2xl overflow-hidden">
+                <CardHeader className="bg-[var(--secondary)]/30 border-b border-[var(--border)]">
+                    <CardTitle className="text-base flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-[var(--primary)]" />
                         {year} Workout Calendar
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                     <WorkoutCalendar year={year} data={calendarData} />
                 </CardContent>
             </Card>
 
             {/* Muscle balance */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">
+            <Card className="border-[var(--border)] rounded-2xl overflow-hidden">
+                <CardHeader className="bg-[var(--secondary)]/30 border-b border-[var(--border)]">
+                    <CardTitle className="text-base flex items-center gap-2">
+                        <BarChart2 className="h-4 w-4 text-[var(--primary)]" />
                         Muscle Group Balance (last 30 days)
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                     <MuscleBalanceChart data={muscleGroupData} />
                 </CardContent>
             </Card>
 
             {/* Body trends */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">Body Trends</CardTitle>
+            <Card className="border-[var(--border)] rounded-2xl overflow-hidden">
+                <CardHeader className="bg-[var(--secondary)]/30 border-b border-[var(--border)]">
+                    <CardTitle className="text-base flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-[var(--primary)]" />
+                        Body Trends
+                    </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                     <BodyTrendsChart metrics={bodyData} />
                 </CardContent>
             </Card>
 
             {/* Progression over time */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">
+            <Card className="border-[var(--border)] rounded-2xl overflow-hidden">
+                <CardHeader className="bg-[var(--secondary)]/30 border-b border-[var(--border)]">
+                    <CardTitle className="text-base flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-[var(--primary)]" />
                         Exercise Progression
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                     <ProgressionChart exercises={exerciseList} />
                 </CardContent>
             </Card>

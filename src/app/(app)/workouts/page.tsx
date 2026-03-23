@@ -22,21 +22,21 @@ export default async function WorkoutsPage() {
                     </div>
                 </div>
                 <Link href="/workouts/new">
-                    <Button>
+                    <Button className="bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_12px_var(--primary-glow)]">
                         <Plus className="h-4 w-4" />
                         Log Workout
                     </Button>
                 </Link>
             </div>
             <Link href="/workouts/new" className="block md:hidden mb-2">
-                <Button className="w-full">
+                <Button className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_12px_var(--primary-glow)]">
                     <Plus className="h-4 w-4" />
                     Log Workout
                 </Button>
             </Link>
 
             {workouts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center py-24 gap-4">
+                <div className="rounded-2xl border border-dashed border-[var(--border)] flex flex-col items-center justify-center text-center py-20 gap-4">
                     <div className="p-5 rounded-full bg-[var(--secondary)]">
                         <Dumbbell className="h-10 w-10 text-[var(--muted-foreground)]" />
                     </div>
@@ -47,7 +47,9 @@ export default async function WorkoutsPage() {
                         </p>
                     </div>
                     <Link href="/workouts/new">
-                        <Button>Log your first workout</Button>
+                        <Button variant="outline" className="border-[var(--primary)]/40 text-[var(--primary)] hover:bg-[var(--primary)]/10 hover:border-[var(--primary)]/60">
+                            Log your first workout
+                        </Button>
                     </Link>
                 </div>
             ) : (

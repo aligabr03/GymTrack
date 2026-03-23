@@ -72,7 +72,7 @@ export default function EditProfilePage() {
                     <Button
                         onClick={handleSave}
                         disabled={saving || !displayName.trim()}
-                        className="w-full"
+                        className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold"
                     >
                         {saving ? "Saving…" : "Save"}
                     </Button>

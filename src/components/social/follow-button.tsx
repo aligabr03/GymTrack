@@ -32,6 +32,10 @@ export function FollowButton({
             variant={isFollowing ? "outline" : "default"}
             onClick={toggle}
             disabled={isPending}
+            className={isFollowing
+                ? "border-[var(--border)] text-[var(--muted-foreground)] hover:border-red-500/40 hover:text-red-400 hover:bg-red-500/10"
+                : "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_8px_var(--primary-glow)]"
+            }
         >
             {isFollowing ? "Unfollow" : "Follow"}
         </Button>

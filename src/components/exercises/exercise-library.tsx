@@ -196,7 +196,7 @@ export function ExerciseLibrary({
 
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button className="bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_12px_var(--primary-glow)]">
                             <Plus className="h-4 w-4" />
                             Add Exercise
                         </Button>
@@ -267,7 +267,7 @@ export function ExerciseLibrary({
                             <Button
                                 onClick={handleCreate}
                                 disabled={isPending}
-                                className="w-full"
+                                className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold"
                             >
                                 {isPending ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -293,7 +293,8 @@ export function ExerciseLibrary({
                         .map(([cat, exs]) => (
                             <div key={cat}>
                                 {/* Category header */}
-                                <div className="flex items-center gap-3 mb-4">
+                        <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />
                                     <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[var(--muted-foreground)]">
                                         {cat}
                                     </span>
@@ -308,7 +309,7 @@ export function ExerciseLibrary({
                                     {exs.map((ex) => (
                                         <div
                                             key={ex.id}
-                                            className="group relative flex flex-col rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-sm p-3.5 gap-2 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/20"
+                                            className="group relative flex flex-col rounded-2xl border border-[var(--border)] bg-[var(--card)] p-3.5 gap-2 transition-all duration-200 hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/25 hover:shadow-lg hover:shadow-black/20"
                                         >
                                             {/* Custom exercise actions */}
                                             {ex.isCustom && (
@@ -359,9 +360,9 @@ export function ExerciseLibrary({
 
                                             {/* Best set */}
                                             {bestWeights[ex.id] && (
-                                                <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-white/[0.06]">
-                                                    <span className="text-amber-400/80 text-[10px]">★</span>
-                                                    <span className="text-[11px] font-medium text-amber-400/80 tabular-nums">
+                                                <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-[var(--border)]">
+                                                    <span className="text-[var(--primary)] text-[10px]">★</span>
+                                                    <span className="text-[11px] font-medium text-[var(--primary)] tabular-nums">
                                                         {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
                                                     </span>
                                                 </div>
@@ -425,7 +426,7 @@ export function ExerciseLibrary({
                         <Button
                             onClick={handleEdit}
                             disabled={isPending}
-                            className="w-full"
+                            className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold"
                         >
                             {isPending ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />

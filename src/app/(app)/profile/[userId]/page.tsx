@@ -51,8 +51,8 @@ export default async function ProfilePage({
         <div className="space-y-6 max-w-2xl">
             {/* Profile header */}
             <div className="flex items-start gap-4">
-                <Avatar className="h-16 w-16 shrink-0">
-                    <AvatarFallback className="text-lg bg-[var(--secondary)]">
+                <Avatar className="h-16 w-16 shrink-0 ring-2 ring-[var(--primary)]/30 ring-offset-2 ring-offset-[var(--background)]">
+                    <AvatarFallback className="text-lg bg-[var(--primary)]/10 text-[var(--primary)] font-bold">
                         {getInitials(profile.displayName)}
                     </AvatarFallback>
                 </Avatar>
@@ -63,7 +63,7 @@ export default async function ProfilePage({
                         </h1>
                         {isOwnProfile ? (
                             <Link href="/profile/edit">
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" className="border-[var(--primary)]/40 text-[var(--primary)] hover:bg-[var(--primary)]/10 hover:border-[var(--primary)]/60">
                                     <Pencil className="h-3.5 w-3.5" />
                                     Edit profile
                                 </Button>
@@ -138,7 +138,7 @@ export default async function ProfilePage({
                                         </p>
                                     </div>
                                     <div className="shrink-0 text-right">
-                                        <p className="text-sm font-medium tabular-nums">
+                                        <p className="text-sm font-bold text-[var(--primary)] tabular-nums">
                                             {Math.round(
                                                 volume,
                                             ).toLocaleString()}{" "}

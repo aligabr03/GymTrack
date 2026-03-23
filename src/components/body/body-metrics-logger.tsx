@@ -114,7 +114,10 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
             {/* Log button / form */}
             <div>
                 {!showForm ? (
-                    <Button onClick={() => setShowForm(true)}>
+                    <Button
+                        onClick={() => setShowForm(true)}
+                        className="bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold shadow-[0_0_12px_var(--primary-glow)]"
+                    >
                         <Plus className="h-4 w-4" />
                         Log Body Metrics
                     </Button>
@@ -221,6 +224,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                 <Button
                                     onClick={handleSave}
                                     disabled={isPending}
+                                    className="bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 font-semibold"
                                 >
                                     {isPending ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -245,9 +249,14 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
 
             {/* History table */}
             {metrics.length === 0 ? (
-                <div className="text-center py-16 text-[var(--muted-foreground)]">
-                    <Scale className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                    <p>No body metrics logged yet.</p>
+                <div className="rounded-2xl border border-dashed border-[var(--border)] flex flex-col items-center justify-center text-center py-20 gap-4">
+                    <div className="p-4 rounded-full bg-[var(--secondary)]">
+                        <Scale className="h-8 w-8 text-[var(--muted-foreground)]" />
+                    </div>
+                    <div>
+                        <p className="text-base font-semibold">No body metrics logged yet</p>
+                        <p className="text-sm text-[var(--muted-foreground)]">Track weight, body fat, and measurements</p>
+                    </div>
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -265,6 +274,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                                 <MetricPill
                                                     label="Weight"
                                                     value={`${m.weightKg} kg`}
+                                                    accent
                                                 />
                                             )}
                                             {m.bodyFatPct && (
@@ -322,11 +332,11 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
     );
 }
 
-function MetricPill({ label, value }: { label: string; value: string }) {
+function MetricPill({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
     return (
         <span className="text-xs">
             <span className="text-[var(--muted-foreground)]">{label}: </span>
-            <span className="font-semibold">{value}</span>
+            <span className={`font-semibold ${accent ? "text-[var(--primary)]" : ""}`}>{value}</span>
         </span>
     );
 }

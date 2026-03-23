@@ -146,6 +146,7 @@ export function WorkoutDetailClient({
                         variant="outline"
                         size="sm"
                         onClick={() => setIsEditing(true)}
+                        className="border-[var(--primary)]/40 text-[var(--primary)] hover:bg-[var(--primary)]/10 hover:border-[var(--primary)]/60"
                     >
                         <Edit className="h-4 w-4" />
                         Edit
@@ -159,6 +160,7 @@ export function WorkoutDetailClient({
                 <SummaryCard
                     label="Volume"
                     value={`${Math.round(volume).toLocaleString()} lbs`}
+                    accent
                 />
                 <SummaryCard
                     label="Sets"
@@ -246,18 +248,18 @@ function ExerciseCard({
         null as ((typeof sets)[0] & { e1rm?: number }) | null,
     );
     return (
-        <Card>
-            <CardHeader className="pb-3">
+        <Card className="border-[var(--border)] rounded-2xl overflow-hidden">
+            <CardHeader className="pb-3 bg-[var(--secondary)]/30">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-base">
                         <div className="flex items-center gap-2">
-                            <Dumbbell className="h-4 w-4 text-[var(--foreground)]" />
+                            <Dumbbell className="h-4 w-4 text-[var(--primary)]" />
                             {exercise.name}
                         </div>
                     </CardTitle>
                     {bestSet?.e1rm && (
                         <div className="text-right">
-                            <p className="text-sm font-semibold text-[var(--foreground)]">
+                            <p className="text-sm font-bold text-[var(--primary)]">
                                 ~{bestSet.e1rm} lbs 1RM
                             </p>
                             <p className="text-xs text-[var(--muted-foreground)]">
@@ -339,18 +341,20 @@ function SummaryCard({
     label,
     value,
     icon,
+    accent,
 }: {
     label: string;
     value: string;
     icon?: React.ReactNode;
+    accent?: boolean;
 }) {
     return (
-        <Card>
+        <Card className={accent ? "border-[var(--primary)]/25 bg-[var(--primary)]/8" : ""}>
             <CardContent className="p-4">
                 <p className="text-xs text-[var(--muted-foreground)]">
                     {label}
                 </p>
-                <p className="text-xl font-bold mt-1 flex items-center gap-1">
+                <p className={`text-xl font-bold mt-1 flex items-center gap-1 ${accent ? "text-[var(--primary)]" : ""}`}>
                     {icon}
                     {value}
                 </p>
