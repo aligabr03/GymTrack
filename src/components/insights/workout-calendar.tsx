@@ -8,6 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { ChevronRight } from "lucide-react";
 
 type WorkoutEntry = { id: string; name: string | null };
 
@@ -162,15 +163,18 @@ export function WorkoutCalendar({ year, data }: Props) {
                     <DialogHeader>
                         <DialogTitle>{selectedDay}</DialogTitle>
                     </DialogHeader>
-                    <ul className="flex flex-col gap-2 mt-2">
+                    <ul className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden mt-2">
                         {selectedWorkouts.map((w) => (
                             <li key={w.id}>
                                 <Link
                                     href={`/workouts/${w.id}`}
-                                    className="text-sm font-medium hover:underline"
+                                    className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40"
                                     onClick={() => setSelectedDay(null)}
                                 >
-                                    {w.name ?? "Unnamed workout"}
+                                    <span className="flex-1 text-sm font-medium truncate">
+                                        {w.name ?? "Unnamed workout"}
+                                    </span>
+                                    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
                                 </Link>
                             </li>
                         ))}
