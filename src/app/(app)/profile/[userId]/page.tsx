@@ -121,10 +121,14 @@ export default async function ProfilePage({
                                         workout.sets.map((s) => s.exerciseId),
                                     ),
                                 ].length - exercises.length;
+                            const href = isOwnProfile
+                                ? `/workouts/${workout.id}`
+                                : `/profile/${userId}/workouts/${workout.id}`;
                             return (
-                                <div
+                                <Link
                                     key={workout.id}
-                                    className="flex items-center gap-3 px-4 py-3"
+                                    href={href}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--muted)] transition-colors"
                                 >
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-medium truncate">
@@ -148,7 +152,7 @@ export default async function ProfilePage({
                                             {workout.sets.length} sets
                                         </p>
                                     </div>
-                                </div>
+                                </Link>
                             );
                         })}
                     </div>

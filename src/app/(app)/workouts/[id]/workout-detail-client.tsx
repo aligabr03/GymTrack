@@ -22,10 +22,14 @@ export function WorkoutDetailClient({
     workout,
     exercises,
     suggestions,
+    readOnly = false,
+    backHref = "/workouts",
 }: {
     workout: WorkoutWithSets;
     exercises: Exercise[];
     suggestions: WorkoutMetaSuggestions;
+    readOnly?: boolean;
+    backHref?: string;
 }) {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
@@ -128,7 +132,7 @@ export function WorkoutDetailClient({
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <Link href="/workouts">
+                <Link href={backHref}>
                     <Button variant="ghost" size="icon-sm">
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
@@ -141,17 +145,19 @@ export function WorkoutDetailClient({
                         {formatDate(workout.date)}
                     </p>
                 </div>
-                <div className="flex gap-2 shrink-0">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsEditing(true)}
-                    >
-                        <Edit className="h-4 w-4" />
-                        Edit
-                    </Button>
-                    <DeleteWorkoutButton id={workout.id} />
-                </div>
+                {!readOnly && (
+                    <div className="flex gap-2 shrink-0">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEditing(true)}
+                        >
+                            <Edit className="h-4 w-4" />
+                            Edit
+                        </Button>
+                        <DeleteWorkoutButton id={workout.id} />
+                    </div>
+                )}
             </div>
 
             {/* Summary */}

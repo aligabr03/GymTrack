@@ -360,6 +360,24 @@ export async function getWorkout(id: string) {
     return workout;
 }
 
+export async function getWorkoutForUser(
+    workoutId: string,
+    ownerUserId: string,
+) {
+    const workout = await prisma.workout.findUnique({
+        where: { id: workoutId },
+        include: {
+            sets: {
+                include: { exercise: true },
+                orderBy: [{ id: "asc" }, { setNumber: "asc" }],
+            },
+        },
+    });
+
+    if (!workout || workout.userId !== ownerUserId) return null;
+    return workout;
+}
+
 async function syncPersonalRecordsForExercises(
     userId: string,
     exerciseIds: string[],
