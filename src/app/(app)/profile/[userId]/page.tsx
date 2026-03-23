@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Pencil } from "lucide-react";
+import { Pencil, ChevronRight } from "lucide-react";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
 import { calculateVolume } from "@/lib/calculations";
 import { FollowButton } from "@/components/social/follow-button";
@@ -152,6 +152,7 @@ export default async function ProfilePage({
                                             {workout.sets.length} sets
                                         </p>
                                     </div>
+                                    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
                                 </Link>
                             );
                         })}

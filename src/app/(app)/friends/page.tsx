@@ -99,6 +99,7 @@ export default async function FriendsPage() {
                                             {workout.sets.length} sets
                                         </p>
                                     </div>
+                                    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
                                 </Link>
                             );
                         })}

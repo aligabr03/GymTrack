@@ -2,7 +2,7 @@ import { getActivityFeed } from "@/actions/social";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronLeft, Dumbbell } from "lucide-react";
+import { ChevronLeft, ChevronRight, Dumbbell } from "lucide-react";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
 import { calculateVolume } from "@/lib/calculations";
 
@@ -145,6 +145,7 @@ export default async function FeedPage() {
                                                             sets
                                                         </p>
                                                     </div>
+                                                    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
                                                 </Link>
                                             );
                                         },
