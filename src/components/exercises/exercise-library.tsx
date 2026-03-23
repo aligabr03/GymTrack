@@ -305,10 +305,10 @@ export function ExerciseLibrary({
                                     {exs.map((ex) => (
                                         <div
                                             key={ex.id}
-                                            className="group relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-3 sm:p-4 flex flex-col gap-1.5 transition-colors hover:border-[var(--ring)]"
+                                            className="group relative rounded-2xl border border-[var(--border)] bg-[var(--card)] aspect-square p-3 sm:p-4 flex flex-col items-center justify-center text-center gap-1.5 transition-colors hover:border-[var(--ring)]"
                                         >
                                             {ex.isCustom && (
-                                                <div className="absolute top-2 right-2 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                                                <div className="absolute top-2 right-2 flex items-center gap-0.5">
                                                     <button
                                                         onClick={() => openEdit(ex)}
                                                         className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors"
@@ -326,7 +326,7 @@ export function ExerciseLibrary({
                                                 </div>
                                             )}
 
-                                            <div className="flex items-center gap-1.5 min-w-0 pr-6">
+                                            <div className="flex items-center justify-center gap-1.5">
                                                 <span className="text-[13px] sm:text-sm font-semibold leading-tight line-clamp-2">
                                                     {ex.name}
                                                 </span>
@@ -340,11 +340,9 @@ export function ExerciseLibrary({
                                             </p>
 
                                             {bestWeights[ex.id] && (
-                                                <div className="mt-auto pt-1.5 border-t border-[var(--border)]">
-                                                    <p className="text-[11px] sm:text-xs font-medium text-amber-400/90">
-                                                        ★ {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
-                                                    </p>
-                                                </div>
+                                                <p className="text-[11px] sm:text-xs font-medium text-amber-400/90 mt-1">
+                                                    ★ {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
+                                                </p>
                                             )}
                                         </div>
                                     ))}
