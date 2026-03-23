@@ -1202,12 +1202,11 @@ function ExerciseGroupCard({
             {!group.collapsed && (
                 <CardContent className="p-4 pt-0 space-y-2">
                     {/* Header row */}
-                    <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr_1fr_auto] gap-1.5 text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-1 pb-1">
+                    <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr_auto] gap-1.5 text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-1 pb-1">
                         <span>#</span>
                         <span>Lbs</span>
                         <span>Reps</span>
                         <span>Form</span>
-                        <span>RPE</span>
                         <span />
                     </div>
 
@@ -1272,7 +1271,7 @@ function SetRow({
         <div className="space-y-0.5">
             {/* Single row for all screen sizes */}
             <div
-                className={`grid grid-cols-[1.75rem_1fr_1fr_1fr_1fr_auto] gap-1.5 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
+                className={`grid grid-cols-[1.75rem_1fr_1fr_1fr_auto] gap-1.5 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
             >
                 <button
                     onClick={onToggleDropset}
@@ -1324,17 +1323,6 @@ function SetRow({
                         ))}
                     </SelectContent>
                 </Select>
-                <Input
-                    type="number"
-                    inputMode="decimal"
-                    placeholder="—"
-                    value={set.rpe}
-                    onChange={(e) => onUpdate("rpe", e.target.value)}
-                    className="h-9 text-sm px-2"
-                    min={1}
-                    max={10}
-                    step={0.5}
-                />
                 <div className="flex items-center gap-0.5">
                     <button
                         onClick={onDuplicate}
