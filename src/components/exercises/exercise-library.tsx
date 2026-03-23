@@ -301,54 +301,47 @@ export function ExerciseLibrary({
                                     </span>
                                     <div className="h-px flex-1 bg-[var(--border)]" />
                                 </div>
-                                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {exs.map((ex) => (
                                         <div
                                             key={ex.id}
-                                            className="flex items-center gap-3 px-4 py-3 group"
+                                            className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 flex flex-col gap-2"
                                         >
-                        <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 min-w-0">
-                                                    <span className="text-sm font-medium truncate">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="flex items-center gap-1.5 min-w-0">
+                                                    <span className="text-sm font-semibold truncate">
                                                         {ex.name}
                                                     </span>
                                                     {ex.isCustom && (
-                                                        <Sparkles className="h-3 w-3 shrink-0 text-[var(--muted-foreground)]" />
+                                                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-[var(--muted-foreground)]" />
                                                     )}
                                                 </div>
-                                                <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
-                                                    {ex.muscleGroups.join(
-                                                        " · ",
-                                                    )}
-                                                    {bestWeights[ex.id] && (
-                                                        <span className="ml-2 text-amber-400/80">
-                                                        Best: {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
-                                                        </span>
-                                                    )}
-                                                </p>
+                                                {ex.isCustom && (
+                                                    <div className="flex items-center gap-0.5 shrink-0">
+                                                        <button
+                                                            onClick={() => openEdit(ex)}
+                                                            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors"
+                                                            aria-label="Edit exercise"
+                                                        >
+                                                            <Pencil className="h-3.5 w-3.5" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(ex.id, ex.name)}
+                                                            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-900/30 transition-colors"
+                                                            aria-label="Delete exercise"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
-                                            {ex.isCustom && (
-                                                <div className="flex items-center gap-1">
-                                                <button
-                                                    onClick={() => openEdit(ex)}
-                                                    className="shrink-0 p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors"
-                                                    aria-label="Edit exercise"
-                                                >
-                                                    <Pencil className="h-3.5 w-3.5" />
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            ex.id,
-                                                            ex.name,
-                                                        )
-                                                    }
-                                                    className="shrink-0 p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-900/30 transition-colors"
-                                                    aria-label="Delete exercise"
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </button>
-                                                </div>
+                                            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                                                {ex.muscleGroups.join(" · ")}
+                                            </p>
+                                            {bestWeights[ex.id] && (
+                                                <p className="text-xs text-amber-400/80 mt-auto pt-1">
+                                                    ★ Best: {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
+                                                </p>
                                             )}
                                         </div>
                                     ))}
