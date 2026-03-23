@@ -269,12 +269,11 @@ function ExerciseCard({
             </CardHeader>
             <CardContent className="pt-0">
                 <div className="space-y-2">
-                    <div className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr] gap-2 text-xs text-[var(--muted-foreground)] px-1">
+                    <div className="grid grid-cols-[2rem_1fr_1fr_1fr] gap-2 text-xs text-[var(--muted-foreground)] px-1">
                         <span>#</span>
                         <span>Weight</span>
                         <span>Reps</span>
                         <span>Form</span>
-                        <span>RPE</span>
                     </div>
                     {sets.map((s) => {
                         const formLabel = FORM_RATINGS.find(
@@ -283,7 +282,7 @@ function ExerciseCard({
                         return (
                             <div
                                 key={s.id}
-                                className={`grid grid-cols-[2rem_1fr_1fr_1fr_1fr] gap-2 items-center px-1 py-1 rounded transition-colors text-sm ${
+                                className={`grid grid-cols-[2rem_1fr_1fr_1fr] gap-2 items-center px-1 py-1 rounded transition-colors text-sm ${
                                     s.isDropset
                                         ? "bg-[var(--secondary)]/60"
                                         : "hover:bg-[var(--secondary)]"
@@ -326,9 +325,6 @@ function ExerciseCard({
                                             -
                                         </span>
                                     )}
-                                </span>
-                                <span className="text-[var(--muted-foreground)]">
-                                    {s.rpe == null ? "-" : s.rpe}
                                 </span>
                             </div>
                         );
