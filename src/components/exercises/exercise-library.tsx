@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
-import { Plus, Trash2, Search, Loader2, Sparkles, Pencil } from "lucide-react";
+import { Plus, Trash2, Search, Loader2, Pencil } from "lucide-react";
 
 const MUSCLE_GROUPS = [
     "Chest",
@@ -335,9 +335,6 @@ export function ExerciseLibrary({
                                                 <p className="text-[13px] sm:text-sm font-semibold leading-snug text-[var(--foreground)] line-clamp-2">
                                                     {ex.name}
                                                 </p>
-                                                {ex.isCustom && (
-                                                    <Sparkles className="h-2.5 w-2.5 shrink-0 mt-0.5 text-[var(--muted-foreground)]" />
-                                                )}
                                             </div>
 
                                             {/* Muscle group pills */}
