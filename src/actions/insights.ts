@@ -169,16 +169,17 @@ export async function getWorkoutCalendar(year: number) {
 
     const workouts = await prisma.workout.findMany({
         where: { userId, date: { gte: start, lte: end } },
-        select: { date: true },
+        select: { id: true, name: true, date: true },
     });
 
-    const counts: Record<string, number> = {};
+    const result: Record<string, { id: string; name: string | null }[]> = {};
     for (const w of workouts) {
         const key = w.date.toISOString().split("T")[0];
-        counts[key] = (counts[key] ?? 0) + 1;
+        if (!result[key]) result[key] = [];
+        result[key].push({ id: w.id, name: w.name });
     }
 
-    return counts;
+    return result;
 }
 
 // ---------------------------------------------------------------------------

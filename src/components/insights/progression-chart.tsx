@@ -59,18 +59,24 @@ export function ProgressionChart({ exercises }: Props) {
             try {
                 const raw = await getProgressionData(exerciseId);
 
-                // Group by date; keep the set with the highest estimated 1RM per session
+                // Per date: track max weight AND max e1rm independently
                 const byDate: Record<string, ChartPoint> = {};
                 for (const s of raw) {
                     if (!s.weightKg || !s.reps) continue;
                     const e1rm = estimateOneRM(s.weightKg, s.reps);
                     const existing = byDate[s.date];
-                    if (!existing || e1rm > (existing.estimatedOneRM ?? 0)) {
+                    if (!existing) {
                         byDate[s.date] = {
                             date: s.date,
                             weight: s.weightKg,
                             estimatedOneRM: Math.round(e1rm * 10) / 10,
                         };
+                    } else {
+                        if (s.weightKg > existing.weight)
+                            existing.weight = s.weightKg;
+                        if (e1rm > (existing.estimatedOneRM ?? 0))
+                            existing.estimatedOneRM =
+                                Math.round(e1rm * 10) / 10;
                     }
                 }
 

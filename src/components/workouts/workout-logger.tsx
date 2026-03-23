@@ -580,12 +580,13 @@ export function WorkoutLogger({
             {/* Workout meta */}
             <Card>
                 <CardContent className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                         <Label>Date</Label>
                         <Input
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
+                            className="w-full max-w-full"
                         />
                     </div>
                     <div className="space-y-2">
