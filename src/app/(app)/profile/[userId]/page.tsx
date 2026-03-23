@@ -12,7 +12,6 @@ import { Pencil, ChevronRight } from "lucide-react";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
 import { calculateVolume } from "@/lib/calculations";
 import { FollowButton } from "@/components/social/follow-button";
-import { SetPageTitle } from "@/components/layout/page-title-context";
 
 function getInitials(name: string) {
     return name
@@ -50,7 +49,6 @@ export default async function ProfilePage({
 
     return (
         <div className="space-y-6 max-w-2xl">
-            <SetPageTitle title={profile.displayName} />
             {/* Profile header */}
             <div className="flex items-start gap-4">
                 <Avatar className="h-16 w-16 shrink-0">
