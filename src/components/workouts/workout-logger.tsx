@@ -1201,10 +1201,10 @@ function ExerciseGroupCard({
 
             {!group.collapsed && (
                 <CardContent className="p-4 pt-0 space-y-2">
-                    {/* Header row - hidden on mobile, shown on md+ */}
-                    <div className="hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_2rem] gap-2 text-xs text-[var(--muted-foreground)] px-1 pb-1">
+                    {/* Header row */}
+                    <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr_1fr_auto] gap-1.5 text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-1 pb-1">
                         <span>#</span>
-                        <span>Weight (lbs)</span>
+                        <span>Lbs</span>
                         <span>Reps</span>
                         <span>Form</span>
                         <span>RPE</span>
@@ -1269,18 +1269,18 @@ function SetRow({
             : null;
 
     return (
-        <div className="space-y-1">
-            {/* Desktop: single row grid */}
+        <div className="space-y-0.5">
+            {/* Single row for all screen sizes */}
             <div
-                className={`hidden md:grid grid-cols-[2rem_1fr_1fr_1fr_1fr_auto] gap-2 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
+                className={`grid grid-cols-[1.75rem_1fr_1fr_1fr_1fr_auto] gap-1.5 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
             >
                 <button
                     onClick={onToggleDropset}
-                    className={`text-xs text-center font-mono w-full h-8 rounded transition-colors ${set.isDropset ? "text-[var(--foreground)] font-bold" : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"}`}
+                    className={`text-xs text-center font-mono w-full h-9 rounded transition-colors ${set.isDropset ? "text-[var(--foreground)] font-bold" : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"}`}
                     title={
                         set.isDropset
-                            ? "Click to unmark dropset"
-                            : "Click to mark as dropset"
+                            ? "Tap to unmark dropset"
+                            : "Tap to mark as dropset"
                     }
                 >
                     {set.isDropset ? "↓" : set.setNumber}
@@ -1291,7 +1291,7 @@ function SetRow({
                     placeholder="0"
                     value={set.weightKg}
                     onChange={(e) => onUpdate("weightKg", e.target.value)}
-                    className="h-8 text-sm"
+                    className="h-9 text-sm px-2"
                     min={0}
                     step={0.5}
                 />
@@ -1301,7 +1301,7 @@ function SetRow({
                     placeholder="0"
                     value={set.reps}
                     onChange={(e) => onUpdate("reps", e.target.value)}
-                    className="h-8 text-sm"
+                    className="h-9 text-sm px-2"
                     min={1}
                 />
                 <Select
@@ -1310,7 +1310,7 @@ function SetRow({
                         onUpdate("formRating", v ? parseInt(v, 10) : null)
                     }
                 >
-                    <SelectTrigger className="h-8 text-xs">
+                    <SelectTrigger className="h-9 text-xs px-2">
                         <SelectValue placeholder="—" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1330,15 +1330,15 @@ function SetRow({
                     placeholder="—"
                     value={set.rpe}
                     onChange={(e) => onUpdate("rpe", e.target.value)}
-                    className="h-8 text-sm"
+                    className="h-9 text-sm px-2"
                     min={1}
                     max={10}
                     step={0.5}
                 />
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5">
                     <button
                         onClick={onDuplicate}
-                        className="p-1 rounded hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors flex items-center justify-center"
+                        className="p-1 rounded hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
                         aria-label="Duplicate set"
                         title="Duplicate set"
                     >
@@ -1346,7 +1346,7 @@ function SetRow({
                     </button>
                     <button
                         onClick={onRemove}
-                        className="p-1 rounded hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors flex items-center justify-center"
+                        className="p-1 rounded hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
                         aria-label="Remove set"
                     >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1354,121 +1354,8 @@ function SetRow({
                 </div>
             </div>
 
-            {/* Mobile: compact card layout */}
-            <div
-                className={`md:hidden rounded-xl p-3 space-y-2 transition-colors ${set.isDropset ? "bg-[var(--secondary)]" : "bg-[var(--secondary)]/50"}`}
-            >
-                <div className="flex items-center justify-between">
-                    <button
-                        onClick={onToggleDropset}
-                        className={`text-xs font-medium px-2 py-0.5 rounded-lg transition-colors ${set.isDropset ? "bg-[var(--border)] text-[var(--foreground)]" : "text-[var(--muted-foreground)] hover:bg-[var(--border)]"}`}
-                        title={
-                            set.isDropset
-                                ? "Tap to unmark dropset"
-                                : "Tap to mark as dropset"
-                        }
-                    >
-                        {set.isDropset ? `↓ Drop` : `Set ${set.setNumber}`}
-                    </button>
-                    <div className="flex items-center gap-1 -mr-1">
-                        <button
-                            onClick={onDuplicate}
-                            className="p-1.5 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
-                            aria-label="Duplicate set"
-                            title="Duplicate set"
-                        >
-                            <Copy className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                            onClick={onRemove}
-                            className="p-1.5 rounded-lg hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
-                            aria-label="Remove set"
-                        >
-                            <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
-                            Weight (lbs)
-                        </label>
-                        <Input
-                            type="number"
-                            inputMode="decimal"
-                            placeholder="0"
-                            value={set.weightKg}
-                            onChange={(e) =>
-                                onUpdate("weightKg", e.target.value)
-                            }
-                            className="h-10"
-                            min={0}
-                            step={0.5}
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
-                            Reps
-                        </label>
-                        <Input
-                            type="number"
-                            inputMode="numeric"
-                            placeholder="0"
-                            value={set.reps}
-                            onChange={(e) => onUpdate("reps", e.target.value)}
-                            className="h-10"
-                            min={1}
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
-                            Form
-                        </label>
-                        <Select
-                            value={set.formRating?.toString() ?? ""}
-                            onValueChange={(v) =>
-                                onUpdate(
-                                    "formRating",
-                                    v ? parseInt(v, 10) : null,
-                                )
-                            }
-                        >
-                            <SelectTrigger className="h-10 text-xs">
-                                <SelectValue placeholder="—" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {FORM_RATINGS.map((r) => (
-                                    <SelectItem
-                                        key={r.value}
-                                        value={r.value.toString()}
-                                    >
-                                        {r.value} – {r.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)]">
-                            RPE
-                        </label>
-                        <Input
-                            type="number"
-                            inputMode="decimal"
-                            placeholder="—"
-                            value={set.rpe}
-                            onChange={(e) => onUpdate("rpe", e.target.value)}
-                            className="h-10"
-                            min={1}
-                            max={10}
-                            step={0.5}
-                        />
-                    </div>
-                </div>
-            </div>
-
             {estimatedRM && (
-                <p className="text-xs text-[var(--muted-foreground)] pl-2 md:pl-10">
+                <p className="text-[10px] text-[var(--muted-foreground)] pl-8 pb-0.5">
                     ~{estimatedRM} lbs est. 1RM
                 </p>
             )}
