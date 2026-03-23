@@ -103,24 +103,21 @@ export default async function FeedPage() {
                                                 workout.sets,
                                             );
                                             return (
-                                                <div
+                                                <Link
                                                     key={workout.id}
-                                                    className="flex items-center gap-3 px-4 py-3 animate-fade-in-up"
+                                                    href={`/profile/${profile.userId}/workouts/${workout.id}`}
+                                                    className="flex items-center gap-3 px-4 py-3 animate-fade-in-up hover:bg-[var(--muted)] transition-colors"
                                                     style={{
                                                         animationDelay: `${index * 50}ms`,
                                                     }}
                                                 >
-                                                    <Link
-                                                        href={`/profile/${profile.userId}`}
-                                                    >
-                                                        <Avatar className="h-8 w-8 shrink-0">
-                                                            <AvatarFallback className="text-xs bg-[var(--secondary)]">
-                                                                {getInitials(
-                                                                    profile.displayName,
-                                                                )}
-                                                            </AvatarFallback>
-                                                        </Avatar>
-                                                    </Link>
+                                                    <Avatar className="h-8 w-8 shrink-0">
+                                                        <AvatarFallback className="text-xs bg-[var(--secondary)]">
+                                                            {getInitials(
+                                                                profile.displayName,
+                                                            )}
+                                                        </AvatarFallback>
+                                                    </Avatar>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-sm font-medium truncate">
                                                             {profile.displayName}
@@ -144,14 +141,11 @@ export default async function FeedPage() {
                                                             lbs
                                                         </p>
                                                         <p className="text-xs text-[var(--muted-foreground)]">
-                                                            {
-                                                                workout.sets
-                                                                    .length
-                                                            }{" "}
+                                                            {workout.sets.length}{" "}
                                                             sets
                                                         </p>
                                                     </div>
-                                                </div>
+                                                </Link>
                                             );
                                         },
                                     )}

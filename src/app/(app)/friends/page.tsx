@@ -65,19 +65,18 @@ export default async function FriendsPage() {
                         {feed.map(({ workout, profile }) => {
                             const volume = calculateVolume(workout.sets);
                             return (
-                                <div
+                                <Link
                                     key={workout.id}
-                                    className="flex items-center gap-3 px-4 py-3"
+                                    href={`/profile/${profile.userId}/workouts/${workout.id}`}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--muted)] transition-colors"
                                 >
-                                    <Link href={`/profile/${profile.userId}`}>
-                                        <Avatar className="h-8 w-8 shrink-0">
-                                            <AvatarFallback className="text-xs bg-[var(--secondary)]">
-                                                {getInitials(
-                                                    profile.displayName,
-                                                )}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    </Link>
+                                    <Avatar className="h-8 w-8 shrink-0">
+                                        <AvatarFallback className="text-xs bg-[var(--secondary)]">
+                                            {getInitials(
+                                                profile.displayName,
+                                            )}
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-medium truncate">
                                             {profile.displayName}
@@ -100,7 +99,7 @@ export default async function FriendsPage() {
                                             {workout.sets.length} sets
                                         </p>
                                     </div>
-                                </div>
+                                </Link>
                             );
                         })}
                     </div>
