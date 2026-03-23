@@ -280,69 +280,91 @@ export function ExerciseLibrary({
                 </Dialog>
             </div>
 
-            {/* Exercise list grouped by category */}
+            {/* Exercise grid grouped by category */}
             {Object.keys(grouped).length === 0 ? (
-                <div className="text-center py-16 text-[var(--muted-foreground)]">
+                <div className="text-center py-20 text-[var(--muted-foreground)]">
                     No exercises found. Add your own with the &quot;Add
                     Exercise&quot; button above.
                 </div>
             ) : (
-                <div className="space-y-8">
+                <div className="space-y-10">
                     {Object.entries(grouped)
                         .sort(([a], [b]) => a.localeCompare(b))
                         .map(([cat, exs]) => (
                             <div key={cat}>
-                                <div className="flex items-center gap-2.5 mb-2 px-1">
-                                    <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-widest">
+                                {/* Category header */}
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[var(--muted-foreground)]">
                                         {cat}
-                                    </h2>
-                                    <span className="text-[10px] tabular-nums text-[var(--muted-foreground)]/60">
+                                    </span>
+                                    <span className="inline-flex items-center justify-center h-4 min-w-4 px-1.5 rounded-full bg-[var(--secondary)] text-[10px] tabular-nums text-[var(--muted-foreground)]">
                                         {exs.length}
                                     </span>
-                                    <div className="h-px flex-1 bg-[var(--border)]" />
+                                    <div className="h-px flex-1 bg-gradient-to-r from-[var(--border)] to-transparent" />
                                 </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+
+                                {/* Cards */}
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
                                     {exs.map((ex) => (
                                         <div
                                             key={ex.id}
-                                            className="group relative rounded-2xl border border-[var(--border)] bg-[var(--card)] aspect-square p-3 sm:p-4 flex flex-col items-center justify-center text-center gap-1.5 transition-colors hover:border-[var(--ring)]"
+                                            className="group relative flex flex-col rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-sm p-3.5 gap-2 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/20"
                                         >
+                                            {/* Custom exercise actions */}
                                             {ex.isCustom && (
-                                                <div className="absolute top-2 right-2 flex items-center gap-0.5">
+                                                <div className="absolute top-2 right-2 flex items-center gap-0.5 z-10">
                                                     <button
                                                         onClick={() => openEdit(ex)}
-                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors"
+                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/10 transition-colors"
                                                         aria-label="Edit exercise"
                                                     >
-                                                        <Pencil className="h-3.5 w-3.5" />
+                                                        <Pencil className="h-3 w-3" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(ex.id, ex.name)}
-                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-900/30 transition-colors"
+                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-500/10 transition-colors"
                                                         aria-label="Delete exercise"
                                                     >
-                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                        <Trash2 className="h-3 w-3" />
                                                     </button>
                                                 </div>
                                             )}
 
-                                            <div className="flex items-center justify-center gap-1.5">
-                                                <span className="text-[13px] sm:text-sm font-semibold leading-tight line-clamp-2">
+                                            {/* Name */}
+                                            <div className={`flex items-start gap-1 ${ex.isCustom ? "pr-14" : ""}`}>
+                                                <p className="text-[13px] sm:text-sm font-semibold leading-snug text-[var(--foreground)] line-clamp-2">
                                                     {ex.name}
-                                                </span>
+                                                </p>
                                                 {ex.isCustom && (
-                                                    <Sparkles className="h-3 w-3 shrink-0 text-[var(--muted-foreground)]" />
+                                                    <Sparkles className="h-2.5 w-2.5 shrink-0 mt-0.5 text-[var(--muted-foreground)]" />
                                                 )}
                                             </div>
 
-                                            <p className="text-[11px] sm:text-xs text-[var(--muted-foreground)] leading-snug line-clamp-2">
-                                                {ex.muscleGroups.join(" · ")}
-                                            </p>
+                                            {/* Muscle group pills */}
+                                            <div className="flex flex-wrap gap-1">
+                                                {ex.muscleGroups.slice(0, 3).map((m) => (
+                                                    <span
+                                                        key={m}
+                                                        className="inline-block px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.07] text-[10px] text-[var(--muted-foreground)] leading-none"
+                                                    >
+                                                        {m}
+                                                    </span>
+                                                ))}
+                                                {ex.muscleGroups.length > 3 && (
+                                                    <span className="inline-block px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.07] text-[10px] text-[var(--muted-foreground)] leading-none">
+                                                        +{ex.muscleGroups.length - 3}
+                                                    </span>
+                                                )}
+                                            </div>
 
+                                            {/* Best set */}
                                             {bestWeights[ex.id] && (
-                                                <p className="text-[11px] sm:text-xs font-medium text-amber-400/90 mt-1">
-                                                    ★ {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
-                                                </p>
+                                                <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-white/[0.06]">
+                                                    <span className="text-amber-400/80 text-[10px]">★</span>
+                                                    <span className="text-[11px] font-medium text-amber-400/80 tabular-nums">
+                                                        {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
+                                                    </span>
+                                                </div>
                                             )}
                                         </div>
                                     ))}
