@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExportDataButton } from "@/components/profile/export-data-button";
 
 export default function EditProfilePage() {
     const router = useRouter();
@@ -78,6 +79,21 @@ export default function EditProfilePage() {
                     </Button>
                 </CardContent>
             </Card>
+
+            {/* Desktop-only data export */}
+            <div className="hidden md:block">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-base">Data export</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-[var(--muted-foreground)] mb-4">
+                            Download all your GymTrack data as a JSON file, including workouts, body metrics, personal records, and templates.
+                        </p>
+                        <ExportDataButton />
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }
