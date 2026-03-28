@@ -12,29 +12,28 @@ async function getUserId(): Promise<string> {
     return user.id;
 }
 
+function toDate(d: Date) {
+    return d.toISOString().slice(0, 10);
+}
+
+function compact<T extends object>(obj: T): Partial<T> {
+    return Object.fromEntries(
+        Object.entries(obj).filter(([, v]) => v !== null && v !== undefined)
+    ) as Partial<T>;
+}
+
 export async function exportUserData() {
     const userId = await getUserId();
 
     const [profile, workouts, bodyMetrics, personalRecords, workoutTemplates, customExercises] =
         await Promise.all([
-            prisma.userProfile.findUnique({
-                where: { userId },
-            }),
+            prisma.userProfile.findUnique({ where: { userId } }),
             prisma.workout.findMany({
                 where: { userId },
                 orderBy: { date: "desc" },
                 include: {
                     sets: {
-                        include: {
-                            exercise: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    category: true,
-                                    muscleGroups: true,
-                                },
-                            },
-                        },
+                        include: { exercise: { select: { name: true } } },
                         orderBy: [{ exerciseId: "asc" }, { setNumber: "asc" }],
                     },
                 },
@@ -45,46 +44,95 @@ export async function exportUserData() {
             }),
             prisma.personalRecord.findMany({
                 where: { userId },
-                include: {
-                    exercise: {
-                        select: {
-                            id: true,
-                            name: true,
-                            category: true,
-                        },
-                    },
-                },
+                include: { exercise: { select: { name: true, category: true } } },
             }),
             prisma.workoutTemplate.findMany({
                 where: { userId },
                 include: {
                     exercises: {
-                        include: {
-                            exercise: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    category: true,
-                                    muscleGroups: true,
-                                },
-                            },
-                        },
+                        include: { exercise: { select: { name: true, category: true, muscleGroups: true } } },
                         orderBy: { order: "asc" },
                     },
                 },
             }),
             prisma.exercise.findMany({
                 where: { userId, isCustom: true },
+                select: { name: true, category: true, muscleGroups: true },
             }),
         ]);
 
+    // Workouts: group sets by exercise name
+    const formattedWorkouts = workouts.map((w) => {
+        const byExercise: Record<string, { reps: number; kg: number; rpe?: number; notes?: string }[]> = {};
+        for (const s of w.sets) {
+            const name = s.exercise.name;
+            if (!byExercise[name]) byExercise[name] = [];
+            const entry: { reps: number; kg: number; rpe?: number; notes?: string } = {
+                reps: s.reps ?? 0,
+                kg: s.weightKg ?? 0,
+            };
+            if (s.rpe != null) entry.rpe = s.rpe;
+            if (s.notes) entry.notes = s.notes;
+            byExercise[name].push(entry);
+        }
+        return compact({
+            date: toDate(w.date),
+            name: w.name || undefined,
+            durationMins: w.durationMins || undefined,
+            notes: w.notes || undefined,
+            exercises: byExercise,
+        });
+    });
+
+    // Body metrics: strip nulls and internal fields
+    const formattedMetrics = bodyMetrics.map((m) =>
+        compact({
+            date: toDate(m.date),
+            weightKg: m.weightKg,
+            bodyFatPct: m.bodyFatPct,
+            waistCm: m.waistCm,
+            hipCm: m.hipCm,
+            chestCm: m.chestCm,
+            armCm: m.armCm,
+            notes: m.notes,
+        })
+    );
+
+    // Personal records: just the essentials
+    const formattedPRs = personalRecords.map((pr) => ({
+        exercise: pr.exercise.name,
+        category: pr.exercise.category,
+        weightKg: pr.weightKg,
+        reps: pr.reps,
+        est1RM: Math.round(pr.estimatedOneRM * 10) / 10,
+        achievedAt: toDate(pr.achievedAt),
+    }));
+
+    // Templates: name + ordered exercise list with targets
+    const formattedTemplates = workoutTemplates.map((t) => ({
+        name: t.name,
+        ...(t.description ? { description: t.description } : {}),
+        exercises: t.exercises.map((te) =>
+            compact({
+                name: te.exercise.name,
+                category: te.exercise.category,
+                muscles: te.exercise.muscleGroups.length ? te.exercise.muscleGroups : undefined,
+                targetSets: te.targetSets,
+                targetReps: te.targetReps,
+                targetWeightKg: te.targetWeight,
+            })
+        ),
+    }));
+
     return {
-        exportedAt: new Date().toISOString(),
-        profile,
-        workouts,
-        bodyMetrics,
-        personalRecords,
-        workoutTemplates,
+        exportedAt: new Date().toISOString().slice(0, 10),
+        profile: profile
+            ? compact({ displayName: profile.displayName, bio: profile.bio })
+            : null,
+        workouts: formattedWorkouts,
+        bodyMetrics: formattedMetrics,
+        personalRecords: formattedPRs,
+        templates: formattedTemplates,
         customExercises,
     };
 }
