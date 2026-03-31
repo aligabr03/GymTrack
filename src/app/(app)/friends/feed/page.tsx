@@ -1,10 +1,10 @@
-import { getActivityFeed } from "@/actions/social";
+import { getActivityFeed, getOrCreateMyProfile } from "@/actions/social";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronLeft, ChevronRight, Dumbbell } from "lucide-react";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
-import { calculateVolume } from "@/lib/calculations";
+import { calculateVolume, formatVolume } from "@/lib/calculations";
 
 const WORKOUT_GROUPS = [
     "Today",
@@ -46,7 +46,11 @@ function getInitials(name: string) {
 }
 
 export default async function FeedPage() {
-    const feed = await getActivityFeed({ all: true });
+    const [feed, myProfile] = await Promise.all([
+        getActivityFeed({ all: true }),
+        getOrCreateMyProfile(),
+    ]);
+    const weightUnit = (myProfile.weightUnit as "KG" | "LBS") ?? "KG";
 
     type FeedEntry = (typeof feed)[number];
     const grouped = feed.reduce(
@@ -135,10 +139,7 @@ export default async function FeedPage() {
                                                     </div>
                                                     <div className="shrink-0 text-right">
                                                         <p className="text-sm font-medium tabular-nums">
-                                                            {Math.round(
-                                                                volume,
-                                                            ).toLocaleString()}{" "}
-                                                            lbs
+                                                            {formatVolume(volume, weightUnit)}
                                                         </p>
                                                         <p className="text-xs text-[var(--muted-foreground)]">
                                                             {workout.sets.length}{" "}

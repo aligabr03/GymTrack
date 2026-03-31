@@ -14,6 +14,7 @@ export default function EditProfilePage() {
     const router = useRouter();
     const [displayName, setDisplayName] = useState("");
     const [bio, setBio] = useState("");
+    const [weightUnit, setWeightUnit] = useState<"KG" | "LBS">("KG");
     const [userId, setUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -23,6 +24,7 @@ export default function EditProfilePage() {
             if (p) {
                 setDisplayName(p.displayName);
                 setBio(p.bio ?? "");
+                setWeightUnit((p.weightUnit as "KG" | "LBS") ?? "KG");
                 setUserId(p.userId);
             }
             setLoading(false);
@@ -31,7 +33,7 @@ export default function EditProfilePage() {
 
     async function handleSave() {
         setSaving(true);
-        await updateProfile({ displayName: displayName.trim(), bio: bio.trim() || undefined });
+        await updateProfile({ displayName: displayName.trim(), bio: bio.trim() || undefined, weightUnit });
         if (userId) router.push(`/profile/${userId}`);
         setSaving(false);
     }
@@ -69,6 +71,27 @@ export default function EditProfilePage() {
                             placeholder="A short bio (optional)"
                             rows={3}
                         />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Weight unit</Label>
+                        <div className="flex gap-2">
+                            <Button
+                                type="button"
+                                variant={weightUnit === "KG" ? "default" : "outline"}
+                                className="flex-1"
+                                onClick={() => setWeightUnit("KG")}
+                            >
+                                kg
+                            </Button>
+                            <Button
+                                type="button"
+                                variant={weightUnit === "LBS" ? "default" : "outline"}
+                                className="flex-1"
+                                onClick={() => setWeightUnit("LBS")}
+                            >
+                                lbs
+                            </Button>
+                        </div>
                     </div>
                     <Button
                         onClick={handleSave}

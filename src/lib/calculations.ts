@@ -1,3 +1,37 @@
+export type WeightUnit = "KG" | "LBS";
+
+const KG_TO_LBS = 2.20462;
+
+export function kgToLbs(kg: number): number {
+    return Math.round(kg * KG_TO_LBS * 10) / 10;
+}
+
+export function lbsToKg(lbs: number): number {
+    return Math.round((lbs / KG_TO_LBS) * 10) / 10;
+}
+
+/**
+ * Format a value stored in KG for display, converting to LBS if requested.
+ * Returns e.g. "102.1 kg" or "225 lbs"
+ */
+export function formatWeight(valueKg: number, unit: WeightUnit): string {
+    if (unit === "LBS") {
+        return `${kgToLbs(valueKg).toLocaleString()} lbs`;
+    }
+    return `${valueKg.toLocaleString()} kg`;
+}
+
+/**
+ * Format a volume total (stored in KG) for display.
+ * Rounds to nearest integer for readability.
+ */
+export function formatVolume(volumeKg: number, unit: WeightUnit): string {
+    if (unit === "LBS") {
+        return `${Math.round(volumeKg * KG_TO_LBS).toLocaleString()} lbs`;
+    }
+    return `${Math.round(volumeKg).toLocaleString()} kg`;
+}
+
 /**
  * Brzycki formula for estimated 1 Rep Max
  * weight × (36 / (37 - reps))

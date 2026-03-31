@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users, ChevronRight, Dumbbell } from "lucide-react";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
-import { calculateVolume } from "@/lib/calculations";
+import { calculateVolume, formatVolume } from "@/lib/calculations";
 import { FollowButton } from "@/components/social/follow-button";
 
 function getInitials(name: string) {
@@ -16,7 +16,8 @@ function getInitials(name: string) {
 }
 
 export default async function FriendsPage() {
-    await getOrCreateMyProfile();
+    const myProfile = await getOrCreateMyProfile();
+    const weightUnit = (myProfile.weightUnit as "KG" | "LBS") ?? "KG";
 
     const [feed, users] = await Promise.all([
         getActivityFeed(),
@@ -90,10 +91,7 @@ export default async function FriendsPage() {
                                     </div>
                                     <div className="shrink-0 text-right">
                                         <p className="text-sm font-medium tabular-nums">
-                                            {Math.round(
-                                                volume,
-                                            ).toLocaleString()}{" "}
-                                            lbs
+                                            {formatVolume(volume, weightUnit)}
                                         </p>
                                         <p className="text-xs text-[var(--muted-foreground)]">
                                             {workout.sets.length} sets

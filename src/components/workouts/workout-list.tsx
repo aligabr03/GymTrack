@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
-import { calculateVolume } from "@/lib/calculations";
+import { calculateVolume, formatVolume } from "@/lib/calculations";
+import type { WeightUnit } from "@/lib/calculations";
 import { Clock, ChevronRight, Search, Dumbbell } from "lucide-react";
 
 type Workout = {
@@ -55,7 +56,7 @@ function getWorkoutGroup(date: Date | string) {
     return "Older";
 }
 
-export function WorkoutList({ workouts }: { workouts: Workout[] }) {
+export function WorkoutList({ workouts, weightUnit = "KG" }: { workouts: Workout[]; weightUnit?: WeightUnit }) {
     const [search, setSearch] = useState("");
 
     const filtered = search.trim()
@@ -148,10 +149,7 @@ export function WorkoutList({ workouts }: { workouts: Workout[] }) {
                                             </div>
                                             <div className="shrink-0 text-right">
                                                 <p className="text-sm font-medium tabular-nums">
-                                                    {Math.round(
-                                                        volume,
-                                                    ).toLocaleString()}{" "}
-                                                    lbs
+                                                    {formatVolume(volume, weightUnit)}
                                                 </p>
                                                 <p className="text-xs text-[var(--muted-foreground)]">
                                                     {workout.sets.length} sets

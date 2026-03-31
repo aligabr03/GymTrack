@@ -12,7 +12,8 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { getProgressionData } from "@/actions/insights";
-import { estimateOneRM } from "@/lib/calculations";
+import { estimateOneRM, kgToLbs } from "@/lib/calculations";
+import type { WeightUnit } from "@/lib/calculations";
 import type { Exercise } from "@/types";
 import {
     Select,
@@ -24,6 +25,7 @@ import {
 
 type Props = {
     exercises: Exercise[];
+    weightUnit?: WeightUnit;
 };
 
 type ChartPoint = {
@@ -32,7 +34,7 @@ type ChartPoint = {
     estimatedOneRM: number | null;
 };
 
-export function ProgressionChart({ exercises }: Props) {
+export function ProgressionChart({ exercises, weightUnit = "KG" }: Props) {
     const [category, setCategory] = useState<string>("all");
     const [selected, setSelected] = useState<string>(exercises[0]?.id ?? "");
     const [data, setData] = useState<ChartPoint[]>([]);
@@ -61,22 +63,24 @@ export function ProgressionChart({ exercises }: Props) {
 
                 // Per date: track max weight AND max e1rm independently
                 const byDate: Record<string, ChartPoint> = {};
+                const convert = (v: number) => weightUnit === "LBS" ? kgToLbs(v) : v;
                 for (const s of raw) {
                     if (!s.weightKg || !s.reps) continue;
                     const e1rm = estimateOneRM(s.weightKg, s.reps);
+                    const displayWeight = convert(s.weightKg);
+                    const displayE1rm = Math.round(convert(e1rm) * 10) / 10;
                     const existing = byDate[s.date];
                     if (!existing) {
                         byDate[s.date] = {
                             date: s.date,
-                            weight: s.weightKg,
-                            estimatedOneRM: Math.round(e1rm * 10) / 10,
+                            weight: displayWeight,
+                            estimatedOneRM: displayE1rm,
                         };
                     } else {
-                        if (s.weightKg > existing.weight)
-                            existing.weight = s.weightKg;
-                        if (e1rm > (existing.estimatedOneRM ?? 0))
-                            existing.estimatedOneRM =
-                                Math.round(e1rm * 10) / 10;
+                        if (displayWeight > existing.weight)
+                            existing.weight = displayWeight;
+                        if (displayE1rm > (existing.estimatedOneRM ?? 0))
+                            existing.estimatedOneRM = displayE1rm;
                     }
                 }
 
@@ -182,7 +186,7 @@ export function ProgressionChart({ exercises }: Props) {
                                     }}
                                     axisLine={false}
                                     tickLine={false}
-                                    unit=" lbs"
+                                    unit={weightUnit === "LBS" ? " lbs" : " kg"}
                                 />
                                 <Tooltip
                                     contentStyle={{
@@ -194,7 +198,7 @@ export function ProgressionChart({ exercises }: Props) {
                                     }}
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     formatter={(value: any, name: any) => [
-                                        `${Number(value ?? 0)} lbs`,
+                                        `${Number(value ?? 0)} ${weightUnit === "LBS" ? "lbs" : "kg"}`,
                                         name === "weight"
                                             ? "Top weight"
                                             : "Est. 1RM",

@@ -11,6 +11,8 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import type { BodyMetric } from "@/types";
+import { kgToLbs } from "@/lib/calculations";
+import type { WeightUnit } from "@/lib/calculations";
 import {
     Select,
     SelectContent,
@@ -47,7 +49,7 @@ type ChartPoint = {
     value: number | null;
 };
 
-export function BodyTrendsChart({ metrics }: { metrics: BodyMetric[] }) {
+export function BodyTrendsChart({ metrics, weightUnit = "KG" }: { metrics: BodyMetric[]; weightUnit?: WeightUnit }) {
     const [selectedMetric, setSelectedMetric] = useState<MetricKey>("weightKg");
 
     const selected =
@@ -60,11 +62,18 @@ export function BodyTrendsChart({ metrics }: { metrics: BodyMetric[] }) {
                 (a, b) =>
                     new Date(a.date).getTime() - new Date(b.date).getTime(),
             )
-            .map((m) => ({
-                date: new Date(m.date).toISOString().split("T")[0],
-                value: m[selectedMetric],
-            }));
-    }, [metrics, selectedMetric]);
+            .map((m) => {
+                const raw = m[selectedMetric];
+                const value = raw == null ? null
+                    : (selectedMetric === "weightKg" && weightUnit === "LBS")
+                        ? kgToLbs(raw)
+                        : raw;
+                return {
+                    date: new Date(m.date).toISOString().split("T")[0],
+                    value,
+                };
+            });
+    }, [metrics, selectedMetric, weightUnit]);
 
     const hasAnyData = data.some((point) => point.value != null);
 
@@ -145,7 +154,7 @@ export function BodyTrendsChart({ metrics }: { metrics: BodyMetric[] }) {
                                 value == null
                                     ? ["-", selected.label]
                                     : [
-                                          `${Number(value).toFixed(1)} ${selected.unit}`,
+                                          `${Number(value).toFixed(1)} ${selected.key === "weightKg" ? (weightUnit === "LBS" ? "lbs" : "kg") : selected.unit}`,
                                           selected.label,
                                       ]
                             }

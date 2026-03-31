@@ -1,4 +1,5 @@
 import { getBodyMetrics } from "@/actions/body-metrics";
+import { getMyWeightUnit } from "@/actions/social";
 import { BodyMetricsLogger } from "@/components/body/body-metrics-logger";
 
 export const metadata = { title: "Body Metrics — GymTrack" };
@@ -10,6 +11,7 @@ export default async function BodyPage() {
     } catch {
         // user not logged in or DB error — middleware protects this route
     }
+    const weightUnit = await getMyWeightUnit().catch(() => "KG" as const);
 
     return (
         <div className="space-y-6">
@@ -19,7 +21,7 @@ export default async function BodyPage() {
                     Track your weight, body fat, and measurements over time.
                 </p>
             </div>
-            <BodyMetricsLogger metrics={metrics} />
+            <BodyMetricsLogger metrics={metrics} weightUnit={weightUnit} />
         </div>
     );
 }

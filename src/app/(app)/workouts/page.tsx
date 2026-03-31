@@ -1,11 +1,15 @@
 import { getWorkouts } from "@/actions/workouts";
+import { getMyWeightUnit } from "@/actions/social";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, ClipboardList, Dumbbell } from "lucide-react";
 import { WorkoutList } from "@/components/workouts/workout-list";
 
 export default async function WorkoutsPage() {
-    const workouts = await getWorkouts();
+    const [workouts, weightUnit] = await Promise.all([
+        getWorkouts(),
+        getMyWeightUnit(),
+    ]);
 
     return (
         <div className="space-y-6">
@@ -51,7 +55,7 @@ export default async function WorkoutsPage() {
                     </Link>
                 </div>
             ) : (
-                <WorkoutList workouts={workouts} />
+                <WorkoutList workouts={workouts} weightUnit={weightUnit} />
             )}
         </div>
     );

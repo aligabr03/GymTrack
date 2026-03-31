@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { createBodyMetric, deleteBodyMetric } from "@/actions/body-metrics";
 import type { BodyMetric } from "@/types";
+import { kgToLbs, lbsToKg } from "@/lib/calculations";
+import type { WeightUnit } from "@/lib/calculations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +47,7 @@ function makeInitialForm(): FormData {
     };
 }
 
-export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
+export function BodyMetricsLogger({ metrics, weightUnit = "KG" }: { metrics: BodyMetric[]; weightUnit?: WeightUnit }) {
     const [form, setForm] = useState<FormData>(makeInitialForm);
     const [showForm, setShowForm] = useState(metrics.length === 0);
     const [isPending, startTransition] = useTransition();
@@ -56,9 +58,12 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
     }
 
     function handleSave() {
+        const rawWeight = form.weightKg ? parseFloat(form.weightKg) : null;
         const data = {
             date: form.date,
-            weightKg: form.weightKg ? parseFloat(form.weightKg) : null,
+            weightKg: rawWeight != null
+                ? (weightUnit === "LBS" ? lbsToKg(rawWeight) : rawWeight)
+                : null,
             bodyFatPct: form.bodyFatPct ? parseFloat(form.bodyFatPct) : null,
             waistCm: form.waistCm ? parseFloat(form.waistCm) : null,
             hipCm: form.hipCm ? parseFloat(form.hipCm) : null,
@@ -136,11 +141,11 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Weight (kg)</Label>
+                                    <Label>Weight ({weightUnit === "LBS" ? "lbs" : "kg"})</Label>
                                     <Input
                                         type="number"
                                         inputMode="decimal"
-                                        placeholder="75.5"
+                                        placeholder={weightUnit === "LBS" ? "166" : "75.5"}
                                         value={form.weightKg}
                                         onChange={field("weightKg")}
                                         step={0.1}
@@ -264,7 +269,7 @@ export function BodyMetricsLogger({ metrics }: { metrics: BodyMetric[] }) {
                                             {m.weightKg && (
                                                 <MetricPill
                                                     label="Weight"
-                                                    value={`${m.weightKg} kg`}
+                                                    value={weightUnit === "LBS" ? `${kgToLbs(m.weightKg)} lbs` : `${m.weightKg} kg`}
                                                 />
                                             )}
                                             {m.bodyFatPct && (

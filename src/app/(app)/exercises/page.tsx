@@ -1,12 +1,14 @@
 import { getExercises } from "@/actions/exercises";
 import { getExerciseBestWeights } from "@/actions/exercises";
+import { getMyWeightUnit } from "@/actions/social";
 import { ExerciseLibrary } from "@/components/exercises/exercise-library";
 import { Library } from "lucide-react";
 
 export default async function ExercisesPage() {
-    const [exercises, bestWeights] = await Promise.all([
+    const [exercises, bestWeights, weightUnit] = await Promise.all([
         getExercises(),
         getExerciseBestWeights(),
+        getMyWeightUnit(),
     ]);
 
     return (
@@ -24,7 +26,7 @@ export default async function ExercisesPage() {
                 </div>
             </div>
 
-            <ExerciseLibrary exercises={exercises} bestWeights={bestWeights} />
+            <ExerciseLibrary exercises={exercises} bestWeights={bestWeights} weightUnit={weightUnit} />
         </div>
     );
 }

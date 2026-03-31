@@ -35,7 +35,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { estimateOneRM } from "@/lib/calculations";
+import { estimateOneRM, kgToLbs, lbsToKg } from "@/lib/calculations";
+import type { WeightUnit } from "@/lib/calculations";
 import {
     Plus,
     Trash2,
@@ -117,12 +118,14 @@ export function WorkoutLogger({
     suggestions,
     onSuccess,
     onCancel,
+    weightUnit = "KG",
 }: {
     exercises: Exercise[];
     existing?: WorkoutWithSets;
     suggestions: WorkoutMetaSuggestions;
     onSuccess?: () => void;
     onCancel?: () => void;
+    weightUnit?: WeightUnit;
 }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -503,7 +506,7 @@ export function WorkoutLogger({
         const allSets = setDrafts.map((set) => ({
             exerciseId: set.exerciseId,
             setNumber: set.setNumber,
-            weightKg: parseFloat(set.weightKg),
+            weightKg: weightUnit === "LBS" ? lbsToKg(parseFloat(set.weightKg)) : parseFloat(set.weightKg),
             reps: parseInt(set.reps, 10),
             formRating: set.formRating,
             rpe: set.rpe ? parseFloat(set.rpe) : null,
@@ -653,7 +656,7 @@ export function WorkoutLogger({
                     </span>
                     <span>
                         <strong className="text-[var(--foreground)]">
-                            {Math.round(totalVolume).toLocaleString()} lbs
+                            {Math.round(totalVolume).toLocaleString()} {weightUnit === "LBS" ? "lbs" : "kg"}
                         </strong>{" "}
                         volume
                     </span>
@@ -702,6 +705,7 @@ export function WorkoutLogger({
                             otherGroups={groups.filter(
                                 (g) => g.exerciseId !== item.group.exerciseId,
                             )}
+                            weightUnit={weightUnit}
                             onAddSet={() => addSet(item.group.exerciseId)}
                             onAddDropSet={() =>
                                 addDropSet(item.group.exerciseId)
@@ -760,6 +764,7 @@ export function WorkoutLogger({
                                                 g.exerciseId !==
                                                 group.exerciseId,
                                         )}
+                                        weightUnit={weightUnit}
                                         onAddSet={() =>
                                             addSet(group.exerciseId)
                                         }
@@ -1033,6 +1038,7 @@ function ExerciseGroupCard({
     onToggleDropset,
     onLinkSuperset,
     onUnlinkSuperset,
+    weightUnit = "KG",
 }: {
     group: ExerciseGroup;
     previousBest: { weightKg: number; reps: number; e1rm: number } | null;
@@ -1051,6 +1057,7 @@ function ExerciseGroupCard({
     onToggleDropset: (setId: string) => void;
     onLinkSuperset: (exerciseId: string) => void;
     onUnlinkSuperset: () => void;
+    weightUnit?: WeightUnit;
 }) {
     const [supersetPickerOpen, setSupersetPickerOpen] = useState(false);
     const currentBestE1rm = getBestEstimatedOneRM(group.sets);
@@ -1062,7 +1069,7 @@ function ExerciseGroupCard({
         previousBest == null
             ? null
             : {
-                  label: `${previousBest.weightKg} lbs × ${previousBest.reps}`,
+                  label: `${weightUnit === "LBS" ? kgToLbs(previousBest.weightKg) : previousBest.weightKg} ${weightUnit === "LBS" ? "lbs" : "kg"} × ${previousBest.reps}`,
                   className:
                       delta == null
                           ? "border-[var(--border)] bg-[var(--secondary)] text-[var(--muted-foreground)]"
@@ -1204,7 +1211,7 @@ function ExerciseGroupCard({
                     {/* Header row */}
                     <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr_auto] gap-1.5 text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-1 pb-1">
                         <span>#</span>
-                        <span>Lbs</span>
+                        <span>{weightUnit === "LBS" ? "Lbs" : "Kg"}</span>
                         <span>Reps</span>
                         <span>Form</span>
                         <span />
@@ -1214,6 +1221,7 @@ function ExerciseGroupCard({
                         <SetRow
                             key={set.id}
                             set={set}
+                            weightUnit={weightUnit}
                             onUpdate={(field, value) =>
                                 onUpdateSet(set.id, field, value)
                             }
@@ -1255,12 +1263,14 @@ function SetRow({
     onRemove,
     onDuplicate,
     onToggleDropset,
+    weightUnit = "KG",
 }: {
     set: SetRow;
     onUpdate: (field: keyof SetRow, value: string | number | null) => void;
     onRemove: () => void;
     onDuplicate: () => void;
     onToggleDropset: () => void;
+    weightUnit?: WeightUnit;
 }) {
     const estimatedRM =
         set.weightKg && set.reps
@@ -1344,7 +1354,7 @@ function SetRow({
 
             {estimatedRM && (
                 <p className="text-[10px] text-[var(--muted-foreground)] pl-8 pb-0.5">
-                    ~{estimatedRM} lbs est. 1RM
+                    ~{estimatedRM} {weightUnit === "LBS" ? "lbs" : "kg"} est. 1RM
                 </p>
             )}
         </div>

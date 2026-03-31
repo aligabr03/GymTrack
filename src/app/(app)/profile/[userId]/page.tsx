@@ -10,7 +10,7 @@ import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Pencil, ChevronRight } from "lucide-react";
 import { formatRelativeDate, formatDate } from "@/lib/utils";
-import { calculateVolume } from "@/lib/calculations";
+import { calculateVolume, formatVolume } from "@/lib/calculations";
 import { FollowButton } from "@/components/social/follow-button";
 import { SetPageTitle } from "@/components/layout/page-title-context";
 
@@ -37,7 +37,11 @@ export default async function ProfilePage({
     const currentUserId = user?.id;
 
     // Ensure the logged-in viewer has a profile
-    if (currentUserId) await getOrCreateMyProfile();
+    let viewerWeightUnit: "KG" | "LBS" = "KG";
+    if (currentUserId) {
+        const viewerProfile = await getOrCreateMyProfile();
+        viewerWeightUnit = (viewerProfile.weightUnit as "KG" | "LBS") ?? "KG";
+    }
 
     const profile = await getProfile(userId);
     if (!profile) notFound();
@@ -145,10 +149,7 @@ export default async function ProfilePage({
                                     </div>
                                     <div className="shrink-0 text-right">
                                         <p className="text-sm font-medium tabular-nums">
-                                            {Math.round(
-                                                volume,
-                                            ).toLocaleString()}{" "}
-                                            lbs
+                                            {formatVolume(volume, viewerWeightUnit)}
                                         </p>
                                         <p className="text-xs text-[var(--muted-foreground)]">
                                             {workout.sets.length} sets

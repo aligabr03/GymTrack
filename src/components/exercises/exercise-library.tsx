@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
+import { kgToLbs } from "@/lib/calculations";
+import type { WeightUnit } from "@/lib/calculations";
 import { Plus, Trash2, Search, Loader2, Pencil } from "lucide-react";
 
 const MUSCLE_GROUPS = [
@@ -45,9 +47,11 @@ const MUSCLE_GROUPS = [
 export function ExerciseLibrary({
     exercises,
     bestWeights = {},
+    weightUnit = "KG",
 }: {
     exercises: Exercise[];
     bestWeights?: Record<string, { weightKg: number; reps: number } | null>;
+    weightUnit?: WeightUnit;
 }) {
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
@@ -359,7 +363,7 @@ export function ExerciseLibrary({
                                                 <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-white/[0.06]">
                                                     <span className="text-amber-400/80 text-[10px]">★</span>
                                                     <span className="text-[11px] font-medium text-amber-400/80 tabular-nums">
-                                                        {bestWeights[ex.id]!.weightKg} lbs × {bestWeights[ex.id]!.reps}
+                                                        {weightUnit === "LBS" ? kgToLbs(bestWeights[ex.id]!.weightKg) : bestWeights[ex.id]!.weightKg} {weightUnit === "LBS" ? "lbs" : "kg"} × {bestWeights[ex.id]!.reps}
                                                     </span>
                                                 </div>
                                             )}

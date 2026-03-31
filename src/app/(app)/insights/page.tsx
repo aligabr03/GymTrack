@@ -4,6 +4,7 @@ import {
     getLoggedExercises,
 } from "@/actions/insights";
 import { getBodyMetrics } from "@/actions/body-metrics";
+import { getMyWeightUnit } from "@/actions/social";
 import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,12 +20,13 @@ export const dynamic = "force-dynamic";
 export default async function InsightsPage() {
     const year = new Date().getFullYear();
 
-    const [muscleData, calendarCounts, exercises, bodyMetrics] =
+    const [muscleData, calendarCounts, exercises, bodyMetrics, weightUnitResult] =
         await Promise.allSettled([
             getMuscleGroupVolume(30),
             getWorkoutCalendar(year),
             getLoggedExercises(),
             getBodyMetrics(180),
+            getMyWeightUnit(),
         ]).then((results) =>
             results.map((r) => (r.status === "fulfilled" ? r.value : null)),
         );
@@ -43,6 +45,7 @@ export default async function InsightsPage() {
     const bodyData =
         (bodyMetrics as Awaited<ReturnType<typeof getBodyMetrics>> | null) ??
         [];
+    const weightUnit = (weightUnitResult as "KG" | "LBS" | null) ?? "KG";
 
     return (
         <div className="space-y-6">
@@ -88,7 +91,7 @@ export default async function InsightsPage() {
                     <CardTitle className="text-base">Body Trends</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <BodyTrendsChart metrics={bodyData} />
+                    <BodyTrendsChart metrics={bodyData} weightUnit={weightUnit} />
                 </CardContent>
             </Card>
 
@@ -100,7 +103,7 @@ export default async function InsightsPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ProgressionChart exercises={exerciseList} />
+                    <ProgressionChart exercises={exerciseList} weightUnit={weightUnit} />
                 </CardContent>
             </Card>
         </div>

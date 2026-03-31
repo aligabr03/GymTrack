@@ -1,5 +1,5 @@
 import { getWorkoutForUser } from "@/actions/workouts";
-import { getProfile } from "@/actions/social";
+import { getProfile, getMyWeightUnit } from "@/actions/social";
 import { getExercises } from "@/actions/exercises";
 import { notFound } from "next/navigation";
 import { WorkoutDetailClient } from "@/app/(app)/workouts/[id]/workout-detail-client";
@@ -12,10 +12,11 @@ export default async function PublicWorkoutDetailPage({
 }) {
     const { userId, workoutId } = await params;
 
-    const [workout, exercises, profile] = await Promise.all([
+    const [workout, exercises, profile, weightUnit] = await Promise.all([
         getWorkoutForUser(workoutId, userId),
         getExercises(),
         getProfile(userId),
+        getMyWeightUnit().catch(() => "KG" as const),
     ]);
 
     if (!workout) notFound();
@@ -29,6 +30,7 @@ export default async function PublicWorkoutDetailPage({
                 suggestions={{ names: [], durations: [] }}
                 readOnly
                 backHref={`/profile/${userId}`}
+                weightUnit={weightUnit}
             />
         </>
     );

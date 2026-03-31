@@ -1,7 +1,8 @@
 import { getDashboardStats } from "@/actions/insights";
+import { getMyWeightUnit } from "@/actions/social";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate, formatRelativeDate } from "@/lib/utils";
-import { calculateVolume } from "@/lib/calculations";
+import { calculateVolume, formatVolume, formatWeight, kgToLbs } from "@/lib/calculations";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,10 @@ import {
 } from "lucide-react";
 
 export default async function DashboardPage() {
-    const stats = await getDashboardStats();
+    const [stats, weightUnit] = await Promise.all([
+        getDashboardStats(),
+        getMyWeightUnit().catch(() => "KG" as const),
+    ]);
 
     return (
         <div className="space-y-8">
@@ -132,10 +136,7 @@ export default async function DashboardPage() {
                                         </div>
                                         <div className="shrink-0 text-right">
                                             <p className="text-sm font-medium tabular-nums">
-                                                {Math.round(
-                                                    volume,
-                                                ).toLocaleString()}{" "}
-                                                lbs
+                                                {formatVolume(volume, weightUnit)}
                                             </p>
                                             <p className="text-xs text-[var(--muted-foreground)]">
                                                 {workout.sets.length} sets
@@ -180,13 +181,13 @@ export default async function DashboardPage() {
                                                     {pr.exercise.name}
                                                 </p>
                                                 <p className="text-xs text-[var(--muted-foreground)]">
-                                                    {pr.weightKg} lbs &times;{" "}
+                                                    {weightUnit === "LBS" ? kgToLbs(pr.weightKg) : pr.weightKg} {weightUnit === "LBS" ? "lbs" : "kg"} &times;{" "}
                                                     {pr.reps} reps
                                                 </p>
                                             </div>
                                             <p className="text-sm font-bold tabular-nums shrink-0">
-                                                {pr.estimatedOneRM.toFixed(1)}{" "}
-                                                lbs
+                                                {weightUnit === "LBS" ? kgToLbs(pr.estimatedOneRM) : pr.estimatedOneRM.toFixed(1)}{" "}
+                                                {weightUnit === "LBS" ? "lbs" : "kg"}
                                             </p>
                                         </div>
                                     ))}
@@ -227,7 +228,7 @@ export default async function DashboardPage() {
                                         {stats.latestMetric.weightKg && (
                                             <MetricItem
                                                 label="Weight"
-                                                value={`${stats.latestMetric.weightKg} kg`}
+                                                value={formatWeight(stats.latestMetric.weightKg, weightUnit)}
                                             />
                                         )}
                                         {stats.latestMetric.bodyFatPct && (

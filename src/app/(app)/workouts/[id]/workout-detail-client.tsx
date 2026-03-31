@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { calculateVolume, estimateOneRM } from "@/lib/calculations";
+import { calculateVolume, estimateOneRM, formatVolume, formatWeight } from "@/lib/calculations";
+import type { WeightUnit } from "@/lib/calculations";
 import { FORM_RATINGS } from "@/types";
 import type {
     WorkoutWithSets,
@@ -24,12 +25,14 @@ export function WorkoutDetailClient({
     suggestions,
     readOnly = false,
     backHref = "/workouts",
+    weightUnit = "KG",
 }: {
     workout: WorkoutWithSets;
     exercises: Exercise[];
     suggestions: WorkoutMetaSuggestions;
     readOnly?: boolean;
     backHref?: string;
+    weightUnit?: WeightUnit;
 }) {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
@@ -118,6 +121,7 @@ export function WorkoutDetailClient({
                     exercises={exercises}
                     existing={workout}
                     suggestions={suggestions}
+                    weightUnit={weightUnit}
                     onSuccess={() => {
                         router.refresh();
                         setIsEditing(false);
@@ -164,7 +168,7 @@ export function WorkoutDetailClient({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <SummaryCard
                     label="Volume"
-                    value={`${Math.round(volume).toLocaleString()} lbs`}
+                    value={formatVolume(volume, weightUnit)}
                 />
                 <SummaryCard
                     label="Sets"
@@ -211,6 +215,7 @@ export function WorkoutDetailClient({
                                         key={exercise.id}
                                         exercise={exercise}
                                         sets={sets}
+                                        weightUnit={weightUnit}
                                     />
                                 ))}
                             </div>
@@ -220,6 +225,7 @@ export function WorkoutDetailClient({
                             key={item.data.exercise.id}
                             exercise={item.data.exercise}
                             sets={item.data.sets}
+                            weightUnit={weightUnit}
                         />
                     ),
                 )}
@@ -231,6 +237,7 @@ export function WorkoutDetailClient({
 function ExerciseCard({
     exercise,
     sets,
+    weightUnit = "KG",
 }: {
     exercise: { id: string; name: string };
     sets: Array<{
@@ -242,6 +249,7 @@ function ExerciseCard({
         rpe: number | null;
         isDropset: boolean;
     }>;
+    weightUnit?: WeightUnit;
 }) {
     const bestSet = sets.reduce(
         (best, s) => {
@@ -264,7 +272,7 @@ function ExerciseCard({
                     {bestSet?.e1rm && (
                         <div className="text-right">
                             <p className="text-sm font-semibold text-[var(--foreground)]">
-                                ~{bestSet.e1rm} lbs 1RM
+                                ~{weightUnit === "LBS" ? Math.round(bestSet.e1rm * 2.20462 * 10) / 10 : bestSet.e1rm} {weightUnit === "LBS" ? "lbs" : "kg"} 1RM
                             </p>
                             <p className="text-xs text-[var(--muted-foreground)]">
                                 estimated
@@ -309,7 +317,7 @@ function ExerciseCard({
                                     )}
                                 </span>
                                 <span>
-                                    {s.weightKg ? `${s.weightKg} lbs` : "-"}
+                                    {s.weightKg ? formatWeight(s.weightKg, weightUnit) : "-"}
                                 </span>
                                 <span>{s.reps ?? "-"}</span>
                                 <span>
