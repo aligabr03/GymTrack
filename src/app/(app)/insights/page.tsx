@@ -4,7 +4,7 @@ import {
     getLoggedExercises,
 } from "@/actions/insights";
 import { getBodyMetrics } from "@/actions/body-metrics";
-import { getMyWeightUnit } from "@/actions/social";
+import { getMyWeightUnit, getMyBodyWeightUnit } from "@/actions/social";
 import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,13 +20,14 @@ export const dynamic = "force-dynamic";
 export default async function InsightsPage() {
     const year = new Date().getFullYear();
 
-    const [muscleData, calendarCounts, exercises, bodyMetrics, weightUnitResult] =
+    const [muscleData, calendarCounts, exercises, bodyMetrics, weightUnitResult, bodyWeightUnitResult] =
         await Promise.allSettled([
             getMuscleGroupVolume(30),
             getWorkoutCalendar(year),
             getLoggedExercises(),
             getBodyMetrics(180),
             getMyWeightUnit(),
+            getMyBodyWeightUnit(),
         ]).then((results) =>
             results.map((r) => (r.status === "fulfilled" ? r.value : null)),
         );
@@ -46,6 +47,7 @@ export default async function InsightsPage() {
         (bodyMetrics as Awaited<ReturnType<typeof getBodyMetrics>> | null) ??
         [];
     const weightUnit = (weightUnitResult as "KG" | "LBS" | null) ?? "KG";
+    const bodyWeightUnit = (bodyWeightUnitResult as "KG" | "LBS" | null) ?? "KG";
 
     return (
         <div className="space-y-6">
@@ -91,7 +93,7 @@ export default async function InsightsPage() {
                     <CardTitle className="text-base">Body Trends</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <BodyTrendsChart metrics={bodyData} weightUnit={weightUnit} />
+                    <BodyTrendsChart metrics={bodyData} weightUnit={bodyWeightUnit} />
                 </CardContent>
             </Card>
 

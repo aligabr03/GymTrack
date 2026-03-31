@@ -51,10 +51,21 @@ export async function getMyWeightUnit(): Promise<"KG" | "LBS"> {
     return unit === "LBS" ? "LBS" : "KG";
 }
 
+export async function getMyBodyWeightUnit(): Promise<"KG" | "LBS"> {
+    const userId = await getUserId();
+    const profile = await prisma.userProfile.findUnique({
+        where: { userId },
+        select: { bodyWeightUnit: true },
+    });
+    const unit = profile?.bodyWeightUnit;
+    return unit === "LBS" ? "LBS" : "KG";
+}
+
 export async function updateProfile(data: {
     displayName?: string;
     bio?: string;
     weightUnit?: "KG" | "LBS";
+    bodyWeightUnit?: "KG" | "LBS";
 }) {
     const { id, name } = await getUserMeta();
     const profile = await prisma.userProfile.upsert({
@@ -65,6 +76,7 @@ export async function updateProfile(data: {
             displayName: data.displayName ?? name,
             bio: data.bio,
             weightUnit: data.weightUnit ?? "KG",
+            bodyWeightUnit: data.bodyWeightUnit ?? "KG",
         },
     });
     revalidatePath(`/profile/${id}`);
