@@ -1,5 +1,5 @@
 import { getDashboardStats } from "@/actions/insights";
-import { getMyWeightUnit } from "@/actions/social";
+import { getMyWeightUnit, getMyBodyWeightUnit } from "@/actions/social";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate, formatRelativeDate } from "@/lib/utils";
 import { calculateVolume, formatVolume, formatWeight, kgToLbs } from "@/lib/calculations";
@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 
 export default async function DashboardPage() {
-    const [stats, weightUnit] = await Promise.all([
+    const [stats, weightUnit, bodyWeightUnit] = await Promise.all([
         getDashboardStats(),
         getMyWeightUnit().catch(() => "KG" as const),
+        getMyBodyWeightUnit().catch(() => "KG" as const),
     ]);
 
     return (
@@ -228,7 +229,7 @@ export default async function DashboardPage() {
                                         {stats.latestMetric.weightKg && (
                                             <MetricItem
                                                 label="Weight"
-                                                value={formatWeight(stats.latestMetric.weightKg, weightUnit)}
+                                                value={formatWeight(stats.latestMetric.weightKg, bodyWeightUnit)}
                                             />
                                         )}
                                         {stats.latestMetric.bodyFatPct && (
