@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { calculateVolume, estimateOneRM, formatVolume, formatWeight } from "@/lib/calculations";
+import { calculateVolume, estimateOneRM, formatVolume, formatWeight, kgToLbs } from "@/lib/calculations";
 import type { WeightUnit } from "@/lib/calculations";
 import { FORM_RATINGS } from "@/types";
 import type {
@@ -272,7 +272,7 @@ function ExerciseCard({
                     {bestSet?.e1rm && (
                         <div className="text-right">
                             <p className="text-sm font-semibold text-[var(--foreground)]">
-                                ~{weightUnit === "LBS" ? Math.round(bestSet.e1rm * 2.20462 * 10) / 10 : bestSet.e1rm} {weightUnit === "LBS" ? "lbs" : "kg"} 1RM
+                                ~{weightUnit === "LBS" ? kgToLbs(bestSet.e1rm) : bestSet.e1rm} {weightUnit === "LBS" ? "lbs" : "kg"} 1RM
                             </p>
                             <p className="text-xs text-[var(--muted-foreground)]">
                                 estimated

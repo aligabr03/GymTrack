@@ -169,7 +169,9 @@ export function WorkoutLogger({
                 exerciseId: s.exerciseId,
                 exerciseName: s.exercise.name,
                 setNumber: s.setNumber,
-                weightKg: s.weightKg?.toString() ?? "",
+                weightKg: s.weightKg != null
+                    ? (weightUnit === "LBS" ? kgToLbs(s.weightKg).toString() : s.weightKg.toString())
+                    : "",
                 reps: s.reps?.toString() ?? "",
                 formRating: s.formRating,
                 rpe: s.rpe?.toString() ?? "",

@@ -3,7 +3,7 @@
 import { createHash } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
-import { getWeekBoundaries } from "@/lib/calculations";
+import { getWeekBoundaries, kgToLbs } from "@/lib/calculations";
 
 async function getUserId(): Promise<string> {
     const supabase = await createClient();
@@ -201,6 +201,7 @@ type InsightSnapshot = {
 
 async function buildInsightSnapshot(
     userId: string,
+    weightUnit: "KG" | "LBS" = "KG",
 ): Promise<InsightSnapshot | null> {
     const now = new Date();
     const ms = (days: number) => days * 24 * 60 * 60 * 1000;
@@ -331,9 +332,12 @@ async function buildInsightSnapshot(
         orderBy: { achievedAt: "desc" },
         take: 3,
     });
-    const recentPRs = prs.map(
-        (p) => `${p.exercise.name} ~${Math.round(p.estimatedOneRM)} lbs`,
-    );
+    const recentPRs = prs.map((p) => {
+        const display = weightUnit === "LBS"
+            ? `${kgToLbs(p.estimatedOneRM)} lbs`
+            : `${Math.round(p.estimatedOneRM)} kg`;
+        return `${p.exercise.name} ~${display}`;
+    });
 
     return {
         weeklyWorkouts,
@@ -346,6 +350,7 @@ async function buildInsightSnapshot(
 
 async function callOpenAI(
     snapshot: InsightSnapshot,
+    weightUnit: "KG" | "LBS" = "KG",
     userContext?: string,
 ): Promise<string> {
     const key = process.env.OPENAI_API_KEY;
@@ -363,7 +368,7 @@ async function callOpenAI(
                 {
                     role: "system",
                     content:
-                        "You are a fitness coach giving a brief snapshot. Output exactly 4 brief bullet points starting with •. Cover important tips given the data and what you think is important, comment on progression and give tips if needed. Use exact numbers only, all weights provided are in lbs except body weight in kg. No filler.",
+                        `You are a fitness coach giving a brief snapshot. Output exactly 4 brief bullet points starting with •. Cover important tips given the data and what you think is important, comment on progression and give tips if needed. Use exact numbers only, all weights are in ${weightUnit === "LBS" ? "lbs" : "kg"}. No filler.`,
                 },
                 {
                     role: "user",
@@ -394,7 +399,9 @@ export async function getAiInsight(): Promise<{
 } | null> {
     try {
         const userId = await getUserId();
-        const snapshot = await buildInsightSnapshot(userId);
+        const profile = await prisma.userProfile.findUnique({ where: { userId }, select: { weightUnit: true } });
+        const weightUnit: "KG" | "LBS" = profile?.weightUnit === "LBS" ? "LBS" : "KG";
+        const snapshot = await buildInsightSnapshot(userId, weightUnit);
 
         if (!snapshot) {
             return {
@@ -420,7 +427,7 @@ export async function getAiInsight(): Promise<{
             };
         }
 
-        const analysis = await callOpenAI(snapshot);
+        const analysis = await callOpenAI(snapshot, weightUnit);
 
         const row = await prisma.aiInsight.upsert({
             where: { userId },
@@ -444,7 +451,9 @@ export async function refreshAiInsight(userContext?: string): Promise<{
 } | null> {
     try {
         const userId = await getUserId();
-        const snapshot = await buildInsightSnapshot(userId);
+        const profile = await prisma.userProfile.findUnique({ where: { userId }, select: { weightUnit: true } });
+        const weightUnit: "KG" | "LBS" = profile?.weightUnit === "LBS" ? "LBS" : "KG";
+        const snapshot = await buildInsightSnapshot(userId, weightUnit);
 
         if (!snapshot) {
             return {
@@ -459,7 +468,7 @@ export async function refreshAiInsight(userContext?: string): Promise<{
             .digest("hex")
             .slice(0, 32);
 
-        const analysis = await callOpenAI(snapshot, userContext);
+        const analysis = await callOpenAI(snapshot, weightUnit, userContext);
 
         const row = await prisma.aiInsight.upsert({
             where: { userId },
