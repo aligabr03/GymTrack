@@ -123,10 +123,10 @@ export default async function ProfilePage({
                     <WorkoutCalendar
                         year={year}
                         data={calendarData}
-                        getWorkoutHref={(id) =>
+                        workoutPathPrefix={
                             isOwnProfile
-                                ? `/workouts/${id}`
-                                : `/profile/${userId}/workouts/${id}`
+                                ? "/workouts"
+                                : `/profile/${userId}/workouts`
                         }
                     />
                 </CardContent>

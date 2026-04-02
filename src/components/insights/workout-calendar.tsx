@@ -16,9 +16,9 @@ type Props = {
     year: number;
     /** Map of ISO date string (YYYY-MM-DD) → list of workouts */
     data: Record<string, WorkoutEntry[]>;
-    /** Optional override for the href of each workout in the day-detail dialog.
-     *  Defaults to the owner's own workout route `/workouts/:id`. */
-    getWorkoutHref?: (workoutId: string) => string;
+    /** Path prefix for workout links in the day-detail dialog.
+     *  Defaults to `/workouts`. Pass e.g. `/profile/[userId]/workouts` for public profiles. */
+    workoutPathPrefix?: string;
 };
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -42,9 +42,9 @@ function intensity(count: number): string {
     return "bg-[var(--foreground)]";
 }
 
-export function WorkoutCalendar({ year, data, getWorkoutHref }: Props) {
+export function WorkoutCalendar({ year, data, workoutPathPrefix = "/workouts" }: Props) {
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
-    const resolveHref = getWorkoutHref ?? ((id: string) => `/workouts/${id}`);
+    const resolveHref = (id: string) => `${workoutPathPrefix}/${id}`;
 
     // Build week grid starting from Jan 1 of year
     const startDate = new Date(year, 0, 1);
