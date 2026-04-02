@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
     createWorkout,
     getBatchPreviousBestSets,
+    getExercisesForWorkoutName,
     updateWorkout,
 } from "@/actions/workouts";
 import { createExercise } from "@/actions/exercises";
@@ -99,14 +100,17 @@ function getBestEstimatedOneRM(
         weightKg: string | number | null;
         reps: string | number | null;
     }>,
+    weightUnit: WeightUnit = "KG",
 ): number | null {
     let best: number | null = null;
     for (const set of sets) {
-        const weight = Number(set.weightKg ?? 0);
+        const displayWeight = Number(set.weightKg ?? 0);
+        // Normalize to kg so comparison against stored (kg-based) e1RM is correct
+        const weightKg = weightUnit === "LBS" ? lbsToKg(displayWeight) : displayWeight;
         const reps = Number(set.reps ?? 0);
-        if (!Number.isFinite(weight) || !Number.isFinite(reps)) continue;
-        if (weight <= 0 || reps <= 0) continue;
-        const e1rm = estimateOneRM(weight, reps);
+        if (!Number.isFinite(weightKg) || !Number.isFinite(reps)) continue;
+        if (weightKg <= 0 || reps <= 0) continue;
+        const e1rm = estimateOneRM(weightKg, reps);
         if (best == null || e1rm > best) best = e1rm;
     }
     return best;
@@ -156,6 +160,11 @@ export function WorkoutLogger({
     const [previousBestByExercise, setPreviousBestByExercise] = useState<
         Record<string, { weightKg: number; reps: number; e1rm: number } | null>
     >({});
+    const [exerciseTemplate, setExerciseTemplate] = useState<{
+        exercises: Exercise[];
+        index: number;
+        sourceName: string;
+    } | null>(null);
 
     // Build groups from existing workout
     const [groups, setGroups] = useState<ExerciseGroup[]>(() => {
@@ -208,6 +217,19 @@ export function WorkoutLogger({
         return matchSearch && matchCat;
     });
 
+    async function handleNameSuggestionSelect(name: string) {
+        setWorkoutName(name);
+        setExerciseTemplate(null);
+        try {
+            const templateExercises = await getExercisesForWorkoutName(name);
+            if (templateExercises.length > 0) {
+                setExerciseTemplate({ exercises: templateExercises, index: 0, sourceName: name });
+            }
+        } catch {
+            // silently ignore — suggestions are non-critical
+        }
+    }
+
     async function loadPreviousBestForExercises(exerciseIds: string[]) {
         const missing = exerciseIds.filter(
             (id) => previousBestByExercise[id] === undefined,
@@ -231,6 +253,45 @@ export function WorkoutLogger({
         if (missing.length > 0) void loadPreviousBestForExercises(missing);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groups]);
+
+    // Clear exercise template if the user types a name that no longer matches
+    useEffect(() => {
+        if (
+            exerciseTemplate &&
+            workoutName.trim().toLowerCase() !== exerciseTemplate.sourceName.toLowerCase()
+        ) {
+            setExerciseTemplate(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workoutName]);
+
+    // Compute next template exercise, skipping any already in the workout
+    const nextTemplateExercise = (() => {
+        if (!exerciseTemplate) return null;
+        for (let i = exerciseTemplate.index; i < exerciseTemplate.exercises.length; i++) {
+            const ex = exerciseTemplate.exercises[i];
+            if (!groups.some((g) => g.exerciseId === ex.id)) return ex;
+        }
+        return null;
+    })();
+
+    function acceptTemplateSuggestion() {
+        if (!exerciseTemplate) return;
+        for (let i = exerciseTemplate.index; i < exerciseTemplate.exercises.length; i++) {
+            const ex = exerciseTemplate.exercises[i];
+            if (!groups.some((g) => g.exerciseId === ex.id)) {
+                addExercise(ex);
+                const nextIndex = i + 1;
+                setExerciseTemplate(
+                    nextIndex < exerciseTemplate.exercises.length
+                        ? { ...exerciseTemplate, index: nextIndex }
+                        : null,
+                );
+                return;
+            }
+        }
+        setExerciseTemplate(null);
+    }
 
     function addExercise(exercise: Exercise) {
         if (groups.some((g) => g.exerciseId === exercise.id)) {
@@ -605,7 +666,7 @@ export function WorkoutLogger({
                             <SuggestionRow
                                 label="Recent"
                                 items={filteredNameSuggestions}
-                                onSelect={setWorkoutName}
+                                onSelect={(name) => void handleNameSuggestionSelect(name)}
                             />
                         )}
                     </div>
@@ -818,6 +879,31 @@ export function WorkoutLogger({
                     ),
                 );
             })()}
+
+            {/* Sequential exercise suggestion from a previously used workout */}
+            {nextTemplateExercise && (
+                <div className="flex items-center gap-2 flex-wrap px-1">
+                    <span className="text-xs text-[var(--muted-foreground)] shrink-0">
+                        Next from &ldquo;{exerciseTemplate!.sourceName}&rdquo;:
+                    </span>
+                    <button
+                        type="button"
+                        onClick={acceptTemplateSuggestion}
+                        className="flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--secondary)] px-3 py-1 text-xs font-medium text-[var(--foreground)] transition-colors hover:border-[var(--ring)] hover:bg-[var(--accent)]"
+                    >
+                        <Plus className="h-3 w-3" />
+                        {nextTemplateExercise.name}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setExerciseTemplate(null)}
+                        className="text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors px-1"
+                        aria-label="Dismiss exercise suggestions"
+                    >
+                        &times;
+                    </button>
+                </div>
+            )}
 
             {/* Add exercise button */}
             <Dialog open={addExOpen} onOpenChange={setAddExOpen}>
@@ -1062,7 +1148,7 @@ function ExerciseGroupCard({
     weightUnit?: WeightUnit;
 }) {
     const [supersetPickerOpen, setSupersetPickerOpen] = useState(false);
-    const currentBestE1rm = getBestEstimatedOneRM(group.sets);
+    const currentBestE1rm = getBestEstimatedOneRM(group.sets, weightUnit);
     const delta =
         previousBest == null || currentBestE1rm == null
             ? null

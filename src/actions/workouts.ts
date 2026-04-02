@@ -282,9 +282,10 @@ export async function getLastSetsForExercise(
 }
 
 /**
- * Batch version: returns the best-1RM set from the most recent workout for
- * each of the supplied exerciseIds in just 2 DB round-trips regardless of
- * how many exercises are requested.
+ * Batch version: returns the all-time best set (by estimated 1RM) for each
+ * of the supplied exerciseIds in a single DB round-trip.
+ * When editing a workout, pass its id as `excludeWorkoutId` so the
+ * comparison is against historical data, not the sets being edited.
  */
 export async function getBatchPreviousBestSets(
     exerciseIds: string[],
@@ -295,18 +296,18 @@ export async function getBatchPreviousBestSets(
     if (exerciseIds.length === 0) return {};
     const userId = await getUserId();
 
-    // 1 query — most recent workoutId per exercise (DISTINCT ON exerciseId)
-    const latestPerExercise = await prisma.workoutSet.findMany({
+    // Single query — all qualifying sets across the user's entire history
+    const sets = await prisma.workoutSet.findMany({
         where: {
             exerciseId: { in: exerciseIds },
             workout: {
                 userId,
                 ...(excludeWorkoutId ? { id: { not: excludeWorkoutId } } : {}),
             },
+            weightKg: { not: null },
+            reps: { not: null },
         },
-        orderBy: { workout: { date: "desc" } },
-        distinct: ["exerciseId"],
-        select: { exerciseId: true, workoutId: true },
+        select: { exerciseId: true, weightKg: true, reps: true },
     });
 
     const result: Record<
@@ -314,33 +315,54 @@ export async function getBatchPreviousBestSets(
         { weightKg: number; reps: number; e1rm: number } | null
     > = Object.fromEntries(exerciseIds.map((id) => [id, null]));
 
-    if (latestPerExercise.length === 0) return result;
-
-    // 1 query — all sets for those (workoutId, exerciseId) pairs
-    const sets = await prisma.workoutSet.findMany({
-        where: {
-            OR: latestPerExercise.map(({ exerciseId, workoutId }) => ({
-                exerciseId,
-                workoutId,
-            })),
-        },
-        select: { exerciseId: true, weightKg: true, reps: true },
-    });
-
-    // group by exerciseId and pick the set with the highest estimated 1RM
-    for (const { exerciseId } of latestPerExercise) {
-        let best: { weightKg: number; reps: number; e1rm: number } | null =
-            null;
-        for (const s of sets) {
-            if (s.exerciseId !== exerciseId || !s.weightKg || !s.reps) continue;
-            const e1rm = estimateOneRM(s.weightKg, s.reps);
-            if (!best || e1rm > best.e1rm)
-                best = { weightKg: s.weightKg, reps: s.reps, e1rm };
+    for (const s of sets) {
+        if (!s.weightKg || !s.reps) continue;
+        const e1rm = estimateOneRM(s.weightKg, s.reps);
+        const current = result[s.exerciseId];
+        if (!current || e1rm > current.e1rm) {
+            result[s.exerciseId] = { weightKg: s.weightKg, reps: s.reps, e1rm };
         }
-        result[exerciseId] = best;
     }
 
     return result;
+}
+
+/**
+ * Returns the exercises (in original order) from the most recent workout
+ * that matches the given name. Used to power sequential exercise suggestions
+ * when a user picks a previously used workout name.
+ */
+export async function getExercisesForWorkoutName(
+    workoutName: string,
+) {
+    const userId = await getUserId();
+
+    const match = await prisma.workout.findFirst({
+        where: {
+            userId,
+            name: { equals: workoutName, mode: "insensitive" },
+        },
+        orderBy: { date: "desc" },
+        include: {
+            sets: {
+                include: { exercise: true },
+                orderBy: [{ id: "asc" }, { setNumber: "asc" }],
+            },
+        },
+    });
+
+    if (!match) return [];
+
+    // Deduplicate exercises preserving their first-occurrence order
+    const seen = new Set<string>();
+    const exercises: (typeof match.sets)[number]["exercise"][] = [];
+    for (const s of match.sets) {
+        if (!seen.has(s.exerciseId)) {
+            seen.add(s.exerciseId);
+            exercises.push(s.exercise);
+        }
+    }
+    return exercises;
 }
 
 export async function getWorkout(id: string) {

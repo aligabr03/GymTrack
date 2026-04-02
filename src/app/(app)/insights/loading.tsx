@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 export default function InsightsLoading() {
     return (
         <div className="space-y-6">
-            {/* Header skeleton */}
+            {/* Header */}
             <div className="hidden md:block">
-                <Skeleton className="h-8 w-28" />
+                <Skeleton className="h-8 w-24" />
                 <Skeleton className="h-4 w-64 mt-2" />
             </div>
 
-            {/* AI Analysis skeleton */}
+            {/* AI Analysis card */}
             <Card>
                 <CardHeader>
                     <div className="flex items-center gap-2">
@@ -31,7 +31,7 @@ export default function InsightsLoading() {
                 </CardContent>
             </Card>
 
-            {/* Calendar skeleton */}
+            {/* Calendar card */}
             <Card>
                 <CardHeader>
                     <Skeleton className="h-5 w-48" />
@@ -41,17 +41,17 @@ export default function InsightsLoading() {
                 </CardContent>
             </Card>
 
-            {/* Muscle balance skeleton */}
+            {/* Muscle balance */}
             <Card>
                 <CardHeader>
-                    <Skeleton className="h-5 w-56" />
+                    <Skeleton className="h-5 w-60" />
                 </CardHeader>
                 <CardContent>
                     <Skeleton className="h-44 w-full rounded-lg" />
                 </CardContent>
             </Card>
 
-            {/* Body trends skeleton */}
+            {/* Body trends */}
             <Card>
                 <CardHeader>
                     <Skeleton className="h-5 w-28" />
@@ -61,7 +61,7 @@ export default function InsightsLoading() {
                 </CardContent>
             </Card>
 
-            {/* Progression chart skeleton */}
+            {/* Exercise progression */}
             <Card>
                 <CardHeader>
                     <Skeleton className="h-5 w-44" />

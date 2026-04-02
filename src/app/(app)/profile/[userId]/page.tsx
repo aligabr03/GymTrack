@@ -3,6 +3,7 @@ import {
     getFollowStatus,
     getOrCreateMyProfile,
 } from "@/actions/social";
+import { getWorkoutCalendar } from "@/actions/insights";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,8 @@ import { formatRelativeDate, formatDate } from "@/lib/utils";
 import { calculateVolume, formatVolume } from "@/lib/calculations";
 import { FollowButton } from "@/components/social/follow-button";
 import { SetPageTitle } from "@/components/layout/page-title-context";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { WorkoutCalendar } from "@/components/insights/workout-calendar";
 
 function getInitials(name: string) {
     return name
@@ -47,10 +50,14 @@ export default async function ProfilePage({
     if (!profile) notFound();
 
     const isOwnProfile = currentUserId === userId;
-    const isFollowing =
+
+    const year = new Date().getFullYear();
+    const [isFollowing, calendarData] = await Promise.all([
         currentUserId && !isOwnProfile
-            ? await getFollowStatus(userId)
-            : false;
+            ? getFollowStatus(userId)
+            : Promise.resolve(false as const),
+        getWorkoutCalendar(year, userId).catch(() => ({} as Record<string, { id: string; name: string | null }[]>)),
+    ]);
 
     return (
         <div className="space-y-6 max-w-2xl">
@@ -104,6 +111,26 @@ export default async function ProfilePage({
                     </div>
                 </div>
             </div>
+
+            {/* Workout Calendar */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-base">
+                        {year} Workout Calendar
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <WorkoutCalendar
+                        year={year}
+                        data={calendarData}
+                        getWorkoutHref={(id) =>
+                            isOwnProfile
+                                ? `/workouts/${id}`
+                                : `/profile/${userId}/workouts/${id}`
+                        }
+                    />
+                </CardContent>
+            </Card>
 
             {/* Recent Workouts */}
             <div className="space-y-3">

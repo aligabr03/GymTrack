@@ -3,25 +3,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function ExercisesLoading() {
     return (
         <div className="space-y-6">
-            {/* Header skeleton */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <Skeleton className="h-11 w-11 rounded-lg" />
-                    <div>
-                        <Skeleton className="h-7 w-36" />
-                        <Skeleton className="h-4 w-24 mt-1" />
-                    </div>
+            {/* Header */}
+            <div className="hidden md:flex items-center gap-3">
+                <Skeleton className="h-11 w-11 rounded-lg" />
+                <div>
+                    <Skeleton className="h-7 w-40" />
+                    <Skeleton className="h-4 w-32 mt-1" />
                 </div>
             </div>
 
-            {/* Toolbar skeleton */}
+            {/* Search + filter toolbar */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <Skeleton className="h-11 flex-1 rounded-xl" />
                 <Skeleton className="h-11 w-full sm:w-48 rounded-xl" />
-                <Skeleton className="h-10 w-32 rounded-xl" />
             </div>
 
-            {/* Category groups skeleton */}
+            {/* Category groups */}
             <div className="space-y-8">
                 {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i}>
@@ -40,6 +37,7 @@ export default function ExercisesLoading() {
                                         <Skeleton className="h-4 w-36" />
                                         <Skeleton className="h-3 w-48" />
                                     </div>
+                                    <Skeleton className="h-4 w-14" />
                                 </div>
                             ))}
                         </div>

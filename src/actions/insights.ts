@@ -162,8 +162,8 @@ export async function getLoggedExercises() {
     return rows.map((r) => r.exercise);
 }
 
-export async function getWorkoutCalendar(year: number) {
-    const userId = await getUserId();
+export async function getWorkoutCalendar(year: number, targetUserId?: string) {
+    const userId = targetUserId ?? await getUserId();
     const start = new Date(year, 0, 1);
     const end = new Date(year, 11, 31, 23, 59, 59);
 
