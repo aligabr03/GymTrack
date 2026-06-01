@@ -136,6 +136,7 @@ export function WorkoutLogger({
     const [prCelebration, setPrCelebration] = useState<{ names: string[]; isExisting: boolean } | null>(null);
 
     function closePrCelebration() {
+        try { localStorage.removeItem(draftKey); } catch {}
         setPrCelebration(null);
         if (onSuccess) {
             onSuccess();
@@ -203,6 +204,46 @@ export function WorkoutLogger({
     const [addExOpen, setAddExOpen] = useState(false);
     const [exerciseSearch, setExerciseSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
+
+    const draftKey = existing ? `gymtrack-workout-draft-${existing.id}` : 'gymtrack-workout-draft-new';
+    const [showDraftBanner, setShowDraftBanner] = useState(false);
+
+    // Restore draft on mount
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem(draftKey);
+            if (!raw) return;
+            const draft = JSON.parse(raw) as {
+                date: string;
+                workoutName: string;
+                notes: string;
+                durationMins: string;
+                groups: ExerciseGroup[];
+            };
+            if (draft.groups.length === 0 && !draft.workoutName) {
+                localStorage.removeItem(draftKey);
+                return;
+            }
+            setDate(draft.date);
+            setWorkoutName(draft.workoutName);
+            setNotes(draft.notes);
+            setDurationMins(draft.durationMins);
+            setGroups(draft.groups);
+            setShowDraftBanner(true);
+        } catch {}
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Auto-save draft on change (debounced 500ms)
+    useEffect(() => {
+        if (groups.length === 0 && !workoutName && !notes && !durationMins) return;
+        const timer = setTimeout(() => {
+            try {
+                localStorage.setItem(draftKey, JSON.stringify({ date, workoutName, notes, durationMins, groups }));
+            } catch {}
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [date, workoutName, notes, durationMins, groups, draftKey]);
 
     const categories = [
         ...new Set(exerciseOptions.map((e) => e.category)),
@@ -530,6 +571,52 @@ export function WorkoutLogger({
         );
     }
 
+    function discardDraft() {
+        try { localStorage.removeItem(draftKey); } catch {}
+        setShowDraftBanner(false);
+        if (existing) {
+            setDate(toStoredDateStr(existing.date));
+            setWorkoutName(existing.name ?? "");
+            setNotes(existing.notes ?? "");
+            setDurationMins(existing.durationMins?.toString() ?? "");
+            const byExercise = new Map<string, SetRow[]>();
+            const supersetMap = new Map<string, string>();
+            for (const s of existing.sets) {
+                if (!byExercise.has(s.exerciseId)) byExercise.set(s.exerciseId, []);
+                byExercise.get(s.exerciseId)!.push({
+                    id: s.id,
+                    exerciseId: s.exerciseId,
+                    exerciseName: s.exercise.name,
+                    setNumber: s.setNumber,
+                    weightKg: s.weightKg != null
+                        ? (weightUnit === "LBS" ? kgToLbs(s.weightKg).toString() : s.weightKg.toString())
+                        : "",
+                    reps: s.reps?.toString() ?? "",
+                    formRating: s.formRating,
+                    rpe: s.rpe?.toString() ?? "",
+                    notes: s.notes ?? "",
+                    isDropset: s.isDropset ?? false,
+                });
+                if (s.supersetId && !supersetMap.has(s.exerciseId)) {
+                    supersetMap.set(s.exerciseId, s.supersetId);
+                }
+            }
+            setGroups(Array.from(byExercise.entries()).map(([exerciseId, sets]) => ({
+                exerciseId,
+                exerciseName: sets[0].exerciseName,
+                sets: sets.sort((a, b) => a.setNumber - b.setNumber),
+                collapsed: true,
+                supersetGroupId: supersetMap.get(exerciseId) ?? null,
+            })));
+        } else {
+            setDate(todayEST());
+            setWorkoutName("");
+            setNotes("");
+            setDurationMins("");
+            setGroups([]);
+        }
+    }
+
     function handleSave() {
         const setDrafts = groups.flatMap((group) =>
             group.sets.map((set) => ({
@@ -602,6 +689,7 @@ export function WorkoutLogger({
             if (result.newPRs && result.newPRs.length > 0) {
                 setPrCelebration({ names: result.newPRs, isExisting: !!existing });
             } else {
+                try { localStorage.removeItem(draftKey); } catch {}
                 toast({
                     title: existing ? "Workout updated" : "Workout saved! 💪",
                     variant: "success",
@@ -643,6 +731,19 @@ export function WorkoutLogger({
     return (
         <>
         <div className="space-y-6">
+            {showDraftBanner && (
+                <div className="flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5">
+                    <span className="text-sm text-amber-300">Draft restored from previous session.</span>
+                    <button
+                        type="button"
+                        onClick={discardDraft}
+                        className="ml-4 shrink-0 text-xs text-amber-400 underline hover:text-amber-200"
+                    >
+                        Discard
+                    </button>
+                </div>
+            )}
+
             {/* Workout meta */}
             <Card>
                 <CardContent className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1021,9 +1122,10 @@ export function WorkoutLogger({
             <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
                 <Button
                     variant="outline"
-                    onClick={() =>
-                        onCancel ? onCancel() : router.push("/workouts")
-                    }
+                    onClick={() => {
+                        try { localStorage.removeItem(draftKey); } catch {}
+                        onCancel ? onCancel() : router.push("/workouts");
+                    }}
                 >
                     Cancel
                 </Button>
