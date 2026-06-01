@@ -16,7 +16,7 @@ import {
     Sun,
     Moon,
     Users,
-    Pencil,
+    UserCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -204,8 +204,8 @@ export function AppNav({ user }: { user: User }) {
                         href={`/profile/${user.id}`}
                         className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
                     >
-                        <Pencil className="h-4 w-4" />
-                        Edit profile
+                        <UserCircle className="h-4 w-4" />
+                        View profile
                     </Link>
                     <button
                         onClick={toggleTheme}
@@ -318,8 +318,8 @@ export function AppNav({ user }: { user: User }) {
                                         onClick={() => setProfileOpen(false)}
                                         className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
                                     >
-                                        <Pencil className="h-4 w-4" />
-                                        Edit profile
+                                        <UserCircle className="h-4 w-4" />
+                                        View profile
                                     </Link>
                                     <button
                                         onClick={() => {
