@@ -6,6 +6,7 @@ import {
     createWorkout,
     getBatchPreviousBestSets,
     getExercisesForWorkoutName,
+    getLastSetsForExercise,
     updateWorkout,
 } from "@/actions/workouts";
 import { createExercise } from "@/actions/exercises";
@@ -48,6 +49,7 @@ import {
     Dumbbell,
     Link2,
     Unlink2,
+    History,
 } from "lucide-react";
 
 type SetRow = {
@@ -870,6 +872,7 @@ export function WorkoutLogger({
                                 (g) => g.exerciseId !== item.group.exerciseId,
                             )}
                             weightUnit={weightUnit}
+                            excludeWorkoutId={existing?.id}
                             onAddSet={() => addSet(item.group.exerciseId)}
                             onAddDropSet={() =>
                                 addDropSet(item.group.exerciseId)
@@ -929,6 +932,7 @@ export function WorkoutLogger({
                                                 group.exerciseId,
                                         )}
                                         weightUnit={weightUnit}
+                                        excludeWorkoutId={existing?.id}
                                         onAddSet={() =>
                                             addSet(group.exerciseId)
                                         }
@@ -1214,6 +1218,19 @@ function SuggestionRow({
     );
 }
 
+type LastPerfData = {
+    date: Date;
+    workoutName: string | null;
+    sets: Array<{
+        setNumber: number;
+        weightKg: number | null;
+        reps: number | null;
+        formRating: number | null;
+        notes: string | null;
+        isDropset: boolean;
+    }>;
+};
+
 function ExerciseGroupCard({
     group,
     previousBest,
@@ -1229,6 +1246,7 @@ function ExerciseGroupCard({
     onLinkSuperset,
     onUnlinkSuperset,
     weightUnit = "KG",
+    excludeWorkoutId,
 }: {
     group: ExerciseGroup;
     previousBest: { weightKg: number; reps: number; e1rm: number } | null;
@@ -1248,8 +1266,25 @@ function ExerciseGroupCard({
     onLinkSuperset: (exerciseId: string) => void;
     onUnlinkSuperset: () => void;
     weightUnit?: WeightUnit;
+    excludeWorkoutId?: string;
 }) {
     const [supersetPickerOpen, setSupersetPickerOpen] = useState(false);
+    const [lastPerfOpen, setLastPerfOpen] = useState(false);
+    const [lastPerfData, setLastPerfData] = useState<
+        undefined | "loading" | null | LastPerfData
+    >(undefined);
+
+    async function handleViewLastPerf(e: React.MouseEvent) {
+        e.stopPropagation();
+        setLastPerfOpen(true);
+        if (lastPerfData !== undefined) return;
+        setLastPerfData("loading");
+        const data = await getLastSetsForExercise(
+            group.exerciseId,
+            excludeWorkoutId,
+        );
+        setLastPerfData(data);
+    }
     const currentBestE1rm = getBestEstimatedOneRM(group.sets, weightUnit);
     const delta =
         previousBest == null || currentBestE1rm == null
@@ -1276,6 +1311,7 @@ function ExerciseGroupCard({
     );
 
     return (
+        <>
         <Card>
             <div
                 className="flex items-center justify-between p-4 cursor-pointer select-none"
@@ -1300,6 +1336,13 @@ function ExerciseGroupCard({
                     )}
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
+                    <button
+                        onClick={handleViewLastPerf}
+                        className="p-1.5 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                        title="View last performance"
+                    >
+                        <History className="h-3.5 w-3.5" />
+                    </button>
                     {/* Superset controls */}
                     {group.supersetGroupId ? (
                         <button
@@ -1444,6 +1487,84 @@ function ExerciseGroupCard({
                 </CardContent>
             )}
         </Card>
+
+        <Dialog open={lastPerfOpen} onOpenChange={setLastPerfOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{group.exerciseName} — Last Session</DialogTitle>
+                </DialogHeader>
+                {lastPerfData === "loading" && (
+                    <div className="flex justify-center py-8">
+                        <Loader2 className="h-5 w-5 animate-spin text-[var(--muted-foreground)]" />
+                    </div>
+                )}
+                {lastPerfData === null && (
+                    <p className="text-center text-[var(--muted-foreground)] py-8 text-sm">
+                        No previous session found for this exercise.
+                    </p>
+                )}
+                {lastPerfData && lastPerfData !== "loading" && (
+                    <div className="space-y-4">
+                        <p className="text-xs text-[var(--muted-foreground)]">
+                            {lastPerfData.workoutName
+                                ? `${lastPerfData.workoutName} · `
+                                : ""}
+                            {new Date(lastPerfData.date).toLocaleDateString(
+                                "en-US",
+                                {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                },
+                            )}
+                        </p>
+                        <div className="space-y-1.5">
+                            <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr] gap-2 text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-1 pb-1">
+                                <span>#</span>
+                                <span>{weightUnit === "LBS" ? "Lbs" : "Kg"}</span>
+                                <span>Reps</span>
+                                <span>Form</span>
+                            </div>
+                            {lastPerfData.sets.map((s) => {
+                                const formLabel =
+                                    FORM_RATINGS.find(
+                                        (r) => r.value === s.formRating,
+                                    )?.label ?? "—";
+                                const weight =
+                                    s.weightKg != null
+                                        ? weightUnit === "LBS"
+                                            ? kgToLbs(s.weightKg)
+                                            : s.weightKg
+                                        : null;
+                                return (
+                                    <div key={s.setNumber}>
+                                        <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr] gap-2 items-center text-sm px-1 py-1 rounded-lg hover:bg-[var(--secondary)]">
+                                            <span className="text-[var(--muted-foreground)] text-xs font-mono">
+                                                {s.isDropset ? "↓" : s.setNumber}
+                                            </span>
+                                            <span>
+                                                {weight != null ? weight : "—"}
+                                            </span>
+                                            <span>{s.reps ?? "—"}</span>
+                                            <span className="text-xs text-[var(--muted-foreground)]">
+                                                {formLabel}
+                                            </span>
+                                        </div>
+                                        {s.notes && (
+                                            <p className="text-xs text-[var(--muted-foreground)] px-8 pb-1 italic">
+                                                {s.notes}
+                                            </p>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+            </DialogContent>
+        </Dialog>
+        </>
     );
 }
 

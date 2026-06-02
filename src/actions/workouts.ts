@@ -262,9 +262,9 @@ export async function getLastSetsForExercise(
             },
         },
         orderBy: { workout: { date: "desc" } },
-        select: { workoutId: true },
+        select: { workoutId: true, workout: { select: { date: true, name: true } } },
     });
-    if (!lastSet) return [];
+    if (!lastSet) return null;
 
     const sets = await prisma.workoutSet.findMany({
         where: { workoutId: lastSet.workoutId, exerciseId },
@@ -274,11 +274,16 @@ export async function getLastSetsForExercise(
             weightKg: true,
             reps: true,
             formRating: true,
-            rpe: true,
+            notes: true,
+            isDropset: true,
         },
     });
 
-    return sets;
+    return {
+        date: lastSet.workout.date,
+        workoutName: lastSet.workout.name,
+        sets,
+    };
 }
 
 /**
