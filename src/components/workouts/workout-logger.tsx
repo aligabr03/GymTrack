@@ -37,7 +37,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { estimateOneRM, kgToLbs, lbsToKg } from "@/lib/calculations";
+import { estimateOneRM, formatVolume, kgToLbs, lbsToKg } from "@/lib/calculations";
 import type { WeightUnit } from "@/lib/calculations";
 import {
     Plus,
@@ -1320,15 +1320,18 @@ function ExerciseGroupCard({
                 <div className="flex items-center gap-2 flex-wrap">
                     <Dumbbell className="h-4 w-4 text-[var(--foreground)] shrink-0" />
                     <span className="font-semibold">{group.exerciseName}</span>
-                    <Badge variant="secondary" className="text-xs">
-                        {group.sets.length} set
-                        {group.sets.length !== 1 ? "s" : ""}
-                    </Badge>
-                    {group.sets.some((s) => s.isDropset) && (
-                        <Badge variant="outline" className="text-xs">
-                            ↓ drop
-                        </Badge>
-                    )}
+                    {(() => {
+                        const vol = group.sets.reduce((total, set) => {
+                            const w = parseFloat(set.weightKg) || 0;
+                            const r = parseInt(set.reps, 10) || 0;
+                            return total + w * r;
+                        }, 0);
+                        return vol > 0 ? (
+                            <Badge variant="secondary" className="text-xs">
+                                {formatVolume(vol, weightUnit)}
+                            </Badge>
+                        ) : null;
+                    })()}
                     {trend && (
                         <Badge className={`text-[10px] ${trend.className}`}>
                             {trend.label}
@@ -1520,8 +1523,7 @@ function ExerciseGroupCard({
                             )}
                         </p>
                         <div className="space-y-1.5">
-                            <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr] gap-2 text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-1 pb-1">
-                                <span>#</span>
+                            <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-1 pb-1">
                                 <span>{weightUnit === "LBS" ? "Lbs" : "Kg"}</span>
                                 <span>Reps</span>
                                 <span>Form</span>
@@ -1539,10 +1541,7 @@ function ExerciseGroupCard({
                                         : null;
                                 return (
                                     <div key={s.setNumber}>
-                                        <div className="grid grid-cols-[1.75rem_1fr_1fr_1fr] gap-2 items-center text-sm px-1 py-1 rounded-lg hover:bg-[var(--secondary)]">
-                                            <span className="text-[var(--muted-foreground)] text-xs font-mono">
-                                                {s.isDropset ? "↓" : s.setNumber}
-                                            </span>
+                                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 items-center text-sm px-1 py-1 rounded-lg hover:bg-[var(--secondary)]">
                                             <span>
                                                 {weight != null ? weight : "—"}
                                             </span>
@@ -1552,13 +1551,28 @@ function ExerciseGroupCard({
                                             </span>
                                         </div>
                                         {s.notes && (
-                                            <p className="text-xs text-[var(--muted-foreground)] px-8 pb-1 italic">
+                                            <p className="text-xs text-[var(--muted-foreground)] px-2 pb-1 italic">
                                                 {s.notes}
                                             </p>
                                         )}
                                     </div>
                                 );
                             })}
+                            {(() => {
+                                const sessionVolume = lastPerfData.sets.reduce(
+                                    (total, s) => {
+                                        if (!s.weightKg || !s.reps) return total;
+                                        return total + s.weightKg * s.reps;
+                                    },
+                                    0,
+                                );
+                                return sessionVolume > 0 ? (
+                                    <div className="pt-2 border-t border-[var(--border)] flex justify-between text-xs">
+                                        <span className="text-[var(--muted-foreground)]">Total volume</span>
+                                        <span className="font-medium">{formatVolume(sessionVolume, weightUnit)}</span>
+                                    </div>
+                                ) : null;
+                            })()}
                         </div>
                     </div>
                 )}
