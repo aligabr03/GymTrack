@@ -12,7 +12,6 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { getProgressionData } from "@/actions/insights";
-import { getSeasons } from "@/actions/seasons";
 import { estimateOneRM, kgToLbs } from "@/lib/calculations";
 import type { WeightUnit } from "@/lib/calculations";
 import type { Exercise, Season } from "@/types";
@@ -24,9 +23,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+const NONE_VALUE = "__none__";
+
 type Props = {
     exercises: Exercise[];
     weightUnit?: WeightUnit;
+    seasons?: Season[];
 };
 
 type ChartPoint = {
@@ -35,18 +37,13 @@ type ChartPoint = {
     estimatedOneRM: number | null;
 };
 
-export function ProgressionChart({ exercises, weightUnit = "KG" }: Props) {
+export function ProgressionChart({ exercises, weightUnit = "KG", seasons = [] }: Props) {
     const [category, setCategory] = useState<string>("all");
     const [selected, setSelected] = useState<string>(exercises[0]?.id ?? "");
     const [data, setData] = useState<ChartPoint[]>([]);
     const [isPending, startTransition] = useTransition();
     const [loaded, setLoaded] = useState(false);
-    const [seasons, setSeasons] = useState<Season[]>([]);
     const [seasonFilter, setSeasonFilter] = useState<string>("");
-
-    useEffect(() => {
-        getSeasons().then(setSeasons).catch(() => setSeasons([]));
-    }, []);
 
     const categories = [
         ...new Set(exercises.map((exercise) => exercise.category)),
@@ -142,12 +139,12 @@ export function ProgressionChart({ exercises, weightUnit = "KG" }: Props) {
                 </Select>
 
                 {seasons.length > 0 && (
-                    <Select value={seasonFilter} onValueChange={(v) => { setSeasonFilter(v); setLoaded(false); }}>
+                    <Select value={seasonFilter || NONE_VALUE} onValueChange={(v) => { setSeasonFilter(v === NONE_VALUE ? "" : v); setLoaded(false); }}>
                         <SelectTrigger className="w-full sm:w-[200px]">
                             <SelectValue placeholder="All seasons" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">All seasons</SelectItem>
+                            <SelectItem value={NONE_VALUE}>All seasons</SelectItem>
                             {seasons.map((season) => (
                                 <SelectItem key={season.id} value={season.id}>
                                     {season.name}

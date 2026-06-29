@@ -14,6 +14,7 @@ import type {
     Exercise,
     WorkoutMetaSuggestions,
     WorkoutWithSets,
+    Season,
 } from "@/types";
 import { toStoredDateStr, todayEST } from "@/lib/utils";
 import { EXERCISE_CATEGORIES, FORM_RATINGS } from "@/types";
@@ -126,6 +127,7 @@ export function WorkoutLogger({
     onSuccess,
     onCancel,
     weightUnit = "KG",
+    seasons = [],
 }: {
     exercises: Exercise[];
     existing?: WorkoutWithSets;
@@ -133,6 +135,7 @@ export function WorkoutLogger({
     onSuccess?: () => void;
     onCancel?: () => void;
     weightUnit?: WeightUnit;
+    seasons?: Season[];
 }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -817,6 +820,7 @@ export function WorkoutLogger({
                     <SeasonSelector
                         value={seasonId}
                         onChange={setSeasonId}
+                        seasons={seasons}
                     />
                 </CardContent>
             </Card>

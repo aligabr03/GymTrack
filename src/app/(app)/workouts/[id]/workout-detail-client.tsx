@@ -14,6 +14,7 @@ import type {
     WorkoutWithSets,
     Exercise,
     WorkoutMetaSuggestions,
+    Season,
 } from "@/types";
 import { ArrowLeft, Clock, Dumbbell, Edit } from "lucide-react";
 import { DeleteWorkoutButton } from "@/components/workouts/delete-workout-button";
@@ -26,6 +27,7 @@ export function WorkoutDetailClient({
     readOnly = false,
     backHref = "/workouts",
     weightUnit = "KG",
+    seasons = [],
 }: {
     workout: WorkoutWithSets;
     exercises: Exercise[];
@@ -33,6 +35,7 @@ export function WorkoutDetailClient({
     readOnly?: boolean;
     backHref?: string;
     weightUnit?: WeightUnit;
+    seasons?: Season[];
 }) {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
@@ -122,6 +125,7 @@ export function WorkoutDetailClient({
                     existing={workout}
                     suggestions={suggestions}
                     weightUnit={weightUnit}
+                    seasons={seasons}
                     onSuccess={() => {
                         router.refresh();
                         setIsEditing(false);

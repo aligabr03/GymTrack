@@ -1,14 +1,16 @@
 import { getExercises } from "@/actions/exercises";
 import { getWorkoutMetaSuggestions } from "@/actions/workouts";
 import { getMyWeightUnit } from "@/actions/social";
+import { getSeasons } from "@/actions/seasons";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
 import { ClipboardList } from "lucide-react";
 
 export default async function NewWorkoutPage() {
-    const [exercises, suggestions, weightUnit] = await Promise.all([
+    const [exercises, suggestions, weightUnit, seasons] = await Promise.all([
         getExercises(),
         getWorkoutMetaSuggestions(),
         getMyWeightUnit(),
+        getSeasons(),
     ]);
 
     return (
@@ -25,7 +27,7 @@ export default async function NewWorkoutPage() {
                 </div>
             </div>
 
-            <WorkoutLogger exercises={exercises} suggestions={suggestions} weightUnit={weightUnit} />
+            <WorkoutLogger exercises={exercises} suggestions={suggestions} weightUnit={weightUnit} seasons={seasons} />
         </div>
     );
 }

@@ -5,6 +5,7 @@ import {
 } from "@/actions/insights";
 import { getBodyMetrics } from "@/actions/body-metrics";
 import { getMyWeightUnit, getMyBodyWeightUnit } from "@/actions/social";
+import { getSeasons } from "@/actions/seasons";
 import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,7 +21,7 @@ export const dynamic = "force-dynamic";
 export default async function InsightsPage() {
     const year = new Date().getFullYear();
 
-    const [muscleData, calendarCounts, exercises, bodyMetrics, weightUnitResult, bodyWeightUnitResult] =
+    const [muscleData, calendarCounts, exercises, bodyMetrics, weightUnitResult, bodyWeightUnitResult, seasonsResult] =
         await Promise.allSettled([
             getMuscleGroupVolume(30),
             getWorkoutCalendar(year),
@@ -28,6 +29,7 @@ export default async function InsightsPage() {
             getBodyMetrics(180),
             getMyWeightUnit(),
             getMyBodyWeightUnit(),
+            getSeasons(),
         ]).then((results) =>
             results.map((r) => (r.status === "fulfilled" ? r.value : null)),
         );
@@ -48,6 +50,8 @@ export default async function InsightsPage() {
         [];
     const weightUnit = (weightUnitResult as "KG" | "LBS" | null) ?? "KG";
     const bodyWeightUnit = (bodyWeightUnitResult as "KG" | "LBS" | null) ?? "KG";
+    const seasonList =
+        (seasonsResult as Awaited<ReturnType<typeof getSeasons>> | null) ?? [];
 
     return (
         <div className="space-y-6">
@@ -105,7 +109,7 @@ export default async function InsightsPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ProgressionChart exercises={exerciseList} weightUnit={weightUnit} />
+                    <ProgressionChart exercises={exerciseList} weightUnit={weightUnit} seasons={seasonList} />
                 </CardContent>
             </Card>
         </div>

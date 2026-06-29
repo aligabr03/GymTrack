@@ -1,5 +1,6 @@
 import { getWorkout, getWorkoutMetaSuggestions } from "@/actions/workouts";
 import { getExercises } from "@/actions/exercises";
+import { getSeasons } from "@/actions/seasons";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
 import { notFound } from "next/navigation";
 import { ClipboardList } from "lucide-react";
@@ -10,10 +11,11 @@ export default async function EditWorkoutPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
-    const [workout, exercises, suggestions] = await Promise.all([
+    const [workout, exercises, suggestions, seasons] = await Promise.all([
         getWorkout(id),
         getExercises(),
         getWorkoutMetaSuggestions(),
+        getSeasons(),
     ]);
 
     if (!workout) notFound();
@@ -36,6 +38,7 @@ export default async function EditWorkoutPage({
                 exercises={exercises}
                 existing={workout}
                 suggestions={suggestions}
+                seasons={seasons}
             />
         </div>
     );
