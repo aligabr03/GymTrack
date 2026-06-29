@@ -356,7 +356,7 @@ export function AppNav({ user }: { user: User }) {
                                     <form action={logout}>
                                         <button
                                             type="submit"
-                                            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-red-900/20 hover:text-red-400 transition-colors"
+                                            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-destructive/10 hover:text-destructive transition-colors"
                                         >
                                             <LogOut className="h-4 w-4" />
                                             Sign out

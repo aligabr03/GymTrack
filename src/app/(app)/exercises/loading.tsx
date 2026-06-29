@@ -27,7 +27,7 @@ export default function ExercisesLoading() {
                             <Skeleton className="h-3 w-4" />
                             <div className="h-px flex-1 bg-[var(--border)]" />
                         </div>
-                        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)]">
+                        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)]">
                             {Array.from({ length: 4 }).map((_, j) => (
                                 <div
                                     key={j}

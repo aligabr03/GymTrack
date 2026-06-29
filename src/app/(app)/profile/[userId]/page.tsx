@@ -140,7 +140,7 @@ export default async function ProfilePage({
                         No workouts logged yet.
                     </p>
                 ) : (
-                    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
                         {profile.workouts.map((workout) => {
                             const volume = calculateVolume(workout.sets);
                             const exercises = [

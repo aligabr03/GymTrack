@@ -195,7 +195,7 @@ export function SeasonsManager({
                                             size="icon-sm"
                                             onClick={() => handleDelete(season)}
                                         >
-                                            <Trash2 className="h-4 w-4 text-red-400" />
+                                            <Trash2 className="h-4 w-4 text-destructive" />
                                         </Button>
                                     </div>
                                 </div>

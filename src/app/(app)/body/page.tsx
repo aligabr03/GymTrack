@@ -1,6 +1,7 @@
 import { getBodyMetrics } from "@/actions/body-metrics";
 import { getMyBodyWeightUnit } from "@/actions/social";
 import { BodyMetricsLogger } from "@/components/body/body-metrics-logger";
+import { Scale } from "lucide-react";
 
 export const metadata = { title: "Body Metrics — GymTrack" };
 
@@ -15,11 +16,16 @@ export default async function BodyPage() {
 
     return (
         <div className="space-y-6">
-            <div className="hidden md:block animate-fade-in">
-                <h1 className="text-2xl font-bold">Body Metrics</h1>
-                <p className="text-[var(--muted-foreground)] text-sm mt-1">
-                    Track your weight, body fat, and measurements over time.
-                </p>
+            <div className="hidden md:flex items-center gap-3 animate-fade-in">
+                <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                    <Scale className="h-6 w-6 text-[var(--foreground)]" />
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold">Body Metrics</h1>
+                    <p className="text-sm text-[var(--muted-foreground)]">
+                        Track your weight, body fat, and measurements over time.
+                    </p>
+                </div>
             </div>
             <BodyMetricsLogger metrics={metrics} weightUnit={weightUnit} />
         </div>

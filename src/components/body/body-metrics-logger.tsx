@@ -311,7 +311,7 @@ export function BodyMetricsLogger({ metrics, weightUnit = "KG" }: { metrics: Bod
                                     </div>
                                     <button
                                         onClick={() => handleDelete(m.id)}
-                                        className="p-1.5 rounded hover:bg-red-900/40 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
+                                        className="p-1.5 rounded hover:bg-destructive/10 text-[var(--muted-foreground)] hover:text-destructive transition-colors"
                                         aria-label="Delete entry"
                                         title="Delete entry"
                                     >

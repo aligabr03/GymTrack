@@ -13,6 +13,7 @@ import {
     Plus,
     ChevronRight,
     Flame,
+    LayoutDashboard,
 } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -23,19 +24,24 @@ export default async function DashboardPage() {
     ]);
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* Header */}
             <div className="hidden md:flex items-center justify-between animate-fade-in">
-                <div>
-                    <h1 className="text-2xl font-bold">Dashboard</h1>
-                    <p className="text-[var(--muted-foreground)] mt-1">
-                        {new Date().toLocaleDateString("en-US", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                        })}
-                    </p>
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                        <LayoutDashboard className="h-6 w-6 text-[var(--foreground)]" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold">Dashboard</h1>
+                        <p className="text-sm text-[var(--muted-foreground)]">
+                            {new Date().toLocaleDateString("en-US", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            })}
+                        </p>
+                    </div>
                 </div>
                 <Link href="/workouts/new">
                     <Button>
@@ -97,7 +103,7 @@ export default async function DashboardPage() {
                             cta="Log your first workout"
                         />
                     ) : (
-                        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
                             {stats.recentWorkouts.map((workout) => {
                                 const volume = calculateVolume(workout.sets);
                                 const exercises = [

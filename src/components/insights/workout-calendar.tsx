@@ -167,7 +167,7 @@ export function WorkoutCalendar({ year, data, workoutPathPrefix = "/workouts" }:
                     <DialogHeader>
                         <DialogTitle>{selectedDay}</DialogTitle>
                     </DialogHeader>
-                    <ul className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden mt-2">
+                    <ul className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden mt-2">
                         {selectedWorkouts.map((w) => (
                             <li key={w.id}>
                                 <Link

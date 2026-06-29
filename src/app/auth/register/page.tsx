@@ -43,7 +43,7 @@ export default function RegisterPage() {
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {error && (
-                        <div className="flex items-center gap-2 rounded-md border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-300">
+                        <div className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             {error}
                         </div>

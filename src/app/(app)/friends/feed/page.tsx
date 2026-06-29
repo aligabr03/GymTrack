@@ -100,7 +100,7 @@ export default async function FeedPage() {
                                     </span>
                                     <div className="h-px flex-1 bg-[var(--border)]" />
                                 </div>
-                                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                                <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
                                     {grouped[group].map(
                                         ({ workout, profile }, index) => {
                                             const volume = calculateVolume(

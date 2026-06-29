@@ -768,12 +768,12 @@ export function WorkoutLogger({
         <>
         <div className="space-y-6">
             {showDraftBanner && (
-                <div className="flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5">
-                    <span className="text-sm text-amber-300">Draft restored from previous session.</span>
+                <div className="flex items-center justify-between rounded-lg border border-warning/30 bg-warning/10 px-4 py-2.5">
+                    <span className="text-sm text-warning">Draft restored from previous session.</span>
                     <button
                         type="button"
                         onClick={discardDraft}
-                        className="ml-4 shrink-0 text-xs text-amber-400 underline hover:text-amber-200"
+                        className="ml-4 shrink-0 text-xs text-warning underline hover:text-warning/70"
                     >
                         Discard
                     </button>
@@ -1195,7 +1195,7 @@ export function WorkoutLogger({
         {/* PR Celebration Popup */}
         {prCelebration && (
             <Dialog open={true} onOpenChange={(open) => { if (!open) closePrCelebration(); }}>
-                <DialogContent className="overflow-hidden border-amber-500/50 p-0 md:max-w-sm">
+                <DialogContent className="overflow-hidden border-warning/50 p-0 md:max-w-sm">
                     <div className="relative overflow-hidden rounded-xl">
                         <div className="animate-gold-shimmer p-8 pb-6 text-center relative overflow-hidden">
                             <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -1343,10 +1343,10 @@ function ExerciseGroupCard({
                       delta == null
                           ? "border-[var(--border)] bg-[var(--secondary)] text-[var(--muted-foreground)]"
                           : delta > 0.15
-                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                            ? "border-success/40 bg-success/10 text-success"
                             : delta < -0.15
-                              ? "border-red-500/40 bg-red-500/10 text-red-300"
-                              : "border-amber-500/40 bg-amber-500/10 text-amber-300",
+                              ? "border-destructive/40 bg-destructive/10 text-destructive"
+                              : "border-warning/40 bg-warning/10 text-warning",
               };
 
     const linkableGroups = otherGroups.filter(
@@ -1397,7 +1397,7 @@ function ExerciseGroupCard({
                                 e.stopPropagation();
                                 onUnlinkSuperset();
                             }}
-                            className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-[var(--secondary)] text-[var(--foreground)] hover:text-red-400 transition-colors"
+                            className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-[var(--secondary)] text-[var(--foreground)] hover:text-destructive transition-colors"
                             title="Remove from superset"
                         >
                             <Unlink2 className="h-3 w-3" />
@@ -1460,7 +1460,7 @@ function ExerciseGroupCard({
                                 onRemoveExercise();
                             }
                         }}
-                        className="p-2 rounded-lg hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
+                        className="p-2 rounded-lg hover:bg-destructive/10 text-[var(--muted-foreground)] hover:text-destructive transition-colors"
                         aria-label="Remove exercise"
                     >
                         <Trash2 className="h-4 w-4" />
@@ -1713,7 +1713,7 @@ function SetRow({
                     </button>
                     <button
                         onClick={onRemove}
-                        className="p-1 rounded hover:bg-red-900/30 text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
+                        className="p-1 rounded hover:bg-destructive/10 text-[var(--muted-foreground)] hover:text-destructive transition-colors"
                         aria-label="Remove set"
                     >
                         <Trash2 className="h-3.5 w-3.5" />

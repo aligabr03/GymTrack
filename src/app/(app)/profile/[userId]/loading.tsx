@@ -33,7 +33,7 @@ export default function ProfileLoading() {
             {/* Recent workouts */}
             <div className="space-y-3">
                 <Skeleton className="h-6 w-36" />
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
                     {Array.from({ length: 5 }).map((_, i) => (
                         <div key={i} className="flex items-center gap-3 px-4 py-3">
                             <div className="flex-1 space-y-1.5">

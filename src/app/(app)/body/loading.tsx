@@ -4,10 +4,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 export default function BodyLoading() {
     return (
         <div className="space-y-6">
-            {/* Header skeleton — hidden on mobile, matches hidden md:block */}
-            <div className="hidden md:block">
-                <Skeleton className="h-8 w-32" />
-                <Skeleton className="h-4 w-72 mt-2" />
+            {/* Header skeleton — hidden on mobile, matches hidden md:flex with icon */}
+            <div className="hidden md:flex items-center gap-3">
+                <Skeleton className="h-11 w-11 rounded-lg" />
+                <div>
+                    <Skeleton className="h-7 w-32" />
+                    <Skeleton className="h-4 w-72 mt-1" />
+                </div>
             </div>
 
             {/* Log entry toggle button */}

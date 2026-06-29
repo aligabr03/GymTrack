@@ -211,7 +211,7 @@ export function ExerciseLibrary({
                         </DialogHeader>
                         <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
                             {formError && (
-                                <p className="text-sm text-red-400">
+                                <p className="text-sm text-destructive">
                                     {formError}
                                 </p>
                             )}
@@ -312,21 +312,21 @@ export function ExerciseLibrary({
                                     {exs.map((ex) => (
                                         <div
                                             key={ex.id}
-                                            className="group relative flex flex-col rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-sm p-3.5 gap-2 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/20"
+                                            className="group relative flex flex-col rounded-2xl border border-border/50 bg-card hover:bg-secondary/40 hover:border-border hover:shadow-lg hover:shadow-black/20 p-3.5 gap-2 transition-all duration-200"
                                         >
                                             {/* Custom exercise actions */}
                                             {ex.isCustom && (
                                                 <div className="absolute top-2 right-2 flex items-center gap-0.5 z-10">
                                                     <button
                                                         onClick={() => openEdit(ex)}
-                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/10 transition-colors"
+                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-secondary/50 transition-colors"
                                                         aria-label="Edit exercise"
                                                     >
                                                         <Pencil className="h-3 w-3" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(ex.id, ex.name)}
-                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-destructive hover:bg-destructive/10 transition-colors"
                                                         aria-label="Delete exercise"
                                                     >
                                                         <Trash2 className="h-3 w-3" />
@@ -346,13 +346,13 @@ export function ExerciseLibrary({
                                                 {ex.muscleGroups.slice(0, 3).map((m) => (
                                                     <span
                                                         key={m}
-                                                        className="inline-block px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.07] text-[10px] text-[var(--muted-foreground)] leading-none"
+                                                        className="inline-block px-1.5 py-0.5 rounded-md bg-secondary border border-border/30 text-[10px] text-[var(--muted-foreground)] leading-none"
                                                     >
                                                         {m}
                                                     </span>
                                                 ))}
                                                 {ex.muscleGroups.length > 3 && (
-                                                    <span className="inline-block px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.07] text-[10px] text-[var(--muted-foreground)] leading-none">
+                                                    <span className="inline-block px-1.5 py-0.5 rounded-md bg-secondary border border-border/30 text-[10px] text-[var(--muted-foreground)] leading-none">
                                                         +{ex.muscleGroups.length - 3}
                                                     </span>
                                                 )}
@@ -360,9 +360,9 @@ export function ExerciseLibrary({
 
                                             {/* Best set */}
                                             {bestWeights[ex.id] && (
-                                                <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-white/[0.06]">
-                                                    <span className="text-amber-400/80 text-[10px]">★</span>
-                                                    <span className="text-[11px] font-medium text-amber-400/80 tabular-nums">
+                                                <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-border/50">
+                                                    <span className="text-warning text-[10px]">★</span>
+                                                    <span className="text-[11px] font-medium text-warning tabular-nums">
                                                         {weightUnit === "LBS" ? kgToLbs(bestWeights[ex.id]!.weightKg) : bestWeights[ex.id]!.weightKg} {weightUnit === "LBS" ? "lbs" : "kg"} × {bestWeights[ex.id]!.reps}
                                                     </span>
                                                 </div>
@@ -386,7 +386,7 @@ export function ExerciseLibrary({
                     </DialogHeader>
                     <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
                         {editError && (
-                            <p className="text-sm text-red-400">{editError}</p>
+                            <p className="text-sm text-destructive">{editError}</p>
                         )}
                         <div className="space-y-2">
                             <Label>Exercise Name</Label>

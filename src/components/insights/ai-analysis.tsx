@@ -125,7 +125,7 @@ export function AiAnalysisCard({ initial }: Props) {
                 </div>
             )}
 
-            {error && <p className="text-xs text-red-400">{error}</p>}
+            {error && <p className="text-xs text-destructive">{error}</p>}
 
             <div className="space-y-2 pt-2 border-t border-[var(--border)]">
                 <p className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider">

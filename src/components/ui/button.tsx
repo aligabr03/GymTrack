@@ -3,21 +3,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 active:scale-[0.97] touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 active:scale-[0.97] touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     {
         variants: {
             variant: {
                 default:
-                    "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-zinc-200",
+                    "bg-primary text-primary-foreground hover:bg-primary/80",
                 destructive:
-                    "bg-[var(--destructive)] text-[var(--destructive-foreground)] hover:bg-red-700",
+                    "bg-destructive text-destructive-foreground hover:bg-destructive/80",
                 outline:
-                    "border border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-[var(--secondary)]",
+                    "border border-border bg-transparent text-foreground hover:bg-secondary",
                 secondary:
-                    "bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:bg-zinc-800",
-                ghost: "text-[var(--foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
-                link: "text-[var(--foreground)] underline-offset-4 hover:underline",
-                accent: "bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-zinc-700",
+                    "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+                ghost: "text-foreground hover:bg-secondary hover:text-foreground",
+                link: "text-foreground underline-offset-4 hover:underline",
+                accent: "bg-accent text-accent-foreground hover:bg-accent/70",
             },
             size: {
                 default: "h-10 px-4 py-2",

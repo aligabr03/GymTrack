@@ -47,14 +47,14 @@ export default function ResetPasswordPage() {
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {error && (
-                        <div className="flex items-center gap-2 rounded-md border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-300">
+                        <div className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             {error}
                         </div>
                     )}
 
                     {success && (
-                        <div className="flex items-center gap-2 rounded-md border border-emerald-800 bg-emerald-950 px-3 py-2 text-sm text-emerald-300">
+                        <div className="flex items-center gap-2 rounded-md border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
                             <CheckCircle2 className="h-4 w-4 shrink-0" />
                             {success}
                         </div>

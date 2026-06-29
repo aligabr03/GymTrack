@@ -14,6 +14,7 @@ import { MuscleBalanceChart } from "@/components/insights/muscle-balance-chart";
 import { WorkoutCalendar } from "@/components/insights/workout-calendar";
 import { AiInsightSection } from "@/components/insights/ai-insight-section";
 import { BodyTrendsChart } from "@/components/insights/body-trends-chart";
+import { TrendingUp } from "lucide-react";
 
 export const metadata = { title: "Insights — GymTrack" };
 export const dynamic = "force-dynamic";
@@ -55,11 +56,16 @@ export default async function InsightsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="hidden md:block animate-fade-in">
-                <h1 className="text-2xl font-bold">Insights</h1>
-                <p className="text-[var(--muted-foreground)] text-sm mt-1">
-                    Analyze your training trends and progression.
-                </p>
+            <div className="hidden md:flex items-center gap-3 animate-fade-in">
+                <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                    <TrendingUp className="h-6 w-6 text-[var(--foreground)]" />
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold">Insights</h1>
+                    <p className="text-sm text-[var(--muted-foreground)]">
+                        Analyze your training trends and progression.
+                    </p>
+                </div>
             </div>
 
             {/* AI Analysis — streams in independently */}

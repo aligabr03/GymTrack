@@ -75,7 +75,7 @@ export default function Home() {
                     ].map(({ icon: Icon, title, desc }) => (
                         <div
                             key={title}
-                            className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 space-y-3"
+                            className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 space-y-3"
                         >
                             <div className="w-10 h-10 rounded-lg bg-[var(--secondary)] flex items-center justify-center">
                                 <Icon className="h-5 w-5 text-[var(--foreground)]" />
