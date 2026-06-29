@@ -154,7 +154,18 @@ export function WorkoutLogger({
     const [date, setDate] = useState(
         existing?.date ? toStoredDateStr(existing.date) : todayEST(),
     );
-    const [seasonId, setSeasonId] = useState(existing?.seasonId ?? "");
+    const [seasonId, setSeasonId] = useState(() => {
+        if (existing) return existing.seasonId ?? "";
+        const today = todayEST();
+        const activeSeason = seasons.find((s) => {
+            const start = new Date(s.startDate).toISOString().slice(0, 10);
+            if (start > today) return false;
+            if (!s.endDate) return true;
+            const end = new Date(s.endDate).toISOString().slice(0, 10);
+            return end >= today;
+        });
+        return activeSeason?.id ?? "";
+    });
     const [workoutName, setWorkoutName] = useState(existing?.name ?? "");
     const [notes, setNotes] = useState(existing?.notes ?? "");
     const [durationMins, setDurationMins] = useState(
@@ -625,7 +636,15 @@ export function WorkoutLogger({
             })));
         } else {
             setDate(todayEST());
-            setSeasonId("");
+            const today = todayEST();
+            const active = seasons.find((s) => {
+                const start = new Date(s.startDate).toISOString().slice(0, 10);
+                if (start > today) return false;
+                if (!s.endDate) return true;
+                const end = new Date(s.endDate).toISOString().slice(0, 10);
+                return end >= today;
+            });
+            setSeasonId(active?.id ?? "");
             setWorkoutName("");
             setNotes("");
             setDurationMins("");
