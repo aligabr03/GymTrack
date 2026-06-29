@@ -120,13 +120,31 @@ export function SeasonsManager({
     }
 
     return (
-        <>
-            <div className="flex justify-end">
+        <div className="space-y-6">
+            {/* Desktop header */}
+            <div className="hidden md:flex items-center justify-between animate-fade-in">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                        <CalendarDays className="h-6 w-6 text-[var(--foreground)]" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold">Seasons</h1>
+                        <p className="text-sm text-[var(--muted-foreground)]">
+                            {seasons.length} season{seasons.length !== 1 ? "s" : ""}
+                        </p>
+                    </div>
+                </div>
                 <Button onClick={openCreate}>
                     <Plus className="h-4 w-4" />
                     Create Season
                 </Button>
             </div>
+
+            {/* Mobile create button */}
+            <Button onClick={openCreate} className="w-full md:hidden">
+                <Plus className="h-4 w-4" />
+                Create Season
+            </Button>
 
             {seasons.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
@@ -255,6 +273,6 @@ export function SeasonsManager({
                     </div>
                 </DialogContent>
             </Dialog>
-        </>
+        </div>
     );
 }
