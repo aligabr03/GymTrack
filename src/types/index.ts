@@ -6,6 +6,7 @@ import type {
     PersonalRecord,
     WorkoutTemplate,
     TemplateExercise,
+    Season,
 } from "@/generated/prisma/client";
 
 export type {
@@ -16,9 +17,11 @@ export type {
     PersonalRecord,
     WorkoutTemplate,
     TemplateExercise,
+    Season,
 };
 
 export type WorkoutWithSets = Workout & {
+    season?: Season | null;
     sets: (WorkoutSet & { exercise: Exercise })[];
 };
 

@@ -66,13 +66,16 @@ export async function getDashboardStats() {
     };
 }
 
-export async function getProgressionData(exerciseId: string) {
+export async function getProgressionData(exerciseId: string, seasonId?: string | null) {
     const userId = await getUserId();
 
     const sets = await prisma.workoutSet.findMany({
         where: {
             exerciseId,
-            workout: { userId },
+            workout: {
+                userId,
+                ...(seasonId != null ? { seasonId } : {}),
+            },
             weightKg: { not: null },
             reps: { not: null },
         },
@@ -149,11 +152,16 @@ export async function getMuscleGroupVolume(days = 30) {
         .sort((a, b) => b.volume - a.volume);
 }
 
-export async function getLoggedExercises() {
+export async function getLoggedExercises(seasonId?: string | null) {
     const userId = await getUserId();
 
     const rows = await prisma.workoutSet.findMany({
-        where: { workout: { userId } },
+        where: {
+            workout: {
+                userId,
+                ...(seasonId != null ? { seasonId } : {}),
+            },
+        },
         select: { exercise: true },
         distinct: ["exerciseId"],
         orderBy: { exercise: { name: "asc" } },

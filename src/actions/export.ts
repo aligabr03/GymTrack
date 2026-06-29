@@ -25,13 +25,14 @@ function compact<T extends object>(obj: T): Partial<T> {
 export async function exportUserData() {
     const userId = await getUserId();
 
-    const [profile, workouts, bodyMetrics, personalRecords, workoutTemplates, customExercises] =
+    const [profile, workouts, bodyMetrics, personalRecords, workoutTemplates, customExercises, seasons] =
         await Promise.all([
             prisma.userProfile.findUnique({ where: { userId } }),
             prisma.workout.findMany({
                 where: { userId },
                 orderBy: { date: "desc" },
                 include: {
+                    season: { select: { name: true } },
                     sets: {
                         include: { exercise: { select: { name: true } } },
                         orderBy: [{ exerciseId: "asc" }, { setNumber: "asc" }],
@@ -59,6 +60,11 @@ export async function exportUserData() {
                 where: { userId, isCustom: true },
                 select: { name: true, category: true, muscleGroups: true },
             }),
+            prisma.season.findMany({
+                where: { userId },
+                orderBy: { startDate: "desc" },
+                select: { name: true, description: true, startDate: true, endDate: true },
+            }),
         ]);
 
     // Workouts: group sets by exercise name
@@ -78,6 +84,7 @@ export async function exportUserData() {
         return compact({
             date: toDate(w.date),
             name: w.name || undefined,
+            season: w.season?.name || undefined,
             durationMins: w.durationMins || undefined,
             notes: w.notes || undefined,
             exercises: byExercise,
@@ -134,5 +141,13 @@ export async function exportUserData() {
         personalRecords: formattedPRs,
         templates: formattedTemplates,
         customExercises,
+        seasons: seasons.map((s) =>
+            compact({
+                name: s.name,
+                description: s.description,
+                startDate: toDate(s.startDate),
+                endDate: s.endDate ? toDate(s.endDate) : undefined,
+            }),
+        ),
     };
 }

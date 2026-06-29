@@ -147,6 +147,11 @@ export function WorkoutDetailClient({
                     </h1>
                     <p className="text-sm text-[var(--muted-foreground)]">
                         {formatDate(workout.date)}
+                        {workout.season && (
+                            <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--secondary)] text-[var(--muted-foreground)] border border-[var(--border)]">
+                                {workout.season.name}
+                            </span>
+                        )}
                     </p>
                 </div>
                 {!readOnly && (

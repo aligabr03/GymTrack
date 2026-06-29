@@ -13,6 +13,7 @@ type Workout = {
     name: string | null;
     date: Date;
     durationMins: number | null;
+    season?: { id: string; name: string } | null;
     sets: Array<{
         exerciseId: string;
         exercise: { name: string };
@@ -137,6 +138,11 @@ export function WorkoutList({ workouts, weightUnit = "KG" }: { workouts: Workout
                                                                 workout.date,
                                                             )}
                                                     </span>
+                                                    {workout.season && (
+                                                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--secondary)] text-[var(--muted-foreground)] border border-[var(--border)]">
+                                                            {workout.season.name}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
                                                     {formatRelativeDate(

@@ -30,6 +30,7 @@ const setSchema = z.object({
 
 const workoutSchema = z.object({
     date: z.string(),
+    seasonId: z.string().optional().nullable(),
     name: z.string().optional(),
     notes: z.string().optional(),
     durationMins: z.number().int().positive().optional().nullable(),
@@ -47,6 +48,7 @@ export async function createWorkout(data: z.infer<typeof workoutSchema>) {
     const workout = await prisma.workout.create({
         data: {
             userId,
+            seasonId: parsed.data.seasonId ?? null,
             date: new Date(parsed.data.date),
             name: parsed.data.name,
             notes: parsed.data.notes,
@@ -111,6 +113,7 @@ export async function updateWorkout(
     const workout = await prisma.workout.update({
         where: { id },
         data: {
+            seasonId: parsed.data.seasonId ?? null,
             date: new Date(parsed.data.date),
             name: parsed.data.name,
             notes: parsed.data.notes,
@@ -182,6 +185,7 @@ export async function getWorkouts(limit?: number) {
     const workouts = await prisma.workout.findMany({
         where: { userId },
         include: {
+            season: { select: { id: true, name: true } },
             sets: {
                 include: { exercise: true },
                 orderBy: [{ id: "asc" }, { setNumber: "asc" }],
@@ -249,6 +253,7 @@ export async function getWorkoutMetaSuggestions(): Promise<WorkoutMetaSuggestion
 export async function getLastSetsForExercise(
     exerciseId: string,
     excludeWorkoutId?: string,
+    seasonId?: string | null,
 ) {
     const userId = await getUserId();
 
@@ -259,6 +264,7 @@ export async function getLastSetsForExercise(
             workout: {
                 userId,
                 ...(excludeWorkoutId ? { id: { not: excludeWorkoutId } } : {}),
+                ...(seasonId != null ? { seasonId } : {}),
             },
         },
         orderBy: { workout: { date: "desc" } },
@@ -295,6 +301,7 @@ export async function getLastSetsForExercise(
 export async function getBatchPreviousBestSets(
     exerciseIds: string[],
     excludeWorkoutId?: string,
+    seasonId?: string | null,
 ): Promise<
     Record<string, { weightKg: number; reps: number; e1rm: number } | null>
 > {
@@ -308,6 +315,7 @@ export async function getBatchPreviousBestSets(
             workout: {
                 userId,
                 ...(excludeWorkoutId ? { id: { not: excludeWorkoutId } } : {}),
+                ...(seasonId != null ? { seasonId } : {}),
             },
             weightKg: { not: null },
             reps: { not: null },
@@ -376,6 +384,7 @@ export async function getWorkout(id: string) {
     const workout = await prisma.workout.findUnique({
         where: { id },
         include: {
+            season: true,
             sets: {
                 include: { exercise: true },
                 orderBy: [{ id: "asc" }, { setNumber: "asc" }],
@@ -394,6 +403,7 @@ export async function getWorkoutForUser(
     const workout = await prisma.workout.findUnique({
         where: { id: workoutId },
         include: {
+            season: true,
             sets: {
                 include: { exercise: true },
                 orderBy: [{ id: "asc" }, { setNumber: "asc" }],

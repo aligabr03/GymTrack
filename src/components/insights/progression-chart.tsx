@@ -12,9 +12,10 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { getProgressionData } from "@/actions/insights";
+import { getSeasons } from "@/actions/seasons";
 import { estimateOneRM, kgToLbs } from "@/lib/calculations";
 import type { WeightUnit } from "@/lib/calculations";
-import type { Exercise } from "@/types";
+import type { Exercise, Season } from "@/types";
 import {
     Select,
     SelectContent,
@@ -40,6 +41,12 @@ export function ProgressionChart({ exercises, weightUnit = "KG" }: Props) {
     const [data, setData] = useState<ChartPoint[]>([]);
     const [isPending, startTransition] = useTransition();
     const [loaded, setLoaded] = useState(false);
+    const [seasons, setSeasons] = useState<Season[]>([]);
+    const [seasonFilter, setSeasonFilter] = useState<string>("");
+
+    useEffect(() => {
+        getSeasons().then(setSeasons).catch(() => setSeasons([]));
+    }, []);
 
     const categories = [
         ...new Set(exercises.map((exercise) => exercise.category)),
@@ -53,13 +60,13 @@ export function ProgressionChart({ exercises, weightUnit = "KG" }: Props) {
     useEffect(() => {
         if (filteredExercises[0]?.id) load(filteredExercises[0].id);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [category]);
+    }, [category, seasonFilter]);
 
     function load(exerciseId: string) {
         setSelected(exerciseId);
         startTransition(async () => {
             try {
-                const raw = await getProgressionData(exerciseId);
+                const raw = await getProgressionData(exerciseId, seasonFilter || null);
 
                 // Per date: track max weight AND max e1rm independently
                 const byDate: Record<string, ChartPoint> = {};
@@ -133,6 +140,22 @@ export function ProgressionChart({ exercises, weightUnit = "KG" }: Props) {
                         ))}
                     </SelectContent>
                 </Select>
+
+                {seasons.length > 0 && (
+                    <Select value={seasonFilter} onValueChange={(v) => { setSeasonFilter(v); setLoaded(false); }}>
+                        <SelectTrigger className="w-full sm:w-[200px]">
+                            <SelectValue placeholder="All seasons" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="">All seasons</SelectItem>
+                            {seasons.map((season) => (
+                                <SelectItem key={season.id} value={season.id}>
+                                    {season.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
             </div>
 
             {filteredExercises.length === 0 && (

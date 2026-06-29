@@ -51,6 +51,7 @@ import {
     Unlink2,
     History,
 } from "lucide-react";
+import { SeasonSelector } from "@/components/seasons/season-selector";
 
 type SetRow = {
     id: string;
@@ -150,6 +151,7 @@ export function WorkoutLogger({
     const [date, setDate] = useState(
         existing?.date ? toStoredDateStr(existing.date) : todayEST(),
     );
+    const [seasonId, setSeasonId] = useState(existing?.seasonId ?? "");
     const [workoutName, setWorkoutName] = useState(existing?.name ?? "");
     const [notes, setNotes] = useState(existing?.notes ?? "");
     const [durationMins, setDurationMins] = useState(
@@ -217,6 +219,7 @@ export function WorkoutLogger({
             if (!raw) return;
             const draft = JSON.parse(raw) as {
                 date: string;
+                seasonId: string;
                 workoutName: string;
                 notes: string;
                 durationMins: string;
@@ -227,6 +230,7 @@ export function WorkoutLogger({
                 return;
             }
             setDate(draft.date);
+            setSeasonId(draft.seasonId ?? "");
             setWorkoutName(draft.workoutName);
             setNotes(draft.notes);
             setDurationMins(draft.durationMins);
@@ -241,11 +245,11 @@ export function WorkoutLogger({
         if (groups.length === 0 && !workoutName && !notes && !durationMins) return;
         const timer = setTimeout(() => {
             try {
-                localStorage.setItem(draftKey, JSON.stringify({ date, workoutName, notes, durationMins, groups }));
+                localStorage.setItem(draftKey, JSON.stringify({ date, seasonId, workoutName, notes, durationMins, groups }));
             } catch {}
         }, 500);
         return () => clearTimeout(timer);
-    }, [date, workoutName, notes, durationMins, groups, draftKey]);
+    }, [date, seasonId, workoutName, notes, durationMins, groups, draftKey]);
 
     const categories = [
         ...new Set(exerciseOptions.map((e) => e.category)),
@@ -279,7 +283,7 @@ export function WorkoutLogger({
         );
         if (missing.length === 0) return;
         try {
-            const batch = await getBatchPreviousBestSets(missing, existing?.id);
+            const batch = await getBatchPreviousBestSets(missing, existing?.id, seasonId || null);
             setPreviousBestByExercise((prev) => ({ ...prev, ...batch }));
         } catch {
             setPreviousBestByExercise((prev) => ({
@@ -296,6 +300,11 @@ export function WorkoutLogger({
         if (missing.length > 0) void loadPreviousBestForExercises(missing);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [groups]);
+
+    // Re-fetch previous best when season changes
+    useEffect(() => {
+        setPreviousBestByExercise({});
+    }, [seasonId]);
 
     // Clear exercise template if the user types a name that no longer matches
     useEffect(() => {
@@ -578,6 +587,7 @@ export function WorkoutLogger({
         setShowDraftBanner(false);
         if (existing) {
             setDate(toStoredDateStr(existing.date));
+            setSeasonId(existing.seasonId ?? "");
             setWorkoutName(existing.name ?? "");
             setNotes(existing.notes ?? "");
             setDurationMins(existing.durationMins?.toString() ?? "");
@@ -612,6 +622,7 @@ export function WorkoutLogger({
             })));
         } else {
             setDate(todayEST());
+            setSeasonId("");
             setWorkoutName("");
             setNotes("");
             setDurationMins("");
@@ -669,6 +680,7 @@ export function WorkoutLogger({
 
         const payload = {
             date,
+            seasonId: seasonId || null,
             name: workoutName || undefined,
             notes: notes || undefined,
             durationMins: durationMins ? parseInt(durationMins, 10) : null,
@@ -748,7 +760,7 @@ export function WorkoutLogger({
 
             {/* Workout meta */}
             <Card>
-                <CardContent className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <CardContent className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="space-y-2 min-w-0">
                         <Label>Date</Label>
                         <Input
@@ -802,6 +814,10 @@ export function WorkoutLogger({
                             onChange={(e) => setNotes(e.target.value)}
                         />
                     </div>
+                    <SeasonSelector
+                        value={seasonId}
+                        onChange={setSeasonId}
+                    />
                 </CardContent>
             </Card>
 
@@ -873,6 +889,7 @@ export function WorkoutLogger({
                             )}
                             weightUnit={weightUnit}
                             excludeWorkoutId={existing?.id}
+                            seasonId={seasonId || null}
                             onAddSet={() => addSet(item.group.exerciseId)}
                             onAddDropSet={() =>
                                 addDropSet(item.group.exerciseId)
@@ -933,6 +950,7 @@ export function WorkoutLogger({
                                         )}
                                         weightUnit={weightUnit}
                                         excludeWorkoutId={existing?.id}
+                                        seasonId={seasonId || null}
                                         onAddSet={() =>
                                             addSet(group.exerciseId)
                                         }
@@ -1247,6 +1265,7 @@ function ExerciseGroupCard({
     onUnlinkSuperset,
     weightUnit = "KG",
     excludeWorkoutId,
+    seasonId,
 }: {
     group: ExerciseGroup;
     previousBest: { weightKg: number; reps: number; e1rm: number } | null;
@@ -1267,6 +1286,7 @@ function ExerciseGroupCard({
     onUnlinkSuperset: () => void;
     weightUnit?: WeightUnit;
     excludeWorkoutId?: string;
+    seasonId?: string | null;
 }) {
     const [supersetPickerOpen, setSupersetPickerOpen] = useState(false);
     const [lastPerfOpen, setLastPerfOpen] = useState(false);
@@ -1282,6 +1302,7 @@ function ExerciseGroupCard({
         const data = await getLastSetsForExercise(
             group.exerciseId,
             excludeWorkoutId,
+            seasonId,
         );
         setLastPerfData(data);
     }

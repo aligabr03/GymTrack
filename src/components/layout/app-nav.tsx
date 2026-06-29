@@ -17,6 +17,7 @@ import {
     Moon,
     Users,
     UserCircle,
+    CalendarDays,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -207,6 +208,13 @@ export function AppNav({ user }: { user: User }) {
                         <UserCircle className="h-4 w-4" />
                         View profile
                     </Link>
+                    <Link
+                        href="/seasons"
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                    >
+                        <CalendarDays className="h-4 w-4" />
+                        Seasons
+                    </Link>
                     <button
                         onClick={toggleTheme}
                         className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
@@ -320,6 +328,14 @@ export function AppNav({ user }: { user: User }) {
                                     >
                                         <UserCircle className="h-4 w-4" />
                                         View profile
+                                    </Link>
+                                    <Link
+                                        href="/seasons"
+                                        onClick={() => setProfileOpen(false)}
+                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                    >
+                                        <CalendarDays className="h-4 w-4" />
+                                        Seasons
                                     </Link>
                                     <button
                                         onClick={() => {

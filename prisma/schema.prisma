@@ -26,6 +26,7 @@ model Exercise {
 model Workout {
   id           String   @id @default(cuid())
   userId       String
+  seasonId     String?
   date         DateTime
   name         String?
   notes        String?
@@ -33,9 +34,11 @@ model Workout {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  sets WorkoutSet[]
+  season Season?     @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  sets   WorkoutSet[]
 
   @@index([userId, date])
+  @@index([seasonId])
 }
 
 model WorkoutSet {
@@ -115,6 +118,20 @@ model PersonalRecord {
   exercise Exercise @relation(fields: [exerciseId], references: [id])
 
   @@unique([userId, exerciseId])
+  @@index([userId])
+}
+
+model Season {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+
+  workouts    Workout[]
+
   @@index([userId])
 }
 
