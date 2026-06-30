@@ -125,10 +125,9 @@ export function WorkoutList({ workouts, weightUnit = "KG" }: { workouts: Workout
                                         <Link
                                             key={workout.id}
                                             href={`/workouts/${workout.id}`}
-                                            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40 animate-fade-in-up"
-                                            style={{
-                                                animationDelay: `${index * 50}ms`,
-                                            }}
+                                            prefetch={true}
+                                            draggable={false}
+                                            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40"
                                         >
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 min-w-0">

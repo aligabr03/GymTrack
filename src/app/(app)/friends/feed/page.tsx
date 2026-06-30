@@ -110,10 +110,9 @@ export default async function FeedPage() {
                                                 <Link
                                                     key={workout.id}
                                                     href={`/profile/${profile.userId}/workouts/${workout.id}`}
-                                                    className="flex items-center gap-3 px-4 py-3 animate-fade-in-up hover:bg-[var(--muted)] transition-colors"
-                                                    style={{
-                                                        animationDelay: `${index * 50}ms`,
-                                                    }}
+                                                    prefetch={true}
+                                                    draggable={false}
+                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--muted)] transition-colors"
                                                 >
                                                     <Avatar className="h-8 w-8 shrink-0">
                                                         <AvatarFallback className="text-xs bg-[var(--secondary)]">
