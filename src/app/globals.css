@@ -97,6 +97,56 @@ body {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     padding-bottom: env(safe-area-inset-bottom);
+    /* Prevent pull-to-refresh / overscroll bounce for native feel */
+    overscroll-behavior: none;
+    /* Smooth scrolling for programmatic scrolls */
+    scroll-behavior: smooth;
+    /* GPU-accelerated rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── View Transitions: native-feel page switches ── */
+::view-transition-old(root) {
+    animation: 150ms ease-out both fade-out;
+}
+
+::view-transition-new(root) {
+    animation: 300ms ease-out 50ms both fade-in-up;
+}
+
+@keyframes fade-out {
+    to {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Mobile: iOS momentum scrolling ── */
+@supports (-webkit-overflow-scrolling: touch) {
+    .overflow-y-auto,
+    .overflow-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ── Reduce layout shift from font loading ── */
+@font-face {
+    font-family: "Inter Fallback";
+    size-adjust: 107%;
+    ascent-override: 90%;
+    src: local("Arial");
 }
 
 /* Hide scrollbars on mobile */
@@ -107,6 +157,21 @@ body {
     }
     *::-webkit-scrollbar {
         display: none;
+    }
+
+    /* Faster tap response — no 300ms delay on iOS */
+    a, button, [role="button"], input, select, textarea {
+        touch-action: manipulation;
+    }
+}
+
+/* ── iOS standalone mode: safe area padding for notch / Dynamic Island ── */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .ios-safe-top {
+        padding-top: env(safe-area-inset-top);
+    }
+    .ios-safe-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
     }
 }
 

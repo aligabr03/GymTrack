@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/layout/app-nav";
 import { PageTitleProvider } from "@/components/layout/page-title-context";
+import { Suspense } from "react";
 
 export default async function AppLayout({
     children,
@@ -19,9 +20,9 @@ export default async function AppLayout({
         <PageTitleProvider>
             <div className="min-h-dvh flex flex-col md:flex-row">
                 <AppNav user={user} />
-                <main className="flex-1 min-w-0 md:ml-64 pt-[calc(env(safe-area-inset-top)+4.5rem)] md:pt-0 pb-20 md:pb-0">
+                <main className="flex-1 min-w-0 md:ml-64 pt-[calc(env(safe-area-inset-top)+4.5rem)] md:pt-0 pb-24 md:pb-0">
                     <div className="max-w-6xl mx-auto px-4 pt-2 pb-4 md:p-8">
-                        {children}
+                        <Suspense>{children}</Suspense>
                     </div>
                 </main>
             </div>

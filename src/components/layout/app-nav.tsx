@@ -86,13 +86,8 @@ export function AppNav({ user }: { user: User }) {
     }, []);
 
     useEffect(() => {
-        // Ensure each tab/page switch starts from the top.
-        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-        document.querySelector("main")?.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: "auto",
-        });
+        // Instant scroll to top on navigation — no animation flash
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
         setProfileOpen(false);
     }, [pathname]);
 
@@ -251,8 +246,9 @@ export function AppNav({ user }: { user: User }) {
                             <Link
                                 key={href}
                                 href={href}
+                                prefetch={true}
                                 className={cn(
-                                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation",
+                                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation transition-all duration-150 active:scale-95",
                                     active
                                         ? "text-[var(--foreground)]"
                                         : "text-[var(--muted-foreground)]",
