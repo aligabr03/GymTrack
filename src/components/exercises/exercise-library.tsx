@@ -361,8 +361,8 @@ export function ExerciseLibrary({
                                             {/* Best set */}
                                             {bestWeights[ex.id] && (
                                                 <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-border/50">
-                                                    <span className="text-warning text-[10px]">★</span>
-                                                    <span className="text-[11px] font-medium text-warning tabular-nums">
+                                                    <span className="text-primary text-[10px] drop-shadow-[0_0_4px_var(--primary)]">★</span>
+                                                    <span className="text-[11px] font-medium text-primary tabular-nums">
                                                         {weightUnit === "LBS" ? kgToLbs(bestWeights[ex.id]!.weightKg) : bestWeights[ex.id]!.weightKg} {weightUnit === "LBS" ? "lbs" : "kg"} × {bestWeights[ex.id]!.reps}
                                                     </span>
                                                 </div>

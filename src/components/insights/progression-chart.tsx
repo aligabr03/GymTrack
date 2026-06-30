@@ -246,10 +246,10 @@ export function ProgressionChart({ exercises, weightUnit = "KG", seasons = [] }:
                                 <Line
                                     type="monotone"
                                     dataKey="estimatedOneRM"
-                                    stroke="#71717a"
+                                    stroke="#fbbf24"
                                     strokeWidth={2}
                                     strokeDasharray="5 5"
-                                    dot={{ r: 2, fill: "#71717a" }}
+                                    dot={{ r: 2, fill: "#fbbf24" }}
                                     activeDot={{ r: 4 }}
                                 />
                             </LineChart>

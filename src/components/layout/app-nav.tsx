@@ -169,7 +169,7 @@ export function AppNav({ user }: { user: User }) {
                                 className={cn(
                                     "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-150",
                                     active
-                                        ? "bg-[var(--secondary)] text-[var(--foreground)] shadow-sm"
+                                        ? "bg-primary/10 text-[var(--foreground)] shadow-[inset_2px_0_0_var(--primary)]"
                                         : "text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
                                 )}
                             >
@@ -262,8 +262,8 @@ export function AppNav({ user }: { user: User }) {
                             >
                                 <div
                                     className={cn(
-                                        "p-1 rounded-lg",
-                                        active && "bg-[var(--secondary)]",
+                                        "p-1 rounded-lg transition-shadow",
+                                        active && "bg-primary/15 shadow-[0_0_12px_-2px_var(--primary)]",
                                     )}
                                 >
                                     <Icon

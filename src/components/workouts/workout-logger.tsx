@@ -1203,7 +1203,7 @@ export function WorkoutLogger({
                             </div>
                             <div className="relative">
                                 <div className="text-5xl mb-3">🏆</div>
-                                <h2 className="text-2xl font-bold text-amber-950">New PR!</h2>
+                                <h2 className="text-2xl font-bold text-amber-900">New PR!</h2>
                                 <p className="text-amber-800 text-sm mt-1">Personal Record Achieved</p>
                             </div>
                         </div>
