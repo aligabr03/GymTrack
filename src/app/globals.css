@@ -3,54 +3,54 @@
 :root {
     --background: #09090b;
     --foreground: #fafafa;
-    --card: #0d0c0a;
+    --card: #0a0d14;
     --card-foreground: #fafafa;
-    --popover: #14120e;
+    --popover: #0f1320;
     --popover-foreground: #fafafa;
-    --primary: #fbbf24;
-    --primary-foreground: #0f0d06;
-    --secondary: #191712;
+    --primary: #3b82f6;
+    --primary-foreground: #eff6ff;
+    --secondary: #111827;
     --secondary-foreground: #fafafa;
-    --muted: #191712;
-    --muted-foreground: #a8984a;
-    --accent: #282211;
-    --accent-foreground: #fcd34d;
+    --muted: #111827;
+    --muted-foreground: #6b8ab5;
+    --accent: #1a2740;
+    --accent-foreground: #60a5fa;
     --destructive: #dc2626;
     --destructive-foreground: #ffffff;
     --success: #059669;
     --success-foreground: #ffffff;
     --warning: #d97706;
     --warning-foreground: #ffffff;
-    --border: #282211;
-    --input: #191712;
-    --ring: #fbbf24;
+    --border: #1a2740;
+    --input: #111827;
+    --ring: #3b82f6;
     --radius: 0.75rem;
 }
 
 html.light {
     --background: #ffffff;
-    --foreground: #1a1508;
-    --card: #fefdf7;
-    --card-foreground: #1a1508;
+    --foreground: #0f172a;
+    --card: #fafcff;
+    --card-foreground: #0f172a;
     --popover: #ffffff;
-    --popover-foreground: #1a1508;
-    --primary: #b45309;
+    --popover-foreground: #0f172a;
+    --primary: #2563eb;
     --primary-foreground: #ffffff;
-    --secondary: #fef3c7;
-    --secondary-foreground: #1a1508;
-    --muted: #fef9e7;
-    --muted-foreground: #8b7b3e;
-    --accent: #fde68a;
-    --accent-foreground: #1a1508;
+    --secondary: #eff6ff;
+    --secondary-foreground: #0f172a;
+    --muted: #f0f7ff;
+    --muted-foreground: #5b7da5;
+    --accent: #dbeafe;
+    --accent-foreground: #1e3a5f;
     --destructive: #dc2626;
     --destructive-foreground: #ffffff;
     --success: #059669;
     --success-foreground: #ffffff;
     --warning: #d97706;
     --warning-foreground: #ffffff;
-    --border: #fde68a;
-    --input: #fef9e7;
-    --ring: #fbbf24;
+    --border: #bfdbfe;
+    --input: #f0f7ff;
+    --ring: #3b82f6;
 }
 
 @theme inline {
@@ -240,12 +240,12 @@ h6 {
     100% { background-position: 0% 50%; }
 }
 
-.animate-gold-shimmer {
+.animate-blue-shimmer {
     background: linear-gradient(
         135deg,
-        #78350f, #92400e, #b45309, #d97706,
-        #f59e0b, #fbbf24, #f59e0b, #d97706,
-        #b45309, #92400e, #78350f
+        #1e3a5f, #1d4ed8, #2563eb, #3b82f6,
+        #60a5fa, #93c5fd, #60a5fa, #3b82f6,
+        #2563eb, #1d4ed8, #1e3a5f
     );
     background-size: 400% 400%;
     animation: goldShimmer 3s ease infinite;

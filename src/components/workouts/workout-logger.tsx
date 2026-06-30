@@ -1195,16 +1195,16 @@ export function WorkoutLogger({
         {/* PR Celebration Popup */}
         {prCelebration && (
             <Dialog open={true} onOpenChange={(open) => { if (!open) closePrCelebration(); }}>
-                <DialogContent className="overflow-hidden border-warning/50 p-0 md:max-w-sm">
+                <DialogContent className="overflow-hidden border-primary/50 p-0 md:max-w-sm">
                     <div className="relative overflow-hidden rounded-xl">
-                        <div className="animate-gold-shimmer p-8 pb-6 text-center relative overflow-hidden">
+                        <div className="animate-blue-shimmer p-8 pb-6 text-center relative overflow-hidden">
                             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                                 <div className="animate-shine-sweep absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent -skew-x-12" />
                             </div>
                             <div className="relative">
                                 <div className="text-5xl mb-3">🏆</div>
-                                <h2 className="text-2xl font-bold text-amber-900">New PR!</h2>
-                                <p className="text-amber-800 text-sm mt-1">Personal Record Achieved</p>
+                                <h2 className="text-2xl font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">New PR!</h2>
+                                <p className="text-blue-100 text-sm mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">Personal Record Achieved</p>
                             </div>
                         </div>
                         <div className="bg-[var(--card)] p-5 space-y-3">
