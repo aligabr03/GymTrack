@@ -163,8 +163,11 @@ export function AppNav({ user }: { user: User }) {
                             <Link
                                 key={href}
                                 href={href}
+                                prefetch={true}
+                                draggable={false}
+                                aria-current={active ? "page" : undefined}
                                 className={cn(
-                                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-150",
                                     active
                                         ? "bg-[var(--secondary)] text-[var(--foreground)] shadow-sm"
                                         : "text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
@@ -247,8 +250,11 @@ export function AppNav({ user }: { user: User }) {
                                 key={href}
                                 href={href}
                                 prefetch={true}
+                                draggable={false}
+                                aria-label={label}
+                                aria-current={active ? "page" : undefined}
                                 className={cn(
-                                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation transition-all duration-150 active:scale-95",
+                                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation transition-colors duration-150 active:scale-95",
                                     active
                                         ? "text-[var(--foreground)]"
                                         : "text-[var(--muted-foreground)]",
