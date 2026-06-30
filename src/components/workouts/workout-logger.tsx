@@ -1359,7 +1359,15 @@ function ExerciseGroupCard({
         <Card>
             <div
                 className="flex items-center justify-between p-4 cursor-pointer select-none"
+                role="button"
+                tabIndex={0}
                 onClick={onToggleCollapse}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onToggleCollapse();
+                    }
+                }}
             >
                 <div className="flex items-center gap-2 flex-wrap">
                     <Dumbbell className="h-4 w-4 text-[var(--foreground)] shrink-0" />
@@ -1419,9 +1427,18 @@ function ExerciseGroupCard({
                                 <>
                                     <div
                                         className="fixed inset-0 z-40"
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-label="Close superset picker"
                                         onClick={() =>
                                             setSupersetPickerOpen(false)
                                         }
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === " ") {
+                                                e.preventDefault();
+                                                setSupersetPickerOpen(false);
+                                            }
+                                        }}
                                     />
                                     <div className="absolute right-0 top-full mt-1 z-50 w-52 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl p-2 space-y-1 animate-scale-in">
                                         <p className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-2 py-1">

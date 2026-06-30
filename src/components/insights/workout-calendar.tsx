@@ -143,11 +143,29 @@ export function WorkoutCalendar({ year, data, workoutPathPrefix = "/workouts" }:
                                             <div
                                                 key={row}
                                                 title={`${iso}: ${count} workout${count !== 1 ? "s" : ""}`}
+                                                role={count > 0 ? "button" : undefined}
+                                                tabIndex={count > 0 ? 0 : -1}
                                                 className={`rounded-[2px] ${intensity(count)} transition-opacity hover:opacity-80 ${count > 0 ? "cursor-pointer" : "cursor-default"}`}
                                                 style={{ width: 12, height: 12 }}
                                                 onClick={() =>
                                                     count > 0 &&
                                                     setSelectedDay(iso)
+                                                }
+                                                onKeyDown={
+                                                    count > 0
+                                                        ? (e) => {
+                                                              if (
+                                                                  e.key ===
+                                                                      "Enter" ||
+                                                                  e.key === " "
+                                                              ) {
+                                                                  e.preventDefault();
+                                                                  setSelectedDay(
+                                                                      iso,
+                                                                  );
+                                                              }
+                                                          }
+                                                        : undefined
                                                 }
                                             />
                                         );

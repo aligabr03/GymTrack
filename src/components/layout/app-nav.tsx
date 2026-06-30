@@ -303,7 +303,16 @@ export function AppNav({ user }: { user: User }) {
                         <>
                             <div
                                 className="fixed inset-0 z-40"
+                                role="button"
+                                tabIndex={0}
+                                aria-label="Close menu"
                                 onClick={() => setProfileOpen(false)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        setProfileOpen(false);
+                                    }
+                                }}
                             />
                             <div className="absolute right-0 top-full mt-2 z-50 w-56 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl p-3 space-y-2 animate-scale-in">
                                 <div className="px-2 py-1.5">
