@@ -91,8 +91,9 @@ export function AppNav({ user }: { user: User }) {
     return (
         <>
             {/* Desktop top nav */}
-            <header className="hidden md:flex items-center justify-between h-16 fixed top-0 inset-x-0 z-50 glass-subtle border-b border-[var(--border)]">
-                <div className="flex items-center gap-1 px-4">
+            <header className="hidden md:block fixed top-0 inset-x-0 z-50 glass-subtle border-b border-[var(--border)] ios-safe-top">
+                <div className="flex items-center justify-between h-16 px-4">
+                <div className="flex items-center gap-1">
                     <Link
                         href="/dashboard"
                         className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl transition-colors hover:bg-[rgba(255,255,255,0.04)]"
@@ -212,10 +213,12 @@ export function AppNav({ user }: { user: User }) {
                         )}
                     </div>
                 </div>
+                </div>
             </header>
 
             {/* Mobile top bar */}
-            <header className="md:hidden flex items-center justify-between h-14 fixed top-0 inset-x-0 z-50 glass-subtle border-b border-[var(--border)] px-4">
+            <header className="md:hidden fixed top-0 inset-x-0 z-50 glass-subtle border-b border-[var(--border)] ios-safe-top">
+                <div className="flex items-center justify-between h-14 px-4">
                 <div className="flex items-center gap-2.5">
                     <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
                         <Dumbbell className="h-3.5 w-3.5 text-primary" />
@@ -310,6 +313,7 @@ export function AppNav({ user }: { user: User }) {
                         </div>
                     </>
                 )}
+                </div>
             </header>
 
             {/* Mobile bottom tabs */}
