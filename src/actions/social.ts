@@ -1,30 +1,16 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
+import { getUserId, getUserMeta } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-async function getUserId(): Promise<string> {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Unauthorized");
-    return user.id;
-}
-
-async function getUserMeta(): Promise<{ id: string; name: string }> {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Unauthorized");
-    const name =
-        (user.user_metadata?.name as string | undefined) ??
-        user.email?.split("@")[0] ??
-        "Athlete";
-    return { id: user.id, name };
-}
+const updateProfileSchema = z.object({
+    displayName: z.string().trim().min(2).max(50).optional(),
+    bio: z.string().trim().max(200).optional(),
+    weightUnit: z.enum(["KG", "LBS"]).optional(),
+    bodyWeightUnit: z.enum(["KG", "LBS"]).optional(),
+});
 
 /** Upserts the current user's profile on first use. */
 export async function getOrCreateMyProfile() {
@@ -67,21 +53,26 @@ export async function updateProfile(data: {
     weightUnit?: "KG" | "LBS";
     bodyWeightUnit?: "KG" | "LBS";
 }) {
+    const parsed = updateProfileSchema.safeParse(data);
+    if (!parsed.success) {
+        return { success: false, error: parsed.error.issues[0].message };
+    }
+
     const { id, name } = await getUserMeta();
     const profile = await prisma.userProfile.upsert({
         where: { userId: id },
-        update: { ...data },
+        update: { ...parsed.data },
         create: {
             userId: id,
-            displayName: data.displayName ?? name,
-            bio: data.bio,
-            weightUnit: data.weightUnit ?? "KG",
-            bodyWeightUnit: data.bodyWeightUnit ?? "KG",
+            displayName: parsed.data.displayName ?? name,
+            bio: parsed.data.bio,
+            weightUnit: parsed.data.weightUnit ?? "KG",
+            bodyWeightUnit: parsed.data.bodyWeightUnit ?? "KG",
         },
     });
     revalidatePath(`/profile/${id}`);
     revalidatePath("/friends");
-    return profile;
+    return { success: true, data: profile };
 }
 
 export async function getProfile(userId: string) {
@@ -137,21 +128,40 @@ export async function getAllUsers() {
 
 export async function followUser(targetUserId: string) {
     const userId = await getUserId();
-    if (userId === targetUserId) return;
-    await prisma.follow.create({
-        data: { followerId: userId, followingId: targetUserId },
+    if (userId === targetUserId) return { success: false, error: "Cannot follow yourself" };
+
+    const target = await prisma.userProfile.findUnique({
+        where: { userId: targetUserId },
+        select: { userId: true },
     });
-    revalidatePath("/friends");
-    revalidatePath(`/profile/${targetUserId}`);
+    if (!target) return { success: false, error: "User not found" };
+
+    try {
+        await prisma.follow.create({
+            data: { followerId: userId, followingId: targetUserId },
+        });
+        revalidatePath("/friends");
+        revalidatePath(`/profile/${targetUserId}`);
+        return { success: true };
+    } catch (err) {
+        console.error("[followUser]", err);
+        return { success: false, error: "Failed to follow user" };
+    }
 }
 
 export async function unfollowUser(targetUserId: string) {
     const userId = await getUserId();
-    await prisma.follow.deleteMany({
-        where: { followerId: userId, followingId: targetUserId },
-    });
-    revalidatePath("/friends");
-    revalidatePath(`/profile/${targetUserId}`);
+    try {
+        await prisma.follow.deleteMany({
+            where: { followerId: userId, followingId: targetUserId },
+        });
+        revalidatePath("/friends");
+        revalidatePath(`/profile/${targetUserId}`);
+        return { success: true };
+    } catch (err) {
+        console.error("[unfollowUser]", err);
+        return { success: false, error: "Failed to unfollow user" };
+    }
 }
 
 export async function getFollowStatus(targetUserId: string): Promise<boolean> {

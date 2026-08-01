@@ -1,5 +1,5 @@
 import {
-    getMuscleGroupVolume,
+    getMuscleGroupSets,
     getWorkoutCalendar,
     getLoggedExercises,
 } from "@/actions/insights";
@@ -24,7 +24,7 @@ export default async function InsightsPage() {
 
     const [muscleData, calendarCounts, exercises, bodyMetrics, weightUnitResult, bodyWeightUnitResult, seasonsResult] =
         await Promise.allSettled([
-            getMuscleGroupVolume(30),
+            getMuscleGroupSets(30),
             getWorkoutCalendar(year),
             getLoggedExercises(),
             getBodyMetrics(180),
@@ -37,7 +37,7 @@ export default async function InsightsPage() {
 
     const muscleGroupData =
         (muscleData as Awaited<
-            ReturnType<typeof getMuscleGroupVolume>
+            ReturnType<typeof getMuscleGroupSets>
         > | null) ?? [];
     const calendarData =
         (calendarCounts as Awaited<

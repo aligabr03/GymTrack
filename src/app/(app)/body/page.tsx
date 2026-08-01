@@ -9,8 +9,8 @@ export default async function BodyPage() {
     let metrics: Awaited<ReturnType<typeof getBodyMetrics>> = [];
     try {
         metrics = await getBodyMetrics(100);
-    } catch {
-        // user not logged in or DB error — middleware protects this route
+    } catch (err) {
+        console.error("[BodyPage]", err);
     }
     const weightUnit = await getMyBodyWeightUnit().catch(() => "KG" as const);
 

@@ -1372,18 +1372,6 @@ function ExerciseGroupCard({
                 <div className="flex items-center gap-2 flex-wrap">
                     <Dumbbell className="h-4 w-4 text-[var(--foreground)] shrink-0" />
                     <span className="font-semibold">{group.exerciseName}</span>
-                    {(() => {
-                        const vol = group.sets.reduce((total, set) => {
-                            const w = parseFloat(set.weightKg) || 0;
-                            const r = parseInt(set.reps, 10) || 0;
-                            return total + w * r;
-                        }, 0);
-                        return vol > 0 ? (
-                            <Badge variant="secondary" className="text-xs">
-                                {formatVolume(vol, weightUnit)}
-                            </Badge>
-                        ) : null;
-                    })()}
                     {trend && (
                         <Badge className={`text-[10px] ${trend.className}`}>
                             {trend.label}

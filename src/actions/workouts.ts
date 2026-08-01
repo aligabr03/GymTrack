@@ -1,22 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
+import { getUserId } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import type { WorkoutMetaSuggestions } from "@/types";
 import { z } from "zod";
 import { estimateOneRM } from "@/lib/calculations";
-
-async function getUserId(): Promise<string> {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Unauthorized");
-    return user.id;
-}
-
 const setSchema = z.object({
+    id: z.string().optional(),
     exerciseId: z.string(),
     setNumber: z.number().int().positive(),
     weightKg: z.number().nonnegative(),
@@ -38,12 +29,13 @@ const workoutSchema = z.object({
 });
 
 export async function createWorkout(data: z.infer<typeof workoutSchema>) {
-    const userId = await getUserId();
+    try {
+        const userId = await getUserId();
 
-    const parsed = workoutSchema.safeParse(data);
-    if (!parsed.success) {
-        return { success: false, error: parsed.error.issues[0].message };
-    }
+        const parsed = workoutSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0].message };
+        }
 
     const workout = await prisma.workout.create({
         data: {
@@ -80,12 +72,17 @@ export async function createWorkout(data: z.infer<typeof workoutSchema>) {
     revalidatePath("/insights");
 
     return { success: true as const, data: workout, newPRs };
+    } catch (err) {
+        console.error("[createWorkout]", err);
+        return { success: false, error: "Failed to save workout" };
+    }
 }
 
 export async function updateWorkout(
     id: string,
     data: z.infer<typeof workoutSchema>,
 ) {
+    try {
     const userId = await getUserId();
 
     // Verify ownership
@@ -108,7 +105,41 @@ export async function updateWorkout(
         return { success: false, error: parsed.error.issues[0].message };
     }
 
-    await prisma.workoutSet.deleteMany({ where: { workoutId: id } });
+    const existingSetIds = existing.sets.map((s) => s.exerciseId);
+    const incomingSetIds = parsed.data.sets.map((s) => s.id).filter(Boolean) as string[];
+
+    // Delete sets that are no longer in the payload
+    if (incomingSetIds.length > 0) {
+        await prisma.workoutSet.deleteMany({
+            where: { workoutId: id, id: { notIn: incomingSetIds } },
+        });
+    }
+
+    // Update existing sets and create new ones
+    const setOps = parsed.data.sets.map((s) => {
+        const setData = {
+            exerciseId: s.exerciseId,
+            setNumber: s.setNumber,
+            weightKg: s.weightKg,
+            reps: s.reps,
+            formRating: s.formRating,
+            rpe: s.rpe,
+            notes: s.notes,
+            isDropset: s.isDropset,
+            supersetId: s.supersetId,
+        };
+        if (s.id) {
+            return prisma.workoutSet.update({
+                where: { id: s.id },
+                data: setData,
+            });
+        }
+        return prisma.workoutSet.create({
+            data: { ...setData, workoutId: id },
+        });
+    });
+
+    await Promise.all(setOps);
 
     const workout = await prisma.workout.update({
         where: { id },
@@ -118,25 +149,12 @@ export async function updateWorkout(
             name: parsed.data.name,
             notes: parsed.data.notes,
             durationMins: parsed.data.durationMins,
-            sets: {
-                create: parsed.data.sets.map((s) => ({
-                    exerciseId: s.exerciseId,
-                    setNumber: s.setNumber,
-                    weightKg: s.weightKg,
-                    reps: s.reps,
-                    formRating: s.formRating,
-                    rpe: s.rpe,
-                    notes: s.notes,
-                    isDropset: s.isDropset,
-                    supersetId: s.supersetId,
-                })),
-            },
         },
         include: { sets: true },
     });
 
     const newPRs = await syncPersonalRecordsForExercises(userId, [
-        ...existing.sets.map((set) => set.exerciseId),
+        ...existingSetIds,
         ...parsed.data.sets.map((set) => set.exerciseId),
     ]);
 
@@ -146,9 +164,14 @@ export async function updateWorkout(
     revalidatePath("/insights");
 
     return { success: true as const, data: workout, newPRs };
+    } catch (err) {
+        console.error("[updateWorkout]", err);
+        return { success: false, error: "Failed to update workout" };
+    }
 }
 
 export async function deleteWorkout(id: string) {
+    try {
     const userId = await getUserId();
 
     const existing = await prisma.workout.findUnique({
@@ -177,6 +200,10 @@ export async function deleteWorkout(id: string) {
     revalidatePath("/insights");
 
     return { success: true };
+    } catch (err) {
+        console.error("[deleteWorkout]", err);
+        return { success: false, error: "Failed to delete workout" };
+    }
 }
 
 export async function getWorkouts(limit?: number) {
@@ -458,7 +485,7 @@ async function syncPersonalRecordsForExercises(
             if (set.weightKg == null || set.reps == null) continue;
             exerciseName = set.exercise.name;
             const estimatedOneRM = estimateOneRM(set.weightKg, set.reps);
-            if (!best || estimatedOneRM > best.estimatedOneRM) {
+            if (!best || estimatedOneRM > best.estimatedOneRM || (estimatedOneRM === best.estimatedOneRM && set.workout.date > best.achievedAt)) {
                 best = {
                     weightKg: set.weightKg,
                     reps: set.reps,

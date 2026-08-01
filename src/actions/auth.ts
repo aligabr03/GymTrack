@@ -46,7 +46,7 @@ export async function register(formData: FormData) {
         return { error: parsed.error.issues[0].message };
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
         email: parsed.data.email,
         password: parsed.data.password,
         options: {
@@ -55,6 +55,10 @@ export async function register(formData: FormData) {
     });
 
     if (error) return { error: error.message };
+
+    if (!data.session) {
+        return { success: true as const, message: "Account created. Please check your email to confirm your account." };
+    }
 
     redirect("/dashboard");
 }
@@ -74,6 +78,30 @@ export async function resetPassword(formData: FormData) {
     if (error) return { error: error.message };
 
     return { success: true, message: "Password reset email sent." };
+}
+
+const updatePasswordSchema = z.object({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export async function updatePassword(formData: FormData) {
+    const supabase = await createClient();
+
+    const parsed = updatePasswordSchema.safeParse({
+        password: formData.get("password"),
+    });
+
+    if (!parsed.success) {
+        return { error: parsed.error.issues[0].message };
+    }
+
+    const { error } = await supabase.auth.updateUser({
+        password: parsed.data.password,
+    });
+
+    if (error) return { error: error.message };
+
+    redirect("/auth/login");
 }
 
 export async function logout() {

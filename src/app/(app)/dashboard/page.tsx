@@ -2,7 +2,7 @@ import { getDashboardStats } from "@/actions/insights";
 import { getMyWeightUnit, getMyBodyWeightUnit } from "@/actions/social";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate, formatRelativeDate } from "@/lib/utils";
-import { calculateVolume, formatVolume, formatWeight, kgToLbs } from "@/lib/calculations";
+import { calculateVolume, formatVolume, formatWeight } from "@/lib/calculations";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -188,13 +188,12 @@ export default async function DashboardPage() {
                                                     {pr.exercise.name}
                                                 </p>
                                                 <p className="text-xs text-[var(--muted-foreground)]">
-                                                    {weightUnit === "LBS" ? kgToLbs(pr.weightKg) : pr.weightKg} {weightUnit === "LBS" ? "lbs" : "kg"} &times;{" "}
+                                                    {formatWeight(pr.weightKg, weightUnit)} &times;{" "}
                                                     {pr.reps} reps
                                                 </p>
                                             </div>
                                             <p className="text-sm font-bold tabular-nums shrink-0">
-                                                {weightUnit === "LBS" ? kgToLbs(pr.estimatedOneRM) : pr.estimatedOneRM.toFixed(1)}{" "}
-                                                {weightUnit === "LBS" ? "lbs" : "kg"}
+                                                {formatWeight(pr.estimatedOneRM, weightUnit)}
                                             </p>
                                         </div>
                                     ))}

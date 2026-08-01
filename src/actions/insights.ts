@@ -2,18 +2,8 @@
 
 import { createHash } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
-import { getWeekBoundaries, kgToLbs } from "@/lib/calculations";
-
-async function getUserId(): Promise<string> {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Unauthorized");
-    return user.id;
-}
-
+import { getUserId } from "@/lib/auth";
+import { estimateOneRM, kgToLbs } from "@/lib/calculations";
 export async function getDashboardStats() {
     const userId = await getUserId();
     const now = new Date();
@@ -91,36 +81,6 @@ export async function getProgressionData(exerciseId: string, seasonId?: string |
     }));
 }
 
-export async function getVolumeByWeek(weeks = 12) {
-    const userId = await getUserId();
-    const boundaries = getWeekBoundaries(weeks);
-
-    const result = await Promise.all(
-        boundaries.map(async ({ start, end }) => {
-            const sets = await prisma.workoutSet.findMany({
-                where: {
-                    workout: { userId, date: { gte: start, lte: end } },
-                    weightKg: { not: null },
-                    reps: { not: null },
-                },
-            });
-
-            const volume = sets.reduce((sum, s) => {
-                if (!s.weightKg || !s.reps) return sum;
-                return sum + s.weightKg * s.reps;
-            }, 0);
-
-            return {
-                week: start.toISOString().split("T")[0],
-                volume: Math.round(volume),
-                sets: sets.length,
-            };
-        }),
-    );
-
-    return result;
-}
-
 export async function getPersonalRecords() {
     const userId = await getUserId();
 
@@ -131,7 +91,7 @@ export async function getPersonalRecords() {
     });
 }
 
-export async function getMuscleGroupVolume(days = 30) {
+export async function getMuscleGroupSets(days = 30) {
     const userId = await getUserId();
     const since = new Date();
     since.setDate(since.getDate() - days);
@@ -162,12 +122,17 @@ export async function getLoggedExercises(seasonId?: string | null) {
                 ...(seasonId != null ? { seasonId } : {}),
             },
         },
-        select: { exercise: true },
+        select: { exerciseId: true },
         distinct: ["exerciseId"],
-        orderBy: { exercise: { name: "asc" } },
     });
 
-    return rows.map((r) => r.exercise);
+    const ids = rows.map((r) => r.exerciseId);
+    if (ids.length === 0) return [];
+
+    return prisma.exercise.findMany({
+        where: { id: { in: ids } },
+        orderBy: { name: "asc" },
+    });
 }
 
 export async function getWorkoutCalendar(year: number, targetUserId?: string) {
@@ -196,14 +161,22 @@ export async function getWorkoutCalendar(year: number, targetUserId?: string) {
 
 type InsightSnapshot = {
     weeklyWorkouts: number[];
+    weeklyWorkoutTrend: "increasing" | "decreasing" | "stable";
+    avgWorkoutsPerWeek: number;
     topExercises: {
         exercise: string;
         sessions: number;
         est1RM_recent: number | null;
         est1RM_prev: number | null;
+        delta: number | null;
     }[];
     muscleBalance: Record<string, number>;
-    bodyWeight: { current: number | null; previous: number | null } | null;
+    underTrainedGroups: string[];
+    bodyWeight: {
+        current: number | null;
+        previous: number | null;
+        delta: number | null;
+    } | null;
     recentPRs: string[];
 };
 
@@ -252,7 +225,7 @@ async function buildInsightSnapshot(
         {};
     for (const s of sets) {
         if (!s.weightKg || !s.reps) continue;
-        const rm = Math.round(s.weightKg * (1 + s.reps / 30));
+        const rm = estimateOneRM(s.weightKg, s.reps);
         const day = s.workout.date.toISOString().slice(0, 10);
         if (!byEx[s.exerciseId])
             byEx[s.exerciseId] = { name: s.exercise.name, days: new Map() };
@@ -327,8 +300,45 @@ async function buildInsightSnapshot(
     });
     const bodyWeight =
         bm.length >= 1
-            ? { current: bm[0].weightKg, previous: bm[1]?.weightKg ?? null }
+            ? {
+                  current: bm[0].weightKg,
+                  previous: bm[1]?.weightKg ?? null,
+                  delta:
+                      bm[0].weightKg != null && bm[1]?.weightKg != null
+                          ? Math.round((bm[0].weightKg - bm[1].weightKg) * 10) / 10
+                          : null,
+              }
             : null;
+
+    // Computed trends
+    const firstHalf = weeklyWorkouts.slice(0, 4);
+    const secondHalf = weeklyWorkouts.slice(4, 8);
+    const firstAvg =
+        firstHalf.reduce((s, v) => s + v, 0) / (firstHalf.length || 1);
+    const secondAvg =
+        secondHalf.reduce((s, v) => s + v, 0) / (secondHalf.length || 1);
+    const weeklyWorkoutTrend: "increasing" | "decreasing" | "stable" =
+        secondAvg - firstAvg > 0.5
+            ? "increasing"
+            : firstAvg - secondAvg > 0.5
+              ? "decreasing"
+              : "stable";
+    const avgWorkoutsPerWeek = Math.round(
+        (weeklyWorkouts.reduce((s, v) => s + v, 0) / weeklyWorkouts.length) *
+            10,
+    ) / 10;
+
+    const exercisesWithDelta = topExercises.map((e) => ({
+        ...e,
+        delta:
+            e.est1RM_recent != null && e.est1RM_prev != null
+                ? Math.round((e.est1RM_recent - e.est1RM_prev) * 10) / 10
+                : null,
+    }));
+
+    const underTrainedGroups = Object.entries(muscleBalance)
+        .filter(([, pct]) => pct < 15)
+        .map(([group]) => group);
 
     // Recent PRs
     const prs = await prisma.personalRecord.findMany({
@@ -349,8 +359,11 @@ async function buildInsightSnapshot(
 
     return {
         weeklyWorkouts,
-        topExercises,
+        weeklyWorkoutTrend,
+        avgWorkoutsPerWeek,
+        topExercises: exercisesWithDelta,
         muscleBalance,
+        underTrainedGroups,
         bodyWeight,
         recentPRs,
     };
@@ -364,6 +377,8 @@ async function callOpenAI(
     const key = process.env.OPENAI_API_KEY;
     if (!key) throw new Error("OPENAI_API_KEY not configured");
 
+    const unit = weightUnit === "LBS" ? "lbs" : "kg";
+
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -376,7 +391,12 @@ async function callOpenAI(
                 {
                     role: "system",
                     content:
-                        `You are a fitness coach giving a brief snapshot. Output exactly 4 brief bullet points starting with •. Cover important tips given the data and what you think is important, comment on progression and give tips if needed. Use exact numbers only, all weights are in ${weightUnit === "LBS" ? "lbs" : "kg"}. No filler.`,
+                        `You are a concise, no-nonsense strength coach. Output exactly 4 bullet points starting with \u2022. Use these sections:\n` +
+                        `1. Consistency — comment on weekly workout frequency. Is it increasing, decreasing, or stable? Note the avg per week.\n` +
+                        `2. Strength — call out the 1-2 exercises with the biggest improvement or decline using the exact delta numbers. Highlight recent PRs.\n` +
+                        `3. Balance — flag any muscle groups getting under 15% of total volume. Mention if a certain group is dominating.\n` +
+                        `4. Advice — give ONE specific, actionable recommendation based on the data (e.g. add a second leg day, increase frequency, push for a new PR on a specific lift).\n\n` +
+                        `Rules: Use exact numbers only. All weights are in ${unit}. Be direct and specific — name exercises, percentages, and deltas. No filler, no congratulations, no motivational fluff. Keep each bullet to 1-2 sentences.`,
                 },
                 {
                     role: "user",
@@ -385,7 +405,7 @@ async function callOpenAI(
                         : JSON.stringify(snapshot),
                 },
             ],
-            max_tokens: 200,
+            max_tokens: 600,
             temperature: 0.3,
         }),
     });
@@ -405,55 +425,17 @@ export async function getAiInsight(): Promise<{
     analysis: string;
     updatedAt: string;
 } | null> {
-    try {
-        const userId = await getUserId();
-        const profile = await prisma.userProfile.findUnique({ where: { userId }, select: { weightUnit: true } });
-        const weightUnit: "KG" | "LBS" = profile?.weightUnit === "LBS" ? "LBS" : "KG";
-        const snapshot = await buildInsightSnapshot(userId, weightUnit);
-
-        if (!snapshot) {
-            return {
-                analysis:
-                    "Log at least 3 workouts to unlock your AI training analysis.",
-                updatedAt: new Date().toISOString(),
-            };
-        }
-
-        const hash = createHash("sha256")
-            .update(JSON.stringify(snapshot))
-            .digest("hex")
-            .slice(0, 32);
-
-        // Return cached result if data hasn't changed
-        const cached = await prisma.aiInsight.findUnique({
-            where: { userId },
-        });
-        if (cached?.dataHash === hash) {
-            return {
-                analysis: cached.analysis,
-                updatedAt: cached.updatedAt.toISOString(),
-            };
-        }
-
-        const analysis = await callOpenAI(snapshot, weightUnit);
-
-        const row = await prisma.aiInsight.upsert({
-            where: { userId },
-            update: { dataHash: hash, analysis },
-            create: { userId, dataHash: hash, analysis },
-        });
-
-        return {
-            analysis: row.analysis,
-            updatedAt: row.updatedAt.toISOString(),
-        };
-    } catch (err) {
-        console.error("[getAiInsight]", err);
-        return null;
-    }
+    return resolveInsight();
 }
 
 export async function refreshAiInsight(userContext?: string): Promise<{
+    analysis: string;
+    updatedAt: string;
+} | null> {
+    return resolveInsight(true, userContext);
+}
+
+async function resolveInsight(force = false, userContext?: string): Promise<{
     analysis: string;
     updatedAt: string;
 } | null> {
@@ -476,6 +458,18 @@ export async function refreshAiInsight(userContext?: string): Promise<{
             .digest("hex")
             .slice(0, 32);
 
+        if (!force) {
+            const cached = await prisma.aiInsight.findUnique({
+                where: { userId },
+            });
+            if (cached?.dataHash === hash) {
+                return {
+                    analysis: cached.analysis,
+                    updatedAt: cached.updatedAt.toISOString(),
+                };
+            }
+        }
+
         const analysis = await callOpenAI(snapshot, weightUnit, userContext);
 
         const row = await prisma.aiInsight.upsert({
@@ -489,7 +483,7 @@ export async function refreshAiInsight(userContext?: string): Promise<{
             updatedAt: row.updatedAt.toISOString(),
         };
     } catch (err) {
-        console.error("[refreshAiInsight]", err);
+        console.error("[resolveInsight]", err);
         return null;
     }
 }

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExportDataButton } from "@/components/profile/export-data-button";
+import { AlertCircle } from "lucide-react";
 
 export default function EditProfilePage() {
     const router = useRouter();
@@ -19,6 +20,7 @@ export default function EditProfilePage() {
     const [userId, setUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         getMyProfile().then((p) => {
@@ -35,9 +37,17 @@ export default function EditProfilePage() {
 
     async function handleSave() {
         setSaving(true);
-        await updateProfile({ displayName: displayName.trim(), bio: bio.trim() || undefined, weightUnit, bodyWeightUnit });
-        if (userId) router.push(`/profile/${userId}`);
-        setSaving(false);
+        setError(null);
+        try {
+            const result = await updateProfile({ displayName: displayName.trim(), bio: bio.trim() || undefined, weightUnit, bodyWeightUnit });
+            if ("error" in result && result.error) {
+                setError(result.error);
+                return;
+            }
+            if (userId) router.push(`/profile/${userId}`);
+        } finally {
+            setSaving(false);
+        }
     }
 
     if (loading) {
@@ -116,6 +126,12 @@ export default function EditProfilePage() {
                             </Button>
                         </div>
                     </div>
+                    {error && (
+                        <div className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                            <AlertCircle className="h-4 w-4 shrink-0" />
+                            {error}
+                        </div>
+                    )}
                     <Button
                         onClick={handleSave}
                         disabled={saving || !displayName.trim()}

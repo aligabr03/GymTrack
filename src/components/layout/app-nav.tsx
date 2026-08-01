@@ -335,17 +335,17 @@ export function AppNav({ user }: { user: User }) {
                                     <Link
                                         href={`/profile/${user.id}`}
                                         onClick={() => setProfileOpen(false)}
-                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                        className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
                                     >
-                                        <UserCircle className="h-4 w-4" />
+                                        <UserCircle className="h-4 w-4 shrink-0" />
                                         View profile
                                     </Link>
                                     <Link
                                         href="/seasons"
                                         onClick={() => setProfileOpen(false)}
-                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                        className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
                                     >
-                                        <CalendarDays className="h-4 w-4" />
+                                        <CalendarDays className="h-4 w-4 shrink-0" />
                                         Seasons
                                     </Link>
                                     <button
@@ -353,23 +353,21 @@ export function AppNav({ user }: { user: User }) {
                                             toggleTheme();
                                             setProfileOpen(false);
                                         }}
-                                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                        className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
                                     >
                                         {theme === "dark" ? (
-                                            <Sun className="h-4 w-4" />
+                                            <Sun className="h-4 w-4 shrink-0" />
                                         ) : (
-                                            <Moon className="h-4 w-4" />
+                                            <Moon className="h-4 w-4 shrink-0" />
                                         )}
-                                        {theme === "dark"
-                                            ? "Light mode"
-                                            : "Dark mode"}
+                                        Toggle theme
                                     </button>
                                     <form action={logout}>
                                         <button
                                             type="submit"
-                                            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                            className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-destructive/10 hover:text-destructive transition-colors"
                                         >
-                                            <LogOut className="h-4 w-4" />
+                                            <LogOut className="h-4 w-4 shrink-0" />
                                             Sign out
                                         </button>
                                     </form>

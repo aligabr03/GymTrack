@@ -1,7 +1,7 @@
 // ── GymTrack Service Worker ──
 // Provides offline shell + cache-first strategy for app-like experience
 
-const CACHE_NAME = "gymtrack-v1";
+const CACHE_NAME = "gymtrack-v2";
 const OFFLINE_URL = "/dashboard";
 
 // Assets to pre-cache for instant offline shell

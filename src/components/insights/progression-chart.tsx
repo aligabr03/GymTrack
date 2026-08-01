@@ -53,9 +53,11 @@ export function ProgressionChart({ exercises, weightUnit = "KG", seasons = [] }:
             ? exercises
             : exercises.filter((exercise) => exercise.category === category);
 
-    // Auto-load the first exercise on mount
+    // Re-load on category or season change, keeping the current selection if valid
     useEffect(() => {
-        if (filteredExercises[0]?.id) load(filteredExercises[0].id);
+        const stillInList = filteredExercises.some((ex) => ex.id === selected);
+        const exerciseId = stillInList ? selected : filteredExercises[0]?.id;
+        if (exerciseId) load(exerciseId);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [category, seasonFilter]);
 
