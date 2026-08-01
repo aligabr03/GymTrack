@@ -58,14 +58,26 @@ export async function deleteExercise(id: string) {
             return { success: false, error: "Cannot delete this exercise" };
         }
 
-        const usedInWorkout = await prisma.workoutSet.findFirst({
-            where: { exerciseId: id },
-            select: { id: true },
-        });
+        const [usedInWorkout, usedInTemplate] = await Promise.all([
+            prisma.workoutSet.findFirst({
+                where: { exerciseId: id },
+                select: { id: true },
+            }),
+            prisma.templateExercise.findFirst({
+                where: { exerciseId: id },
+                select: { id: true },
+            }),
+        ]);
         if (usedInWorkout) {
             return {
                 success: false,
                 error: `"${exercise.name}" is used in one or more workouts and cannot be deleted.`,
+            };
+        }
+        if (usedInTemplate) {
+            return {
+                success: false,
+                error: `"${exercise.name}" is used in one or more workout templates and cannot be deleted.`,
             };
         }
 

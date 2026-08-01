@@ -16,8 +16,6 @@ import {
     Trash2,
     Loader2,
     Scale,
-    ChevronDown,
-    ChevronUp,
 } from "lucide-react";
 
 type FormData = {
@@ -79,6 +77,31 @@ export function BodyMetricsLogger({ metrics, weightUnit = "KG" }: { metrics: Bod
         if (!hasData) {
             toast({
                 title: "Enter at least one measurement",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        const invalidMeasurement = [
+            { label: "Weight", value: data.weightKg, min: 0 },
+            { label: "Body fat", value: data.bodyFatPct, min: 1, max: 60 },
+            { label: "Waist", value: data.waistCm, min: 0 },
+            { label: "Hip", value: data.hipCm, min: 0 },
+            { label: "Chest", value: data.chestCm, min: 0 },
+            { label: "Arm", value: data.armCm, min: 0 },
+        ].find(
+            (f) =>
+                f.value != null &&
+                (f.value <= f.min || (f.max != null && f.value > f.max)),
+        );
+
+        if (invalidMeasurement) {
+            toast({
+                title: `${invalidMeasurement.label} must be ${
+                    invalidMeasurement.max != null
+                        ? `between ${invalidMeasurement.min} and ${invalidMeasurement.max}`
+                        : `greater than ${invalidMeasurement.min}`
+                }`,
                 variant: "destructive",
             });
             return;
@@ -163,7 +186,7 @@ export function BodyMetricsLogger({ metrics, weightUnit = "KG" }: { metrics: Bod
                                         onChange={field("bodyFatPct")}
                                         step={0.1}
                                         min={1}
-                                        max={70}
+                                        max={60}
                                     />
                                 </div>
                                 <div className="space-y-2">

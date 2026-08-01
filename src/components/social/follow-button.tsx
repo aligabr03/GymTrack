@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { followUser, unfollowUser } from "@/actions/social";
+import { toast } from "@/components/ui/use-toast";
 
 export function FollowButton({
     targetUserId,
@@ -16,13 +17,17 @@ export function FollowButton({
 
     function toggle() {
         startTransition(async () => {
-            if (isFollowing) {
-                await unfollowUser(targetUserId);
-                setIsFollowing(false);
-            } else {
-                await followUser(targetUserId);
-                setIsFollowing(true);
+            const result = isFollowing
+                ? await unfollowUser(targetUserId)
+                : await followUser(targetUserId);
+            if (!result.success) {
+                toast({
+                    title: result.error ?? "Action failed",
+                    variant: "destructive",
+                });
+                return;
             }
+            setIsFollowing(!isFollowing);
         });
     }
 

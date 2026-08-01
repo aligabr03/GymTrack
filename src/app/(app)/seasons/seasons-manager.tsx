@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { Plus, Pencil, Trash2, Loader2, CalendarDays, Dumbbell } from "lucide-react";
-import { toESTDateStr, formatDate } from "@/lib/utils";
+import { toESTDateStr, toStoredDateStr, formatDate } from "@/lib/utils";
 
 type SeasonWithCount = Season & { _count: { workouts: number } };
 
@@ -47,8 +47,8 @@ export function SeasonsManager({
         setEditingSeason(season);
         setName(season.name);
         setDescription(season.description ?? "");
-        setStartDate(toESTDateStr(season.startDate));
-        setEndDate(season.endDate ? toESTDateStr(season.endDate) : "");
+        setStartDate(toStoredDateStr(season.startDate));
+        setEndDate(season.endDate ? toStoredDateStr(season.endDate) : "");
         setDialogOpen(true);
     }
 
