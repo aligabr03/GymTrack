@@ -11,7 +11,7 @@ export async function AiInsightSection() {
             <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                     <span>AI Training Analysis</span>
-                    <span className="text-[10px] font-normal px-1.5 py-0.5 rounded-md bg-[var(--secondary)] text-[var(--muted-foreground)] tracking-wide uppercase">
+                    <span className="text-[10px] font-normal px-1.5 py-0.5 rounded-md bg-white/[0.08] text-[var(--muted-foreground)] tracking-wide uppercase">
                         GPT-4o mini
                     </span>
                 </CardTitle>

@@ -76,7 +76,7 @@ export default async function FeedPage() {
 
             {feed.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center py-24 gap-4">
-                    <div className="p-5 rounded-full bg-[var(--secondary)]">
+                    <div className="p-5 rounded-full bg-white/[0.06]">
                         <Dumbbell className="h-10 w-10 text-[var(--muted-foreground)]" />
                     </div>
                     <div>
@@ -100,7 +100,7 @@ export default async function FeedPage() {
                                     </span>
                                     <div className="h-px flex-1 bg-[var(--border)]" />
                                 </div>
-                                <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                                <div className="glass rounded-2xl divide-y divide-[var(--border)] overflow-hidden">
                                     {grouped[group].map(
                                         ({ workout, profile }, index) => {
                                             const volume = calculateVolume(
@@ -112,7 +112,7 @@ export default async function FeedPage() {
                                                     href={`/profile/${profile.userId}/workouts/${workout.id}`}
                                                     prefetch={true}
                                                     draggable={false}
-                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--muted)] transition-colors"
+                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors"
                                                 >
                                                     <Avatar className="h-8 w-8 shrink-0">
                                                         <AvatarFallback className="text-xs bg-[var(--secondary)]">

@@ -301,10 +301,10 @@ export function ExerciseLibrary({
                                     <span className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[var(--muted-foreground)]">
                                         {cat}
                                     </span>
-                                    <span className="inline-flex items-center justify-center h-4 min-w-4 px-1.5 rounded-full bg-[var(--secondary)] text-[10px] tabular-nums text-[var(--muted-foreground)]">
+                                    <span className="inline-flex items-center justify-center h-4 min-w-4 px-1.5 rounded-full bg-white/[0.06] text-[10px] tabular-nums text-[var(--muted-foreground)]">
                                         {exs.length}
                                     </span>
-                                    <div className="h-px flex-1 bg-gradient-to-r from-[var(--border)] to-transparent" />
+                                    <div className="h-px flex-1 bg-gradient-to-r from-[var(--border-light)] to-transparent" />
                                 </div>
 
                                 {/* Cards */}
@@ -312,14 +312,14 @@ export function ExerciseLibrary({
                                     {exs.map((ex) => (
                                         <div
                                             key={ex.id}
-                                            className="group relative flex flex-col rounded-2xl border border-border/50 bg-card hover:bg-secondary/40 hover:border-border hover:shadow-lg hover:shadow-black/20 p-3.5 gap-2 transition-all duration-200"
+                                            className="group relative flex flex-col rounded-2xl border border-[var(--border-light)] glass hover:border-[var(--border-glow)] hover:shadow-[var(--glow-subtle)] p-3.5 gap-2 transition-all duration-200"
                                         >
                                             {/* Custom exercise actions */}
                                             {ex.isCustom && (
                                                 <div className="absolute top-2 right-2 flex items-center gap-0.5 z-10">
                                                     <button
                                                         onClick={() => openEdit(ex)}
-                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-secondary/50 transition-colors"
+                                                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/[0.06] transition-colors"
                                                         aria-label="Edit exercise"
                                                     >
                                                         <Pencil className="h-3 w-3" />
@@ -346,13 +346,13 @@ export function ExerciseLibrary({
                                                 {ex.muscleGroups.slice(0, 3).map((m) => (
                                                     <span
                                                         key={m}
-                                                        className="inline-block px-1.5 py-0.5 rounded-md bg-secondary border border-border/30 text-[10px] text-[var(--muted-foreground)] leading-none"
+                                                        className="inline-block px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-[var(--border-light)] text-[10px] text-[var(--muted-foreground)] leading-none"
                                                     >
                                                         {m}
                                                     </span>
                                                 ))}
                                                 {ex.muscleGroups.length > 3 && (
-                                                    <span className="inline-block px-1.5 py-0.5 rounded-md bg-secondary border border-border/30 text-[10px] text-[var(--muted-foreground)] leading-none">
+                                                    <span className="inline-block px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-[var(--border-light)] text-[10px] text-[var(--muted-foreground)] leading-none">
                                                         +{ex.muscleGroups.length - 3}
                                                     </span>
                                                 )}
@@ -360,9 +360,9 @@ export function ExerciseLibrary({
 
                                             {/* Best set */}
                                             {bestWeights[ex.id] && (
-                                                <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-border/50">
-                                                    <span className="text-primary text-[10px] drop-shadow-[0_0_4px_var(--primary)]">★</span>
-                                                    <span className="text-[11px] font-medium text-primary tabular-nums">
+                                                <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-[var(--border-light)]">
+                                                    <span className="text-[var(--foreground)] text-[10px]">★</span>
+                                                    <span className="text-[11px] font-medium text-[var(--foreground)] tabular-nums">
                                                         {weightUnit === "LBS" ? kgToLbs(bestWeights[ex.id]!.weightKg) : bestWeights[ex.id]!.weightKg} {weightUnit === "LBS" ? "lbs" : "kg"} × {bestWeights[ex.id]!.reps}
                                                     </span>
                                                 </div>

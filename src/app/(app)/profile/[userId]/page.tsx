@@ -140,7 +140,7 @@ export default async function ProfilePage({
                         No workouts logged yet.
                     </p>
                 ) : (
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                    <div className="glass rounded-2xl divide-y divide-[var(--border)] overflow-hidden">
                         {profile.workouts.map((workout) => {
                             const volume = calculateVolume(workout.sets);
                             const exercises = [
@@ -161,7 +161,7 @@ export default async function ProfilePage({
                                 <Link
                                     key={workout.id}
                                     href={href}
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--muted)] transition-colors"
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors"
                                 >
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-medium truncate">

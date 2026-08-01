@@ -250,7 +250,7 @@ export function BodyMetricsLogger({ metrics, weightUnit = "KG" }: { metrics: Bod
 
             {/* History table */}
             {metrics.length === 0 ? (
-                <div className="text-center py-16 text-[var(--muted-foreground)]">
+                <div className="glass rounded-2xl text-center py-16 text-[var(--muted-foreground)]">
                     <Scale className="h-12 w-12 mx-auto mb-4 opacity-30" />
                     <p>No body metrics logged yet.</p>
                 </div>

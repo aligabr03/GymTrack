@@ -57,7 +57,7 @@ export default async function InsightsPage() {
     return (
         <div className="space-y-6">
             <div className="hidden md:flex items-center gap-3 animate-fade-in">
-                <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                <div className="p-2.5 rounded-lg bg-white/[0.06]">
                     <TrendingUp className="h-6 w-6 text-[var(--foreground)]" />
                 </div>
                 <div>

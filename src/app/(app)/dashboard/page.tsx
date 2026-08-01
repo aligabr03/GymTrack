@@ -13,7 +13,7 @@ import {
     Plus,
     ChevronRight,
     Flame,
-    LayoutDashboard,
+    Sparkles,
 } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -28,11 +28,11 @@ export default async function DashboardPage() {
             {/* Header */}
             <div className="hidden md:flex items-center justify-between animate-fade-in">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
-                        <LayoutDashboard className="h-6 w-6 text-[var(--foreground)]" />
+                    <div className="p-2.5 rounded-xl glass glow-subtle">
+                        <Sparkles className="h-6 w-6 text-[var(--foreground)]" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold">Dashboard</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
                         <p className="text-sm text-[var(--muted-foreground)]">
                             {new Date().toLocaleDateString("en-US", {
                                 weekday: "long",
@@ -52,29 +52,23 @@ export default async function DashboardPage() {
             </div>
 
             {/* Stat cards */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-3 animate-stagger">
                 <StatCard
                     icon={Dumbbell}
                     label="Total Workouts"
                     value={stats.totalWorkouts}
-                    iconColor="text-[var(--foreground)]"
-                    iconBg="bg-[var(--secondary)]"
                     index={0}
                 />
                 <StatCard
                     icon={Flame}
                     label="This Week"
                     value={stats.workoutsThisWeek}
-                    iconColor="text-[var(--foreground)]"
-                    iconBg="bg-[var(--secondary)]"
                     index={1}
                 />
                 <StatCard
                     icon={CalendarDays}
                     label="This Month"
                     value={stats.workoutsThisMonth}
-                    iconColor="text-[var(--foreground)]"
-                    iconBg="bg-[var(--secondary)]"
                     index={2}
                 />
             </div>
@@ -103,7 +97,7 @@ export default async function DashboardPage() {
                             cta="Log your first workout"
                         />
                     ) : (
-                        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                        <div className="rounded-2xl border border-[var(--border-light)] glass divide-y divide-[var(--border-light)] overflow-hidden">
                             {stats.recentWorkouts.map((workout) => {
                                 const volume = calculateVolume(workout.sets);
                                 const exercises = [
@@ -125,7 +119,7 @@ export default async function DashboardPage() {
                                     <Link
                                         key={workout.id}
                                         href={`/workouts/${workout.id}`}
-                                        className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40"
+                                        className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-white/[0.04]"
                                     >
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 min-w-0">
@@ -176,8 +170,8 @@ export default async function DashboardPage() {
                                 cta="Log a workout"
                             />
                         ) : (
-                            <Card>
-                                <CardContent className="p-4 divide-y divide-[var(--border)]">
+                            <Card className="glow-subtle">
+                                <CardContent className="p-4 divide-y divide-[var(--border-light)]">
                                     {stats.personalRecords.map((pr) => (
                                         <div
                                             key={pr.id}
@@ -225,7 +219,7 @@ export default async function DashboardPage() {
                                 cta="Log metrics"
                             />
                         ) : (
-                            <Card>
+                            <Card className="glow-subtle">
                                 <CardContent className="p-4 space-y-3">
                                     <p className="text-xs text-[var(--muted-foreground)]">
                                         {formatDate(stats.latestMetric.date)}
@@ -270,28 +264,24 @@ function StatCard({
     icon: Icon,
     label,
     value,
-    iconColor,
-    iconBg,
     index = 0,
 }: {
     icon: React.ComponentType<{ className?: string }>;
     label: string;
     value: number;
-    iconColor: string;
-    iconBg: string;
     index?: number;
 }) {
     return (
         <Card
-            className="animate-fade-in-up"
+            className="animate-fade-in-up glow-hover"
             style={{ animationDelay: `${index * 80}ms` }}
         >
             <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                <div className={`p-2.5 rounded-xl ${iconBg}`}>
-                    <Icon className={`h-5 w-5 ${iconColor}`} />
+                <div className="p-2.5 rounded-xl glass">
+                    <Icon className="h-5 w-5 text-[var(--foreground)]" />
                 </div>
-                <p className="text-2xl font-bold">{value}</p>
-                <p className="text-[10px] text-[var(--muted-foreground)] leading-tight">
+                <p className="text-3xl font-bold tabular-nums">{value}</p>
+                <p className="text-[10px] text-[var(--muted-foreground)] leading-tight uppercase tracking-wider">
                     {label}
                 </p>
             </CardContent>
@@ -322,9 +312,9 @@ function EmptyCard({
     cta: string;
 }) {
     return (
-        <Card>
+        <Card className="glow-subtle">
             <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                <div className="p-3 rounded-full bg-[var(--secondary)]">
+                <div className="p-3 rounded-full glass">
                     <Icon className="h-5 w-5 text-[var(--muted-foreground)]" />
                 </div>
                 <div>

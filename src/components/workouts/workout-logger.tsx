@@ -846,7 +846,7 @@ export function WorkoutLogger({
 
             {/* Stats bar */}
             {groups.length > 0 && (
-                <div className="flex items-center gap-6 px-1 text-sm text-[var(--muted-foreground)]">
+                <div className="flex items-center gap-6 px-4 py-2.5 rounded-xl glass glow-subtle text-sm text-[var(--muted-foreground)]">
                     <span>
                         <strong className="text-[var(--foreground)]">
                             {groups.length}
@@ -950,13 +950,13 @@ export function WorkoutLogger({
                     ) : (
                         <div key={item.ssId} className="space-y-2">
                             <div className="flex items-center gap-3 px-1">
-                                <div className="h-px flex-1 bg-[var(--border)]" />
+                                <div className="h-px flex-1 bg-[var(--border-light)]" />
                                 <span className="text-[10px] font-bold tracking-widest text-[var(--muted-foreground)] uppercase">
                                     Superset
                                 </span>
-                                <div className="h-px flex-1 bg-[var(--border)]" />
+                                <div className="h-px flex-1 bg-[var(--border-light)]" />
                             </div>
-                            <div className="pl-3 border-l-2 border-[var(--border)] space-y-2">
+                            <div className="pl-3 border-l-2 border-[var(--border-light)] space-y-2">
                                 {item.groups.map((group) => (
                                     <ExerciseGroupCard
                                         key={group.exerciseId}
@@ -1035,7 +1035,7 @@ export function WorkoutLogger({
                     <button
                         type="button"
                         onClick={acceptTemplateSuggestion}
-                        className="flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--secondary)] px-3 py-1 text-xs font-medium text-[var(--foreground)] transition-colors hover:border-[var(--ring)] hover:bg-[var(--accent)]"
+                        className="flex items-center gap-1.5 rounded-full border border-[var(--border-light)] glass px-3 py-1 text-xs font-medium text-[var(--foreground)] transition-colors hover:border-[var(--border-glow)] hover:shadow-[var(--glow-subtle)]"
                     >
                         <Plus className="h-3 w-3" />
                         {nextTemplateExercise.name}
@@ -1098,7 +1098,7 @@ export function WorkoutLogger({
                                     <button
                                         key={ex.id}
                                         onClick={() => addExercise(ex)}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-[var(--secondary)] transition-colors flex items-center justify-between group"
+                                        className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/[0.06] transition-colors flex items-center justify-between group"
                                     >
                                         <div>
                                             <p className="text-sm font-medium">
@@ -1113,7 +1113,7 @@ export function WorkoutLogger({
                                 ))
                             )}
                         </div>
-                        <div className="border-t border-[var(--border)] pt-3 space-y-2">
+                        <div className="border-t border-[var(--border-light)] pt-3 space-y-2">
                             <p className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
                                 Create new exercise
                             </p>
@@ -1164,7 +1164,7 @@ export function WorkoutLogger({
             </Dialog>
 
             {/* Save button */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
+            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border-light)]">
                 <Button
                     variant="outline"
                     onClick={() => {
@@ -1195,19 +1195,19 @@ export function WorkoutLogger({
         {/* PR Celebration Popup */}
         {prCelebration && (
             <Dialog open={true} onOpenChange={(open) => { if (!open) closePrCelebration(); }}>
-                <DialogContent className="overflow-hidden border-primary/50 p-0 md:max-w-sm">
+                <DialogContent className="overflow-hidden border-[var(--border-glow)] p-0 md:max-w-sm">
                     <div className="relative overflow-hidden rounded-xl">
-                        <div className="animate-blue-shimmer p-8 pb-6 text-center relative overflow-hidden">
+                        <div className="relative glass p-8 pb-6 text-center overflow-hidden">
                             <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                                <div className="animate-shine-sweep absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent -skew-x-12" />
+                                <div className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-[glassShimmer_2s_ease-in-out_infinite]" />
                             </div>
                             <div className="relative">
                                 <div className="text-5xl mb-3">🏆</div>
-                                <h2 className="text-2xl font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">New PR!</h2>
-                                <p className="text-blue-100 text-sm mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">Personal Record Achieved</p>
+                                <h2 className="text-2xl font-bold text-[var(--foreground)]">New PR!</h2>
+                                <p className="text-[var(--muted-foreground)] text-sm mt-1">Personal Record Achieved</p>
                             </div>
                         </div>
-                        <div className="bg-[var(--card)] p-5 space-y-3">
+                        <div className="bg-[rgba(18,18,18,0.85)] p-5 space-y-3">
                             <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)]">
                                 {prCelebration.names.length === 1 ? "Exercise" : "Exercises"}
                             </p>
@@ -1250,7 +1250,7 @@ function SuggestionRow({
                     key={item}
                     type="button"
                     onClick={() => onSelect(item)}
-                    className="rounded-full border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-1 text-xs text-[var(--foreground)] transition-colors hover:border-[var(--ring)] hover:bg-[var(--accent)]"
+                    className="rounded-full border border-[var(--border-light)] bg-white/[0.04] backdrop-blur-sm px-2.5 py-1 text-xs text-[var(--foreground)] transition-colors hover:border-[var(--border-glow)] hover:bg-white/[0.08]"
                 >
                     {item}
                 </button>
@@ -1341,7 +1341,7 @@ function ExerciseGroupCard({
                   label: `${weightUnit === "LBS" ? kgToLbs(previousBest.weightKg) : previousBest.weightKg} ${weightUnit === "LBS" ? "lbs" : "kg"} × ${previousBest.reps}`,
                   className:
                       delta == null
-                          ? "border-[var(--border)] bg-[var(--secondary)] text-[var(--muted-foreground)]"
+                          ? "border-[var(--border-light)] bg-white/[0.04] text-[var(--muted-foreground)]"
                           : delta > 0.15
                             ? "border-success/40 bg-success/10 text-success"
                             : delta < -0.15
@@ -1381,7 +1381,7 @@ function ExerciseGroupCard({
                 <div className="flex items-center gap-3 shrink-0">
                     <button
                         onClick={handleViewLastPerf}
-                        className="p-1.5 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
                         title="View last performance"
                     >
                         <History className="h-3.5 w-3.5" />
@@ -1393,7 +1393,7 @@ function ExerciseGroupCard({
                                 e.stopPropagation();
                                 onUnlinkSuperset();
                             }}
-                            className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-[var(--secondary)] text-[var(--foreground)] hover:text-destructive transition-colors"
+                            className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-white/[0.06] text-[var(--foreground)] hover:text-destructive transition-colors"
                             title="Remove from superset"
                         >
                             <Unlink2 className="h-3 w-3" />
@@ -1406,7 +1406,7 @@ function ExerciseGroupCard({
                                     e.stopPropagation();
                                     setSupersetPickerOpen((v) => !v);
                                 }}
-                                className="p-1.5 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                                className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
                                 title="Link as superset"
                             >
                                 <Link2 className="h-3.5 w-3.5" />
@@ -1428,7 +1428,7 @@ function ExerciseGroupCard({
                                             }
                                         }}
                                     />
-                                    <div className="absolute right-0 top-full mt-1 z-50 w-52 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl p-2 space-y-1 animate-scale-in">
+                                    <div className="absolute right-0 top-full mt-1 z-50 w-52 rounded-xl border border-[var(--border-light)] glass p-2 space-y-1 animate-scale-in shadow-[0_8px_40px_rgba(0,0,0,0.7)]">
                                         <p className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] px-2 py-1">
                                             Superset with…
                                         </p>
@@ -1443,7 +1443,7 @@ function ExerciseGroupCard({
                                                         false,
                                                     );
                                                 }}
-                                                className="w-full text-left px-2 py-2 rounded-lg text-sm hover:bg-[var(--secondary)] transition-colors truncate"
+                                                className="w-full text-left px-2 py-2 rounded-lg text-sm hover:bg-white/[0.06] transition-colors truncate"
                                             >
                                                 {g.exerciseName}
                                             </button>
@@ -1475,7 +1475,7 @@ function ExerciseGroupCard({
                             e.stopPropagation();
                             onToggleCollapse();
                         }}
-                        className="p-2 rounded-lg hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                        className="p-2 rounded-lg hover:bg-white/[0.06] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
                         aria-label={
                             group.collapsed
                                 ? "Expand exercise"
@@ -1521,7 +1521,7 @@ function ExerciseGroupCard({
                             variant="ghost"
                             size="sm"
                             onClick={onAddSet}
-                            className="flex-1 border border-dashed border-[var(--border)]"
+                            className="flex-1 border border-dashed border-[var(--border-light)] hover:border-[var(--border-glow)] hover:bg-white/[0.04]"
                         >
                             <Plus className="h-3 w-3" />
                             Add Set
@@ -1530,7 +1530,7 @@ function ExerciseGroupCard({
                             variant="ghost"
                             size="sm"
                             onClick={onAddDropSet}
-                            className="flex-1 border border-dashed border-[var(--border)] text-[var(--muted-foreground)]"
+                            className="flex-1 border border-dashed border-[var(--border-light)] text-[var(--muted-foreground)] hover:border-[var(--border-glow)] hover:bg-white/[0.04]"
                         >
                             <ChevronDown className="h-3 w-3" />
                             Add Drop Set
@@ -1590,7 +1590,7 @@ function ExerciseGroupCard({
                                         : null;
                                 return (
                                     <div key={s.setNumber}>
-                                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 items-center text-sm px-1 py-1 rounded-lg hover:bg-[var(--secondary)]">
+                                        <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 items-center text-sm px-1 py-1 rounded-lg hover:bg-white/[0.04]">
                                             <span>
                                                 {weight != null ? weight : "—"}
                                             </span>
@@ -1616,7 +1616,7 @@ function ExerciseGroupCard({
                                     0,
                                 );
                                 return sessionVolume > 0 ? (
-                                    <div className="pt-2 border-t border-[var(--border)] flex justify-between text-xs">
+                                    <div className="pt-2 border-t border-[var(--border-light)] flex justify-between text-xs">
                                         <span className="text-[var(--muted-foreground)]">Total volume</span>
                                         <span className="font-medium">{formatVolume(sessionVolume, weightUnit)}</span>
                                     </div>
@@ -1655,7 +1655,7 @@ function SetRow({
         <div className="space-y-0.5">
             {/* Single row for all screen sizes */}
             <div
-                className={`grid grid-cols-[1.75rem_1fr_1fr_1fr_auto] gap-1.5 items-center rounded-lg transition-colors ${set.isDropset ? "bg-[var(--secondary)]/60" : ""}`}
+                className={`grid grid-cols-[1.75rem_1fr_1fr_1fr_auto] gap-1.5 items-center rounded-lg transition-colors ${set.isDropset ? "bg-white/[0.04]" : ""}`}
             >
                 <button
                     onClick={onToggleDropset}
@@ -1710,7 +1710,7 @@ function SetRow({
                 <div className="flex items-center gap-0.5">
                     <button
                         onClick={onDuplicate}
-                        className="p-1 rounded hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                        className="p-1 rounded hover:bg-white/[0.06] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
                         aria-label="Duplicate set"
                         title="Duplicate set"
                     >

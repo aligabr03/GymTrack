@@ -1,341 +1,176 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { logout } from "@/actions/auth";
-import type { User } from "@supabase/supabase-js";
-import { cn } from "@/lib/utils";
 import {
-    Dumbbell,
     LayoutDashboard,
     ClipboardList,
     Library,
-    TrendingUp,
     Scale,
-    LogOut,
-    Sun,
-    Moon,
+    TrendingUp,
     Users,
+    Dumbbell,
     UserCircle,
     CalendarDays,
+    Sun,
+    Moon,
+    LogOut,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { usePageTitle } from "@/components/layout/page-title-context";
+import { logout } from "@/actions/auth";
+import { usePageTitle } from "./page-title-context";
+import type { User } from "@supabase/supabase-js";
 
-const navItems = [
-    {
-        href: "/dashboard",
-        icon: LayoutDashboard,
-        label: "Dashboard",
-        mobileLabel: "Home",
-        subtitle: "date",
-    },
-    {
-        href: "/workouts",
-        icon: ClipboardList,
-        label: "Workouts",
-        subtitle: null,
-    },
-    { href: "/exercises", icon: Library, label: "Exercises", subtitle: null },
-    {
-        href: "/body",
-        icon: Scale,
-        label: "Body",
-        subtitle: "Weight, body fat & measurements",
-    },
-    {
-        href: "/insights",
-        icon: TrendingUp,
-        label: "Insights",
-        subtitle: "Training trends & progression",
-    },
-    {
-        href: "/friends",
-        icon: Users,
-        label: "Friends",
-        subtitle: "Activity & people",
-    },
+const NAV_ITEMS = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, mobileLabel: "Home" },
+    { href: "/workouts", label: "Workouts", icon: ClipboardList },
+    { href: "/exercises", label: "Exercises", icon: Library },
+    { href: "/body", label: "Body", icon: Scale },
+    { href: "/insights", label: "Insights", icon: TrendingUp },
+    { href: "/friends", label: "Friends", icon: Users },
 ];
 
-// Bottom tab bar only shows 5 items — the most commonly used
-const mobileNavItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-    { href: "/workouts", icon: ClipboardList, label: "Workouts" },
-    { href: "/exercises", icon: Library, label: "Exercises" },
-    { href: "/insights", icon: TrendingUp, label: "Insights" },
-    { href: "/friends", icon: Users, label: "Friends" },
-];
+const MOBILE_TABS = NAV_ITEMS.filter((item) => item.href !== "/body");
 
-export function AppNav({ user }: { user: User }) {
-    const pathname = usePathname();
-    const [profileOpen, setProfileOpen] = useState(false);
+function useTheme() {
     const [theme, setTheme] = useState<"dark" | "light">("dark");
-    const { title: contextTitle } = usePageTitle();
 
     useEffect(() => {
-        const saved = localStorage.getItem("theme") as "dark" | "light" | null;
-        if (saved) {
-            setTheme(saved);
-            document.documentElement.classList.toggle(
-                "light",
-                saved === "light",
-            );
+        const stored = localStorage.getItem("theme") as "dark" | "light" | null;
+        if (stored) {
+            setTheme(stored);
+            document.documentElement.classList.toggle("light", stored === "light");
         }
     }, []);
 
-    useEffect(() => {
-        // Instant scroll to top on navigation — no animation flash
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
-        setProfileOpen(false);
-    }, [pathname]);
+    const toggle = useCallback(() => {
+        setTheme((prev) => {
+            const next = prev === "dark" ? "light" : "dark";
+            localStorage.setItem("theme", next);
+            document.documentElement.classList.toggle("light", next === "light");
+            return next;
+        });
+    }, []);
 
-    useEffect(() => {
-        if (!profileOpen) return;
+    return { theme, toggle };
+}
 
-        const close = () => setProfileOpen(false);
-        window.addEventListener("scroll", close, true);
-        window.addEventListener("wheel", close, { passive: true });
-        window.addEventListener("touchmove", close, { passive: true });
+export function AppNav({ user }: { user: User }) {
+    const pathname = usePathname();
+    const { title, subtitle } = usePageTitle();
+    const { theme, toggle: toggleTheme } = useTheme();
+    const [profileOpen, setProfileOpen] = useState(false);
 
-        return () => {
-            window.removeEventListener("scroll", close, true);
-            window.removeEventListener("wheel", close);
-            window.removeEventListener("touchmove", close);
-        };
-    }, [profileOpen]);
+    const userName =
+        (user.user_metadata?.name as string | undefined) ??
+        user.email?.split("@")[0] ??
+        "Athlete";
+    const initials = userName
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
 
-    function toggleTheme() {
-        const next = theme === "dark" ? "light" : "dark";
-        setTheme(next);
-        localStorage.setItem("theme", next);
-        document.documentElement.classList.toggle("light", next === "light");
-    }
+    const isActive = (href: string) => {
+        if (href === "/dashboard") return pathname === "/dashboard";
+        return pathname.startsWith(href);
+    };
 
-    // Get current page title from navItems
-    const currentPage = navItems.find(
-        (item) =>
-            pathname === item.href || pathname.startsWith(item.href + "/"),
-    ) as ((typeof navItems)[0] & { mobileLabel?: string }) | undefined;
-    const currentPageTitle =
-        currentPage?.mobileLabel ?? currentPage?.label ?? contextTitle ?? "GymTrack";
-    const currentPageSubtitle =
-        currentPage?.subtitle === "date"
-            ? new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  month: "short",
-                  day: "numeric",
-              })
-            : (currentPage?.subtitle ?? null);
+    const getPageTitle = () => {
+        if (title) return title;
+        for (const item of NAV_ITEMS) {
+            if (isActive(item.href)) return item.label;
+        }
+        return "GymTrack";
+    };
 
-    const initials =
-        (user.user_metadata?.name as string | undefined)
-            ?.split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2) ??
-        user.email?.[0]?.toUpperCase() ??
-        "U";
+    const getPageSubtitle = () => subtitle ?? undefined;
 
     return (
         <>
-            {/* ===== DESKTOP: Side navigation ===== */}
-            <aside className="hidden md:flex fixed top-0 left-0 z-40 h-full w-64 flex-col bg-[var(--card)]/80 backdrop-blur-xl border-r border-[var(--border)]">
-                {/* Logo */}
-                <div className="flex items-center gap-2.5 px-5 py-5 border-b border-[var(--border)]">
-                    <div className="p-1.5 rounded-lg bg-[var(--secondary)]">
-                        <Dumbbell className="h-5 w-5 text-[var(--foreground)]" />
-                    </div>
-                    <span className="text-lg font-bold tracking-tight">
-                        GymTrack
-                    </span>
+            {/* Desktop top nav */}
+            <header className="hidden md:flex items-center justify-between h-16 fixed top-0 inset-x-0 z-50 glass-subtle border-b border-[var(--border)]">
+                <div className="flex items-center gap-1 px-4">
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+                    >
+                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
+                            <Dumbbell className="h-4 w-4 text-primary" />
+                        </div>
+                        <span className="text-sm font-semibold tracking-tight">
+                            GymTrack
+                        </span>
+                    </Link>
                 </div>
 
-                {/* Nav links */}
-                <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-                    {navItems.map(({ href, icon: Icon, label }) => {
-                        const active =
-                            pathname === href ||
-                            pathname.startsWith(href + "/");
+                <nav className="flex items-center gap-0.5">
+                    {NAV_ITEMS.map((item) => {
+                        const active = isActive(item.href);
                         return (
                             <Link
-                                key={href}
-                                href={href}
-                                prefetch={true}
-                                draggable={false}
-                                aria-current={active ? "page" : undefined}
-                                className={cn(
-                                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-150",
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                                     active
-                                        ? "bg-primary/10 text-[var(--foreground)] shadow-[inset_2px_0_0_var(--primary)]"
-                                        : "text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]",
-                                )}
+                                        ? "bg-primary/10 text-primary shadow-[var(--glow-subtle)]"
+                                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)]"
+                                }`}
                             >
-                                <Icon className="h-5 w-5 shrink-0" />
-                                {label}
+                                <item.icon className="h-4 w-4" />
+                                {item.label}
                             </Link>
                         );
                     })}
                 </nav>
 
-                {/* User section */}
-                <div className="border-t border-[var(--border)] p-4 space-y-3">
-                    <div className="flex items-center gap-3 px-1">
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback className="text-xs bg-[var(--secondary)] text-[var(--foreground)]">
-                                {initials}
-                            </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
-                                {(user.user_metadata?.name as
-                                    | string
-                                    | undefined) ?? "Athlete"}
-                            </p>
-                            <p className="text-xs text-[var(--muted-foreground)] truncate">
-                                {user.email}
-                            </p>
-                        </div>
-                    </div>
-                    <Link
-                        href={`/profile/${user.id}`}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
-                    >
-                        <UserCircle className="h-4 w-4" />
-                        View profile
-                    </Link>
-                    <Link
-                        href="/seasons"
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
-                    >
-                        <CalendarDays className="h-4 w-4" />
-                        Seasons
-                    </Link>
+                <div className="flex items-center gap-2 pr-4">
                     <button
                         onClick={toggleTheme}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                        className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                        title="Toggle theme"
                     >
                         {theme === "dark" ? (
                             <Sun className="h-4 w-4" />
                         ) : (
                             <Moon className="h-4 w-4" />
                         )}
-                        {theme === "dark" ? "Light mode" : "Dark mode"}
                     </button>
-                    <form action={logout}>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            type="submit"
-                            className="w-full justify-start text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+
+                    <div className="relative">
+                        <button
+                            onClick={() => setProfileOpen((v) => !v)}
+                            className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                         >
-                            <LogOut className="h-4 w-4" />
-                            Sign out
-                        </Button>
-                    </form>
-                </div>
-            </aside>
+                            <Avatar className="h-8 w-8 ring-1 ring-primary/10">
+                                <AvatarFallback className="text-xs bg-primary/10 text-[var(--foreground)]">
+                                    {initials}
+                                </AvatarFallback>
+                            </Avatar>
+                        </button>
 
-            {/* ===== MOBILE: Bottom tab bar ===== */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--background)]/90 backdrop-blur-xl border-t border-[var(--border)] pb-[env(safe-area-inset-bottom)]">
-                <div className="flex items-center justify-around px-1 h-16">
-                    {mobileNavItems.map(({ href, icon: Icon, label }) => {
-                        const active =
-                            pathname === href ||
-                            pathname.startsWith(href + "/");
-                        return (
-                            <Link
-                                key={href}
-                                href={href}
-                                prefetch={true}
-                                draggable={false}
-                                aria-label={label}
-                                aria-current={active ? "page" : undefined}
-                                className={cn(
-                                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl min-w-[3.5rem] touch-manipulation transition-colors duration-150 active:scale-95",
-                                    active
-                                        ? "text-[var(--foreground)]"
-                                        : "text-[var(--muted-foreground)]",
-                                )}
-                            >
+                        {profileOpen && (
+                            <>
                                 <div
-                                    className={cn(
-                                        "p-1 rounded-lg transition-shadow",
-                                        active && "bg-primary/15 shadow-[0_0_12px_-2px_var(--primary)]",
-                                    )}
-                                >
-                                    <Icon
-                                        className={cn(
-                                            "h-5 w-5",
-                                            active && "scale-110",
-                                        )}
-                                    />
-                                </div>
-                                <span className="text-[10px] font-medium">
-                                    {label}
-                                </span>
-                            </Link>
-                        );
-                    })}
-                </div>
-            </nav>
-
-            {/* Mobile: top bar with user info */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-[var(--background)]/80 backdrop-blur-xl">
-                <div>
-                    {currentPageTitle && (
-                        <h1 className="text-lg font-bold">{currentPageTitle}</h1>
-                    )}
-                    {currentPageSubtitle && (
-                        <p className="text-xs text-[var(--muted-foreground)]">
-                            {currentPageSubtitle}
-                        </p>
-                    )}
-                </div>
-                <div className="relative">
-                    <button
-                        onClick={() => setProfileOpen((v) => !v)}
-                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-[var(--secondary)] transition-colors"
-                    >
-                        <Avatar className="h-9 w-9">
-                            <AvatarFallback className="text-xs bg-[var(--secondary)] text-[var(--foreground)]">
-                                {initials}
-                            </AvatarFallback>
-                        </Avatar>
-                    </button>
-                    {profileOpen && (
-                        <>
-                            <div
-                                className="fixed inset-0 z-40"
-                                role="button"
-                                tabIndex={0}
-                                aria-label="Close menu"
-                                onClick={() => setProfileOpen(false)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                        e.preventDefault();
-                                        setProfileOpen(false);
-                                    }
-                                }}
-                            />
-                            <div className="absolute right-0 top-full mt-2 z-50 w-56 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl p-3 space-y-2 animate-scale-in">
-                                <div className="px-2 py-1.5">
-                                    <p className="text-sm font-medium truncate">
-                                        {(user.user_metadata?.name as
-                                            | string
-                                            | undefined) ?? "Athlete"}
-                                    </p>
-                                    <p className="text-xs text-[var(--muted-foreground)] truncate">
-                                        {user.email}
-                                    </p>
-                                </div>
-                                <div className="border-t border-[var(--border)] pt-2">
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setProfileOpen(false)}
+                                />
+                                <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-2xl glass-elevated p-2 space-y-1 animate-scale-in">
+                                    <div className="px-3 py-2">
+                                        <p className="text-sm font-medium truncate">
+                                            {userName}
+                                        </p>
+                                        <p className="text-xs text-[var(--muted-foreground)] truncate">
+                                            {user.email}
+                                        </p>
+                                    </div>
+                                    <div className="h-px bg-[var(--border)]" />
                                     <Link
                                         href={`/profile/${user.id}`}
                                         onClick={() => setProfileOpen(false)}
-                                        className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                                     >
                                         <UserCircle className="h-4 w-4 shrink-0" />
                                         View profile
@@ -343,7 +178,7 @@ export function AppNav({ user }: { user: User }) {
                                     <Link
                                         href="/seasons"
                                         onClick={() => setProfileOpen(false)}
-                                        className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                                     >
                                         <CalendarDays className="h-4 w-4 shrink-0" />
                                         Seasons
@@ -353,7 +188,7 @@ export function AppNav({ user }: { user: User }) {
                                             toggleTheme();
                                             setProfileOpen(false);
                                         }}
-                                        className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                                     >
                                         {theme === "dark" ? (
                                             <Sun className="h-4 w-4 shrink-0" />
@@ -362,21 +197,157 @@ export function AppNav({ user }: { user: User }) {
                                         )}
                                         Toggle theme
                                     </button>
+                                    <div className="h-px bg-[var(--border)]" />
                                     <form action={logout}>
                                         <button
                                             type="submit"
-                                            className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-[var(--muted-foreground)] hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-destructive hover:bg-destructive/10 transition-colors"
                                         >
                                             <LogOut className="h-4 w-4 shrink-0" />
                                             Sign out
                                         </button>
                                     </form>
                                 </div>
-                            </div>
-                        </>
-                    )}
+                            </>
+                        )}
+                    </div>
                 </div>
-            </div>
+            </header>
+
+            {/* Mobile top bar */}
+            <header className="md:hidden flex items-center justify-between h-14 fixed top-0 inset-x-0 z-50 glass-subtle border-b border-[var(--border)] px-4">
+                <div className="flex items-center gap-2.5">
+                    <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
+                        <Dumbbell className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-sm font-semibold truncate">
+                            {getPageTitle()}
+                        </p>
+                        {getPageSubtitle() && (
+                            <p className="text-[11px] text-[var(--muted-foreground)] truncate">
+                                {getPageSubtitle()}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => setProfileOpen((v) => !v)}
+                    className="p-1 rounded-full"
+                >
+                    <Avatar className="h-8 w-8 ring-1 ring-primary/10">
+                        <AvatarFallback className="text-xs bg-primary/10 text-[var(--foreground)]">
+                            {initials}
+                        </AvatarFallback>
+                    </Avatar>
+                </button>
+
+                {profileOpen && (
+                    <>
+                        <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setProfileOpen(false)}
+                        />
+                        <div className="absolute right-4 top-full mt-1 z-50 w-60 rounded-2xl glass-elevated p-2 space-y-1 animate-scale-in">
+                            <div className="px-3 py-2">
+                                <p className="text-sm font-medium truncate">
+                                    {userName}
+                                </p>
+                                <p className="text-xs text-[var(--muted-foreground)] truncate">
+                                    {user.email}
+                                </p>
+                            </div>
+                            <div className="h-px bg-[var(--border)]" />
+                            <Link
+                                href={`/profile/${user.id}`}
+                                onClick={() => setProfileOpen(false)}
+                                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                            >
+                                <UserCircle className="h-4 w-4 shrink-0" />
+                                View profile
+                            </Link>
+                            <Link
+                                href="/seasons"
+                                onClick={() => setProfileOpen(false)}
+                                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                            >
+                                <CalendarDays className="h-4 w-4 shrink-0" />
+                                Seasons
+                            </Link>
+                            <Link
+                                href="/body"
+                                onClick={() => setProfileOpen(false)}
+                                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                            >
+                                <Scale className="h-4 w-4 shrink-0" />
+                                Body metrics
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    toggleTheme();
+                                    setProfileOpen(false);
+                                }}
+                                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                            >
+                                {theme === "dark" ? (
+                                    <Sun className="h-4 w-4 shrink-0" />
+                                ) : (
+                                    <Moon className="h-4 w-4 shrink-0" />
+                                )}
+                                Toggle theme
+                            </button>
+                            <div className="h-px bg-[var(--border)]" />
+                            <form action={logout}>
+                                <button
+                                    type="submit"
+                                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                >
+                                    <LogOut className="h-4 w-4 shrink-0" />
+                                    Sign out
+                                </button>
+                            </form>
+                        </div>
+                    </>
+                )}
+            </header>
+
+            {/* Mobile bottom tabs */}
+            <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 glass-elevated border-t border-[var(--border)] pb-[env(safe-area-inset-bottom)]">
+                <div className="flex items-center justify-around h-16 px-2">
+                    {MOBILE_TABS.map((item) => {
+                        const active = isActive(item.href);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex flex-col items-center justify-center gap-0.5 min-w-0 flex-1 py-1 rounded-xl transition-all duration-200 ${
+                                    active
+                                        ? "text-primary"
+                                        : "text-[var(--muted-foreground)]"
+                                }`}
+                            >
+                                <div
+                                    className={`relative flex items-center justify-center h-8 w-14 rounded-xl transition-all duration-200 ${
+                                        active
+                                            ? "bg-primary/10 shadow-[var(--glow-subtle)]"
+                                            : ""
+                                    }`}
+                                >
+                                    <item.icon
+                                        className={`h-5 w-5 transition-transform duration-200 ${
+                                            active ? "scale-110" : ""
+                                        }`}
+                                    />
+                                </div>
+                                <span className="text-[10px] font-medium leading-none">
+                                    {item.mobileLabel ?? item.label}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </nav>
         </>
     );
 }

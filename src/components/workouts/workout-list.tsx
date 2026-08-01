@@ -94,7 +94,7 @@ export function WorkoutList({ workouts, weightUnit = "KG" }: { workouts: Workout
             </div>
 
             {filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
+                <div className="rounded-2xl border border-[var(--border-light)] glass p-12 flex flex-col items-center justify-center text-center gap-3">
                     <Dumbbell className="h-8 w-8 text-[var(--muted-foreground)] opacity-40" />
                     <p className="text-sm text-[var(--muted-foreground)]">
                         No workouts match &ldquo;{search}&rdquo;
@@ -110,12 +110,11 @@ export function WorkoutList({ workouts, weightUnit = "KG" }: { workouts: Workout
                                 <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-widest">
                                     {group}
                                 </h2>
-                                <span className="text-[10px] tabular-nums text-[var(--muted-foreground)]/60">
+                                <span className="inline-flex items-center justify-center h-4 min-w-4 px-1.5 rounded-full bg-white/[0.06] text-[10px] tabular-nums text-[var(--muted-foreground)]">
                                     {grouped[group].length}
                                 </span>
-                                <div className="h-px flex-1 bg-[var(--border)]" />
                             </div>
-                            <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                            <div className="rounded-2xl border border-[var(--border-light)] glass divide-y divide-[var(--border-light)] overflow-hidden">
                                 {grouped[group].map((workout, index) => {
                                     const volume = calculateVolume(
                                         workout.sets,
@@ -127,7 +126,7 @@ export function WorkoutList({ workouts, weightUnit = "KG" }: { workouts: Workout
                                             href={`/workouts/${workout.id}`}
                                             prefetch={true}
                                             draggable={false}
-                                            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40"
+                                            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-white/[0.04]"
                                         >
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 min-w-0">
@@ -138,7 +137,7 @@ export function WorkoutList({ workouts, weightUnit = "KG" }: { workouts: Workout
                                                             )}
                                                     </span>
                                                     {workout.season && (
-                                                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--secondary)] text-[var(--muted-foreground)] border border-[var(--border)]">
+                                                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full glass border border-[var(--border-light)] text-[var(--muted-foreground)]">
                                                             {workout.season.name}
                                                         </span>
                                                     )}

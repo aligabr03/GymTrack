@@ -23,11 +23,11 @@ export default async function EditWorkoutPage({
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                <div className="p-2.5 rounded-xl glass glow-subtle">
                     <ClipboardList className="h-6 w-6 text-[var(--foreground)]" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold">Edit Workout</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Edit Workout</h1>
                     <p className="text-sm text-[var(--muted-foreground)]">
                         Update your workout log
                     </p>

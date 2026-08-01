@@ -11,13 +11,19 @@ import {
 
 const PageTitleContext = createContext<{
     title: string | null;
-    setTitle: (t: string | null) => void;
-}>({ title: null, setTitle: () => {} });
+    subtitle: string | null;
+    setTitle: (t: string | null, s?: string | null) => void;
+}>({ title: null, subtitle: null, setTitle: () => {} });
 
 export function PageTitleProvider({ children }: { children: ReactNode }) {
     const [title, setTitle] = useState<string | null>(null);
+    const [subtitle, setSubtitle] = useState<string | null>(null);
+    const set = useCallback((t: string | null, s?: string | null) => {
+        setTitle(t);
+        if (s !== undefined) setSubtitle(s);
+    }, []);
     return (
-        <PageTitleContext.Provider value={{ title, setTitle }}>
+        <PageTitleContext.Provider value={{ title, subtitle, setTitle: set }}>
             {children}
         </PageTitleContext.Provider>
     );
@@ -28,13 +34,11 @@ export function usePageTitle() {
 }
 
 /** Drop this into any server-rendered page to override the mobile header title. */
-export function SetPageTitle({ title }: { title: string }) {
+export function SetPageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
     const { setTitle } = useContext(PageTitleContext);
-    // Reset on unmount so navigating away doesn't leave a stale title.
-    const stableSet = useCallback(setTitle, []); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
-        stableSet(title);
-        return () => stableSet(null);
-    }, [title, stableSet]);
+        setTitle(title, subtitle ?? null);
+        return () => setTitle(null, null);
+    }, [title, subtitle, setTitle]);
     return null;
 }

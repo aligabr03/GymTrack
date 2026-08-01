@@ -38,7 +38,7 @@ const MONTHS = [
 ];
 
 function intensity(count: number): string {
-    if (count === 0) return "bg-[var(--secondary)]";
+    if (count === 0) return "bg-white/[0.05]";
     return "bg-[var(--foreground)]";
 }
 
@@ -185,12 +185,12 @@ export function WorkoutCalendar({ year, data, workoutPathPrefix = "/workouts" }:
                     <DialogHeader>
                         <DialogTitle>{selectedDay}</DialogTitle>
                     </DialogHeader>
-                    <ul className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden mt-2">
+                    <ul className="glass rounded-2xl divide-y divide-[var(--border)] overflow-hidden mt-2">
                         {selectedWorkouts.map((w) => (
                             <li key={w.id}>
                                 <Link
                                     href={resolveHref(w.id)}
-                                    className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--secondary)]/40"
+                                    className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-white/[0.04]"
                                     onClick={() => setSelectedDay(null)}
                                 >
                                     <span className="flex-1 text-sm font-medium truncate">

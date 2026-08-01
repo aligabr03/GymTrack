@@ -198,7 +198,7 @@ export function WorkoutDetailClient({
             </div>
 
             {workout.notes && (
-                <Card>
+        <Card className="glow-subtle">
                     <CardContent className="p-4">
                         <p className="text-sm text-[var(--muted-foreground)]">
                             {workout.notes}
@@ -213,13 +213,13 @@ export function WorkoutDetailClient({
                     item.type === "superset" ? (
                         <div key={item.ssId} className="space-y-2">
                             <div className="flex items-center gap-3 px-1">
-                                <div className="h-px flex-1 bg-[var(--border)]" />
+                                <div className="h-px flex-1 bg-[var(--border-light)]" />
                                 <span className="text-[10px] font-bold tracking-widest text-[var(--muted-foreground)] uppercase">
                                     Superset
                                 </span>
-                                <div className="h-px flex-1 bg-[var(--border)]" />
+                                <div className="h-px flex-1 bg-[var(--border-light)]" />
                             </div>
-                            <div className="pl-3 border-l-2 border-[var(--border)] space-y-2">
+                            <div className="pl-3 border-l-2 border-[var(--border-light)] space-y-2">
                                 {item.exercises.map(({ exercise, sets }) => (
                                     <ExerciseCard
                                         key={exercise.id}
@@ -270,7 +270,7 @@ function ExerciseCard({
         null as ((typeof sets)[0] & { e1rm?: number }) | null,
     );
     return (
-        <Card>
+        <Card className="glow-subtle">
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-base">
@@ -308,8 +308,8 @@ function ExerciseCard({
                                 key={s.id}
                                 className={`grid grid-cols-[2rem_1fr_1fr_1fr] gap-2 items-center px-1 py-1 rounded transition-colors text-sm ${
                                     s.isDropset
-                                        ? "bg-[var(--secondary)]/60"
-                                        : "hover:bg-[var(--secondary)]"
+                                        ? "bg-white/[0.04]"
+                                        : "hover:bg-white/[0.04]"
                                 }`}
                             >
                                 <span
@@ -369,7 +369,7 @@ function SummaryCard({
     icon?: React.ReactNode;
 }) {
     return (
-        <Card>
+        <Card className="glow-subtle">
             <CardContent className="p-4">
                 <p className="text-xs text-[var(--muted-foreground)]">
                     {label}

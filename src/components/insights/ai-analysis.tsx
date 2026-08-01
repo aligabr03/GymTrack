@@ -89,7 +89,7 @@ export function AiAnalysisCard({ initial }: Props) {
                             Generated {formatRelative(data.updatedAt)}
                         </p>
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             onClick={handleRefresh}
                             disabled={isPending}

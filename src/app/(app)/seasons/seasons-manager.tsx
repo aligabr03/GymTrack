@@ -124,7 +124,7 @@ export function SeasonsManager({
             {/* Desktop header */}
             <div className="hidden md:flex items-center justify-between animate-fade-in">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                    <div className="p-2.5 rounded-lg bg-white/[0.06]">
                         <CalendarDays className="h-6 w-6 text-[var(--foreground)]" />
                     </div>
                     <div>
@@ -147,7 +147,7 @@ export function SeasonsManager({
             </Button>
 
             {seasons.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
+                <div className="glass rounded-2xl flex flex-col items-center justify-center text-center py-16 gap-3">
                     <CalendarDays className="h-8 w-8 text-[var(--muted-foreground)] opacity-40" />
                     <p className="text-sm text-[var(--muted-foreground)]">
                         No seasons yet. Create one to group workouts for focused comparisons.

@@ -28,7 +28,7 @@ export default async function FriendsPage() {
         <div className="space-y-6">
             {/* Desktop header */}
             <div className="hidden md:flex items-center gap-3 animate-fade-in">
-                <div className="p-2.5 rounded-lg bg-[var(--secondary)]">
+                <div className="p-2.5 rounded-lg bg-white/[0.06]">
                     <Users className="h-6 w-6 text-[var(--foreground)]" />
                 </div>
                 <div>
@@ -54,7 +54,7 @@ export default async function FriendsPage() {
                 </div>
 
                 {feed.length === 0 ? (
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 text-center">
+                    <div className="glass rounded-2xl p-8 text-center">
                         <Dumbbell className="h-8 w-8 text-[var(--muted-foreground)]/40 mx-auto mb-3" />
                         <p className="text-sm font-medium">No activity yet</p>
                         <p className="text-xs text-[var(--muted-foreground)] mt-1">
@@ -62,14 +62,14 @@ export default async function FriendsPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                    <div className="glass rounded-2xl divide-y divide-[var(--border)] overflow-hidden">
                         {feed.map(({ workout, profile }) => {
                             const volume = calculateVolume(workout.sets);
                             return (
                                 <Link
                                     key={workout.id}
                                     href={`/profile/${profile.userId}/workouts/${workout.id}`}
-                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--muted)] transition-colors"
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors"
                                 >
                                     <Avatar className="h-8 w-8 shrink-0">
                                         <AvatarFallback className="text-xs bg-[var(--secondary)]">
@@ -109,7 +109,7 @@ export default async function FriendsPage() {
             <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Athletes</h2>
                 {users.length === 0 ? (
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 text-center">
+                    <div className="glass rounded-2xl p-8 text-center">
                         <Users className="h-8 w-8 text-[var(--muted-foreground)]/40 mx-auto mb-3" />
                         <p className="text-sm font-medium">
                             No other athletes yet
@@ -119,7 +119,7 @@ export default async function FriendsPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)] overflow-hidden">
+                    <div className="glass rounded-2xl divide-y divide-[var(--border)] overflow-hidden">
                         {users.map((u) => (
                             <div
                                 key={u.userId}
