@@ -655,6 +655,7 @@ export function WorkoutLogger({
     function handleSave() {
         const setDrafts = groups.flatMap((group) =>
             group.sets.map((set) => ({
+                id: set.id,
                 exerciseId: set.exerciseId,
                 exerciseName: group.exerciseName,
                 setNumber: set.setNumber,
@@ -689,6 +690,7 @@ export function WorkoutLogger({
         }
 
         const allSets = setDrafts.map((set) => ({
+            id: set.id,
             exerciseId: set.exerciseId,
             setNumber: set.setNumber,
             weightKg: weightUnit === "LBS" ? lbsToKg(parseFloat(set.weightKg)) : parseFloat(set.weightKg),
@@ -789,7 +791,7 @@ export function WorkoutLogger({
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="w-full max-w-full"
+                            className="w-full max-w-full min-w-0"
                         />
                     </div>
                     <div className="space-y-2">

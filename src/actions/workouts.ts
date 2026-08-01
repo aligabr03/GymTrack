@@ -91,6 +91,7 @@ export async function updateWorkout(
         include: {
             sets: {
                 select: {
+                    id: true,
                     exerciseId: true,
                 },
             },
@@ -105,7 +106,8 @@ export async function updateWorkout(
         return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const existingSetIds = existing.sets.map((s) => s.exerciseId);
+    const existingExerciseIds = existing.sets.map((s) => s.exerciseId);
+    const existingSetIds = new Set(existing.sets.map((s) => s.id));
     const incomingSetIds = parsed.data.sets.map((s) => s.id).filter(Boolean) as string[];
 
     // Delete sets that are no longer in the payload
@@ -128,7 +130,7 @@ export async function updateWorkout(
             isDropset: s.isDropset,
             supersetId: s.supersetId,
         };
-        if (s.id) {
+        if (s.id && existingSetIds.has(s.id)) {
             return prisma.workoutSet.update({
                 where: { id: s.id },
                 data: setData,
@@ -154,7 +156,7 @@ export async function updateWorkout(
     });
 
     const newPRs = await syncPersonalRecordsForExercises(userId, [
-        ...existingSetIds,
+        ...existingExerciseIds,
         ...parsed.data.sets.map((set) => set.exerciseId),
     ]);
 

@@ -138,6 +138,7 @@ export function BodyMetricsLogger({ metrics, weightUnit = "KG" }: { metrics: Bod
                                         type="date"
                                         value={form.date}
                                         onChange={field("date")}
+                                        className="w-full max-w-full min-w-0"
                                     />
                                 </div>
                                 <div className="space-y-2">

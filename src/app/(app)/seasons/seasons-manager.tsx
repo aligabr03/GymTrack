@@ -236,6 +236,7 @@ export function SeasonsManager({
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
+                                    className="w-full max-w-full min-w-0"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -244,6 +245,7 @@ export function SeasonsManager({
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
+                                    className="w-full max-w-full min-w-0"
                                 />
                             </div>
                         </div>
